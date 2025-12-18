@@ -1,4 +1,4 @@
-const Canvas = { CanvasRenderingContext2D: { prototype: {} } }// require('canvas');
+const Canvas = require('canvas'); // { CanvasRenderingContext2D: { prototype: {} } }// require('canvas');
 const Tokenizer = require('./tokenizer');
 
 /** @typedef {'preserve-word'|'break-longest'|'break-anywhere'} BreakRule */
