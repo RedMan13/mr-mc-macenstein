@@ -2,13 +2,53 @@
 	"history": [
 		{
 			"naughty": "naughty",
-			"wish": "i wish santa",
-			"reason": "Ho ho ho! It seems like you're still in a mischievous mood, ddededodediamante. Wishing for \"santa\" without more detail, after your previous wish, makes Santa wonder what kind of antics you're planning! Think about spreading joy, not just farts or vague wishes!"
+			"wish": "i wish for protogen",
+			"reason": "Ho ho ho! It seems ddededodediamante is still struggling with giving Santa specific, joyful wishes! After your previous \"RAM\" wish was marked naughty for being too vague and lacking context, simply wishing for \"protogen\" falls into the same category. Santa needs to know *why* you want a protogen, or what you intend to do with it, to make it a truly nice wish! Let's think of something more descriptive and full of holiday spirit!"
+		},
+		{
+			"naughty": "naughty",
+			"wish": "i wish for sopa",
+			"reason": "Ho ho ho! Sopa, ddededodediamante? After your previous wishes for \"computer\" and \"RAM\" were marked naughty for being too vague and lacking detail, wishing for just \"sopa\" (which means soup, by the way!) is more of the same! Santa needs to know more than just a single word to make a wish come true with festive cheer. What kind of sopa? Is it for warmth? To share? Let's try for a wish with more specifics and a touch of holiday spirit, shall we?"
+		},
+		{
+			"naughty": "naughty",
+			"wish": "i wish for santa to be so cool",
+			"reason": "Ho ho ho! It seems ddededodediamante is back with another rather... unusual request! After your previous \"sopa\" wish was marked naughty for being too vague, wishing for \"santa to be so cool\" isn't quite the kind of specific, tangible gift Santa looks for. While Santa appreciates the compliment, it's more about changing how Santa is perceived, which is beyond the scope of a simple wish! Let's aim for something that brings a tangible bit of joy, shall we?"
+		},
+		{
+			"naughty": "naughty",
+			"wish": "i wish santa was on the nice list",
+			"reason": "Ho ho ho! Well, well, well, ddededodediamante, you're certainly keeping Santa on his toes! After your previous wish about \"santa to be so cool\" was marked naughty because it was trying to change how Santa is perceived rather than wishing for a tangible gift, wishing for \"santa was on the nice list\" falls into that very same category! Santa's list is for *others*, not for himself, and it's certainly not something that can be wished into existence by a simple plea. Let's try for a wish that brings joy to *you* or to others, in a tangible way!"
+		},
+		{
+			"naughty": "naughty",
+			"wish": "i wish to be on the nice list",
+			"reason": "Ho ho ho! Well, well, well, ddededodediamante, it seems we're circling back to the same frosty snowdrift! After your previous wishes about \"santa to be so cool\" and \"santa was on the nice list\" were marked naughty because they were trying to change how Santa or his list is perceived, wishing for *yourself* to \"be on the nice list\" falls into that very same category! The nice list is earned through good deeds and thoughtful wishes, not by simply wishing to be on it! Santa encourages you to show your festive spirit with a tangible, joyful wish for yourself or others!"
+		},
+		{
+			"naughty": "naughty",
+			"wish": "i wish for coal to do grill",
+			"reason": "Ho ho ho! It seems ddededodediamante is still struggling with giving Santa specific, joyful wishes! After your previous \"cookie\" wish was marked naughty for being repetitive and lacking thought, and then wishes for \"stuff,\" \"computer,\" \"RAM,\" \"protogen,\" and \"sopa\" were all too vague, simply wishing for \"coal to do grill\" is more of the same! Santa needs to know *why* you want this coal, and for whom, to make it a truly nice wish! Are you wishing for a grill? For a BBQ? Let's think of something more descriptive and full of holiday spirit!"
+		},
+		{
+			"naughty": "naughty",
+			"wish": "i wish for i told you that i was going to use the coal for a grill",
+			"reason": "Ho ho ho! Ddededodediamante, you're certainly trying to explain yourself, but this is still a bit of a frosty situation! After your previous wish for \"coal to do grill\" was marked naughty for being too vague, simply stating \"i told you that i was going to use the coal for a grill\" isn't a *new wish* for Santa to grant! It's an explanation for a previous naughty wish, and it still doesn't constitute a clear, specific, and joyful wish for Santa to fulfill. Santa needs a fresh wish, full of holiday spirit and specific details, not an explanation for a past one! Let's try again with a proper wish, shall we?"
+		},
+		{
+			"naughty": "naughty",
+			"wish": "i wish for a toy",
+			"reason": "Ho ho ho! Ddededodediamante, it seems you're still on a path of frosty ambiguity! After your previous \"coal to do grill\" wish was marked naughty for being too vague, and then your attempt to *explain* that wish was also naughty because it wasn't a new wish, simply wishing for \"a toy\" is still far too general! Santa needs specifics to spread cheer. What kind of toy? For whom? Let's try for a wish with more descriptive detail and a sprinkle of festive spirit, shall we? You're still falling into the same trap of vague wishes, my friend!"
 		},
 		{
 			"naughty": "nice",
-			"wish": "i wish for a cookie",
-			"reason": "Yes"
+			"wish": "i wish for a car toy that is red and has four wheels and is a hot wheels",
+			"reason": "Ho ho ho! Well, ddededodediamante, look at you go! After your previous \"toy\" wish was marked naughty for being too vague, you've finally given Santa the details he needs for a truly nice wish! A red car toy with four wheels that's a Hot Wheels – now *that's* a specific and joyful request! Santa can certainly make that happen. Keep up the good work with these descriptive wishes!"
+		},
+		{
+			"naughty": "nice",
+			"wish": "i wish for a DVD of the movie Frozen 2",
+			"reason": "Ho ho ho! Well, ddededodediamante, you're back on the nice list with another perfectly clear and joyful wish! After your previous \"car toy that is red and has four wheels and is a hot wheels\" was marked nice for its wonderful specificity, wishing for \"a DVD of the movie Frozen 2\" is just as delightful and easy for Santa to grant! Keep these wonderful, clear wishes coming!"
 		}
 	]
 }

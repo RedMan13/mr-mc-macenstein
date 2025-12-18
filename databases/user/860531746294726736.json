@@ -3,11 +3,6 @@
 	"reason": "Godslayerakp, a fish? After such a lovely wish for everyone, you wish for a single fish? While it's not inherently bad, it's a bit of a letdown after showing such wonderful spirit. It's not a *bad* wish, but it's certainly not as nice as your previous one. It feels a bit... selfish.",
 	"history": [
 		{
-			"naughty": "`nice`",
-			"wish": "santa",
-			"reason": "`Ho ho ho! A simple \"Santa\" is always a nice thing to hear, especially from a cheerful soul like you, godslayerakp! It shows you're thinking of me.`"
-		},
-		{
 			"naughty": "nice",
 			"wish": "i wish for a meat loaf",
 			"reason": "Ho ho ho! A meat loaf, you say? A wholesome and hearty wish, godslayerakp! It certainly brings a smile to my face. A nice warm meal is always a nice thing to ask for."
@@ -51,6 +46,11 @@
 			"naughty": "naughty",
 			"wish": "i wish for the pm port to finally be finished",
 			"reason": "Ho ho ho, godslayerakp! Wishing for \"the pm port to finally be finished\" is a bit like your previous wishes to change how things are managed or perceived. While I appreciate your enthusiasm for the PenguinMod Port, I cannot simply \"finish\" a complex software development project with a wave of my hand! That requires the hard work of developers like Jeremy, gsa, Sharkpool, ian, and jwk. It's similar to wishing for Blockly to \"not be bad\" or for Fresh to give jwk ownership – it's wishing to change the state of an ongoing project and the efforts of others, which is outside my festive powers. That's a naughty wish, my friend!"
+		},
+		{
+			"naughty": "naughty",
+			"wish": "i wish for some pizza",
+			"reason": "Ho ho ho, godslayerakp! A wish for pizza, you say? While normally a nice and simple wish for a tasty treat, I must remember your previous tendencies! You've been wishing for me to interfere with how things are managed and how projects progress, like the PM port or the ownership of PenguinMod. Simply giving you a pizza wouldn't change those naughty tendencies, and I suspect you might next ask for a pizza that magically finishes the PM port or has the perfect amount of toppings to convince Fresh to give jwk ownership! I need to ensure you understand that my magic is for spreading cheer, not for manipulating the world or its projects. So, while pizza itself is nice, this wish, coming from you with your recent history of trying to influence things, makes me a little suspicious of its true intent! For now, to reinforce the lesson from your previous naughty wishes, this is a naughty wish!"
 		}
 	]
 }
