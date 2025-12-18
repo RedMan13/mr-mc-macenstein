@@ -8,21 +8,24 @@ async function respondSanta(message, naughty = '', ...reason) {
     userWishes.get('history').push({ naughty, wish: message.content, reason: reason.join('; ') });
     if (userWishes.get('history').length > maxMemory)
     	userWishes.get('history').splice(0, userWishes.get('history').length - maxMemory);
+    userWishes.flush();
     message.react('📃');
     const webhook = await imports.client.fetchWebhook(messageChannel.get('webhookId'), messageChannel.get('webhookToken')).catch(() => null);
 
     const embed = new EmbedBuilder()
         .setColor(naughty.toLowerCase().includes('nice') ? 0x00FF00 : 0xFF0000)
         .setTitle(`${message.author.username} is on the ${naughty} list!`)
-        .setDescription(`${reason.join('; ')}. ${message.author}`)
+        .setDescription(`${reason.join('; ')} ${message.author}`)
         .setAuthor({
             name: "Santa Claus",
             url: "https://godslayerakp.serv00.net",
             iconURL: "https://pics.clipartpng.com/Cute_Santa_PNG_Clipart-21.png",
         });
-    if (!webhook) return message.reply({ embeds: [embed] });
-    webhook.send({ embeds: [embed] });
-    return userWishes.flush();
+    const reply = !webhook 
+        ? await message.reply({ embeds: [embed] }).catch(() => null)
+        : await webhook.send({ embeds: [embed] }).catch(() => null);
+    if (!reply) message.reply(`You are ${naughty} because ${reason.join('; ')}`.slice(0, 2000));
+    return;
 }
 module.exports = {
     name: 'messageCreate',
@@ -93,7 +96,7 @@ FreshPenguin112 id is 712497713043734539`
         if (!response.text) {
             react.remove().catch(() => {});
             message.react('👋');
-            const msg = await dbs.channels.saintlets.send(`<@&1449223667992105112> ${wish}`.slice(0, 4000)).catch(err => err);
+            const msg = await dbs.channels.saintlets.send(`<@&1449223667992105112> ${wish}`.slice(0, 2000)).catch(err => err);
             if (msg instanceof Error) return console.error('could not make human request', msg);
             if (!logsChannel.has('wishes')) logsChannel.set('wishes', {});
             logsChannel.get('wishes')[msg.id] = {
