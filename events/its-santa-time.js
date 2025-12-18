@@ -93,7 +93,7 @@ FreshPenguin112 id is 712497713043734539`
         if (!response.text) {
             react.remove().catch(() => {});
             message.react('👋');
-            const msg = await dbs.channels.saintlets.send(`<@&1449223667992105112> ${wish}`).catch(err => err);
+            const msg = await dbs.channels.saintlets.send(`<@&1449223667992105112> ${wish}`.slice(0, 4000)).catch(err => err);
             if (msg instanceof Error) return console.error('could not make human request', msg);
             if (!logsChannel.has('wishes')) logsChannel.set('wishes', {});
             logsChannel.get('wishes')[msg.id] = {
