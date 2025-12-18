@@ -12,7 +12,7 @@ module.exports = {
      * @param {import('discord.js').Interaction} interaction
      */
     execute: async (interaction) => {
-        await interaction.deferReply().catch(() => null);
+        await interaction.deferReply().catch(err => console.warn(err));
         return;
         /** @type {Blob} */
         const blob = await imports.createQuoteCard(await interaction.targetMessage);

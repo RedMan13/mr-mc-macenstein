@@ -50,7 +50,7 @@ module.exports = async (message, args, slash) => {
             member = member.replace('<@', '').replace('>', '')
             await message.guild.members.fetch(member).then(member => {
                 result[name] = member
-            }).catch(() => null);
+            }).catch(err => console.warn(err));
             break;
         case 'channel':
             let channel = argContent
@@ -58,7 +58,7 @@ module.exports = async (message, args, slash) => {
             channel = channel.replace('<#', '').replace('>', '')
             await imports.client.channels.fetch(channel).then(channel => {
                 result[name] = channel
-            }).catch(() => null);
+            }).catch(err => console.warn(err));
             break;
         case 'role':
             let role = argContent

@@ -44,8 +44,8 @@ async function createQuoteCard(message) {
     ctx.scale(imageScale);
     ctx.fillStyle = 'black';
     ctx.fillRect(0,0, 640,480);
-    const guild = message.guild ?? imports.client.guilds.fetch(message.guildId).catch(() => null);
-    const member = message.member ?? guild?.members?.fetch?.(message.author.id).catch(() => null);
+    const guild = message.guild ?? imports.client.guilds.fetch(message.guildId).catch(err => console.warn(err));
+    const member = message.member ?? guild?.members?.fetch?.(message.author.id).catch(err => console.warn(err));
     const avatar = await loadImage(
         member?.avatarURL?.({ extension: 'png', size: findBitEdge(360 * imageScale) }) ??
         message.author.avatarURL({ extension: 'png', size: findBitEdge(360 * imageScale) })

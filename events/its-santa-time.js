@@ -10,7 +10,7 @@ async function respondSanta(message, naughty = '', ...reason) {
     	userWishes.get('history').splice(0, userWishes.get('history').length - maxMemory);
     userWishes.flush();
     message.react('📃');
-    const webhook = await imports.client.fetchWebhook(messageChannel.get('webhookId'), messageChannel.get('webhookToken')).catch(() => null);
+    const webhook = await imports.client.fetchWebhook(messageChannel.get('webhookId'), messageChannel.get('webhookToken')).catch(err => console.warn(err));
 
     const embed = new EmbedBuilder()
         .setColor(naughty.toLowerCase().includes('nice') ? 0x00FF00 : 0xFF0000)
@@ -22,8 +22,8 @@ async function respondSanta(message, naughty = '', ...reason) {
             iconURL: "https://pics.clipartpng.com/Cute_Santa_PNG_Clipart-21.png",
         });
     const reply = !webhook 
-        ? await message.reply({ embeds: [embed] }).catch(() => null)
-        : await webhook.send({ embeds: [embed] }).catch(() => null);
+        ? await message.reply({ embeds: [embed] }).catch(err => console.warn(err))
+        : await webhook.send({ embeds: [embed] }).catch(err => console.warn(err));
     if (!reply) message.reply(`You are ${naughty} because ${reason.join('; ')}`.slice(0, 2000));
     return;
 }
@@ -41,12 +41,12 @@ module.exports = {
             const wish = logsChannel.get('wishes')[message.reference.messageId];
             delete logsChannel.get('wishes')[message.reference.messageId];
             logsChannel.flush();
-            const systemMessage = await dbs.channels.saintlets.messages.fetch(message.reference.messageId).catch(() => null);
+            const systemMessage = await dbs.channels.saintlets.messages.fetch(message.reference.messageId).catch(err => console.warn(err));
             if (systemMessage) systemMessage.react('✅');
             const args = message.content.split('; ');
-            const channel = await imports.client.channels.fetch(wish.channel).catch(() => null);
+            const channel = await imports.client.channels.fetch(wish.channel).catch(err => console.warn(err));
             if (!channel) return console.error('the wishing channel is gone');
-            message = await channel.messages.fetch(wish.message).catch(() => null);
+            message = await channel.messages.fetch(wish.message).catch(err => console.warn(err));
             if (!message) return console.error('the wish message is gone');
             respondSanta(message, ...args);
             return;
@@ -55,7 +55,7 @@ module.exports = {
         if (!(message.content.toLowerCase().startsWith('i wish') || message.content.toLowerCase().startsWith('i want') || message.content.toLowerCase().startsWith('santa')))
             return;
         
-        const react = await message.react('🧏‍♂️').catch(() => null);
+        const react = await message.react('🧏‍♂️').catch(err => console.warn(err));
         if (!userWishes.has('history')) userWishes.set('history', []);
         const wish = `the users name is ${message.author.username}, they said \`${message.content}\`. You have said to them the following: \n${userWishes.get('history').map(message => `they said \`${message.wish}\` and were \`${message.naughty}\` because \`${message.reason}\``).join('\n')}`;
         const response = await imports.ai.models.generateContent({

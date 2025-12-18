@@ -18,8 +18,8 @@ class Database {
         setInterval(async () => {
             if (!this.#needsWrite) return;
             console.log(`saving ${path.basename(this.#path)}...`);
-            await fs.mkdir(path.dirname(this.#path), { recursive: true }).catch(() => null);
-            await fs.writeFile(this.#path, JSON.stringify(this.#data, null, '\t')).catch(() => null);
+            await fs.mkdir(path.dirname(this.#path), { recursive: true }).catch(err => console.warn(err));
+            await fs.writeFile(this.#path, JSON.stringify(this.#data, null, '\t')).catch(err => console.warn(err));
             this.#needsWrite = false;
             console.log(`Finished saving ${path.basename(this.#path)}`);
         }, 1000);

@@ -12,6 +12,8 @@ const config = require('./statics/config.json');
 const syncSlash = require('@frostzzone/discord-sync-commands');
 const { createQuoteCard, createQuoteMessage } = require('./statics/quote-generator.js');
 
+process.on('uncaughtException', err => console.warn(err));
+
 globalThis.imports = {
     exec,
     process,
