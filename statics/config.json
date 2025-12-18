@@ -1,0 +1,17 @@
+{
+    "channels": {
+        "saintlets": "1449210762840113163",
+        "console": "983516228691824641"
+    },
+    "server": "865486218351345674",
+    "commands": {
+        "prefix": "mc;",
+        "categorys": [
+            "dumb fun", 
+            "info",
+            "moderators",
+            "settings",
+            "operator"
+        ]
+    }
+}

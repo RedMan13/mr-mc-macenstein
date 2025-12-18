@@ -1,0 +1,16 @@
+{
+	"naughty": "Naughty",
+	"reason": "This wish makes no sense, and needs to be rewritten to be understandable. That's a naughty wish! naughty",
+	"history": [
+		{
+			"naughty": "nice",
+			"wish": "santa",
+			"reason": "Ho ho ho!"
+		},
+		{
+			"naughty": "nice",
+			"wish": "i wish for a pizza as well",
+			"reason": "Another pizza it is, coming right up! Ho ho ho!"
+		}
+	]
+}

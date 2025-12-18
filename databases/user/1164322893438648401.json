@@ -1,0 +1,29 @@
+{
+	"history": [
+		{
+			"naughty": "naughty",
+			"wish": "I wish for",
+			"reason": "Oh ho ho, Lordcat__! It seems you've forgotten to finish your wish! Santa can't grant what isn't fully asked for. You're getting a lump of coal for this one until you learn to complete your sentences!"
+		},
+		{
+			"naughty": "nice",
+			"wish": "I wish for a singular banana muffin",
+			"reason": "A singular banana muffin sounds like a delightful and modest wish, Lordcat__! Santa enjoys a good muffin himself. Keep up the good manners, and perhaps you'll get more than just a muffin!"
+		},
+		{
+			"naughty": "naughty",
+			"wish": "i wish for the pm port",
+			"reason": "Oh ho ho, Lordcat__! It seems you've made the same mistake twice! You wished for \"the pm port\" without clarifying what \"pm\" or \"port\" refers to. Santa can't grant a wish that's incomplete and unclear, just like last time! You're getting another lump of coal until you learn to articulate your wishes properly!"
+		},
+		{
+			"naughty": "nice",
+			"wish": "i wish for a bicycle",
+			"reason": "A bicycle! A wonderful and active wish, Lordcat__! Santa loves to see children wishing for things that promote health and outdoor fun. This is a perfectly delightful wish!"
+		},
+		{
+			"naughty": "naughty",
+			"wish": "i wish for 7",
+			"reason": "Oh ho ho, Lordcat__! It seems you've learned nothing from your past incomplete wishes! Wishing for just \"7\" is even less clear than wishing for \"the pm port\"! Seven what, Lordcat__? Seven reindeer? Seven lumps of coal? Until you learn to make a complete and clear wish, you'll be getting a big, fat lump of coal in your stocking!"
+		}
+	]
+}

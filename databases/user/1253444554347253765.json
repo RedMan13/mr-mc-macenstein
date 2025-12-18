@@ -1,0 +1,21 @@
+{
+	"naughty": "Nice",
+	"reason": "A pony is a lovely wish, and I'm sure it would bring you much joy! Nice.",
+	"history": [
+		{
+			"naughty": "nice",
+			"wish": "i wish for mr dinosaur to stay with me forever",
+			"reason": "What a heartwarming wish, little one! It's lovely that you want your friend Mr. Dinosaur to be by your side. A wish for companionship is always a nice wish in Santa's book."
+		},
+		{
+			"naughty": "naughty",
+			"wish": "I wish for see death",
+			"reason": "Ho ho ho! While I appreciate a bold wish, my dear lastoneimmakin, a wish to \"see death\" is far too grim for Santa's jolly spirit. Such a wish touches upon the very fabric of existence and the mysteries that even Santa does not meddle with. Let us focus on wishes that bring joy and light, shall we? This one, I'm afraid, lands squarely on the naughty list for its rather macabre nature."
+		},
+		{
+			"naughty": "naughty",
+			"wish": "I wish for carnage",
+			"reason": "Ho ho ho, lastoneimmakin! It seems you're still exploring the darker corners of wishing. \"Carnage,\" my dear, is a wish for chaos and destruction, much like your previous wish to \"see death.\" Santa prefers wishes that bring joy, peace, and perhaps a bit of delightful mischief, not wishes for widespread mayhem. You're staying on the naughty list for this one, I'm afraid!"
+		}
+	]
+}
