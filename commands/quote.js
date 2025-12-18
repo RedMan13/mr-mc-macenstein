@@ -12,6 +12,7 @@ module.exports = {
             message.reply('You must reply to a message for this to work');
             return;
         }
+        return;
         /** @type {Blob} */
         const blob = await imports.createQuoteCard(await message.channel.messages.fetch(message.reference.messageId));
         message.reply({

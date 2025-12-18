@@ -13,6 +13,7 @@ module.exports = {
      */
     execute: async (interaction) => {
         await interaction.deferReply().catch(() => null);
+        return;
         /** @type {Blob} */
         const blob = await imports.createQuoteCard(await interaction.targetMessage);
         interaction.editReply({
