@@ -3,6 +3,9 @@ const util = require('util');
 module.exports = {
     name: 'clientReady',
     once: true,
+    /**
+     * @param {import("discord.js").Client} client 
+     */
     async execute(client) {
         console.log(`Ready! Logged in as ${client.user.tag}`);
         dbs.channels = Object.fromEntries(await Promise.all(Object.entries(dbs.config.channels)

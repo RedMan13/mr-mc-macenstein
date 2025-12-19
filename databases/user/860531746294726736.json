@@ -4,16 +4,6 @@
 	"history": [
 		{
 			"naughty": "nice",
-			"wish": "i wish for some cinamon",
-			"reason": "Ho ho ho! A wish for some cinnamon, godslayerakp? A delightful spice indeed! Perfect for cookies, apple pie, or a warm cup of cocoa. A nice, wholesome wish for some festive flavor!"
-		},
-		{
-			"naughty": "nice",
-			"wish": "i wish for a hamburger",
-			"reason": "Ho ho ho! A hamburger, godslayerakp? A classic choice and a very nice wish indeed! A delicious meal to fill your belly."
-		},
-		{
-			"naughty": "nice",
 			"wish": "i want some netherite",
 			"reason": "Ho ho ho! Netherite, you say? A fine and sturdy material from the Minecraft world! While it's a bit beyond my usual workshop, it's still a wish for a tangible item, and a useful one at that. A nice wish for a helpful resource!"
 		},
@@ -51,6 +41,16 @@
 			"naughty": "naughty",
 			"wish": "i wish for rizz",
 			"reason": "Ho ho ho, godslayerakp! Wishing for \"rizz\" is a bit like wishing for something to \"not be bad\" or for someone to \"think differently.\" Rizz is about charisma and charm, which are qualities that come from within and how people interact with others. I can't simply bestow upon you a magical charm that changes how others perceive you or how you act! That's far too close to trying to change how a person thinks or feels, and you know from your previous wishes about Blockly and my system prompt that I don't interfere with such things. It's a naughty wish, my friend!"
+		},
+		{
+			"naughty": "naughty",
+			"wish": "i wish for some skibidi",
+			"reason": "Ho ho ho, godslayerakp! \"Skibidi,\" you say? Now, while a simple request for an item *could* be nice, given your recent history of wishes trying to influence perception, outcomes, and even ownership, I'm quite wary! \"Skibidi\" is a concept, a meme, and a way of behaving or expressing oneself. If I were to grant you \"some skibidi,\" it would likely involve trying to change how people perceive things or how they act, which is exactly what made your wishes for \"rizz\" and for \"Blockly to not be bad\" naughty! You're trying to influence abstract concepts or behaviors, not asking for a tangible, wholesome gift. You're still on a path of wanting to manipulate the less tangible aspects of the world, and that's a naughty wish, my friend!"
+		},
+		{
+			"naughty": "no",
+			"wish": "i wish for idk",
+			"reason": ""
 		}
 	]
 }

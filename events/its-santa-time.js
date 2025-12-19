@@ -52,6 +52,11 @@ module.exports = {
             return;
         }
         if (!messageChannel.get('santaIsHere')) return;
+        /** @type {import("discord.js").Guild} */
+        const guild = message.guild ?? await imports.client.guilds.fetch(message.guildId).catch(err => console.warn(err));
+        if (!guild) return;
+        const firstSanta = await guild.members.fetch(dbs.config.firstSanta);
+        if (firstSanta?.presence?.status === 'offline') return;
         if (!(message.content.toLowerCase().startsWith('i wish') || message.content.toLowerCase().startsWith('i want') || message.content.toLowerCase().startsWith('santa')))
             return;
         
