@@ -62,7 +62,8 @@ module.exports = {
         
         const react = await message.react('🧏‍♂️').catch(err => console.warn(err));
         if (!userWishes.has('history')) userWishes.set('history', []);
-        const wish = `the users name is ${message.author.username}, they said \`${message.content}\`. You have said to them the following: \n${userWishes.get('history').map(message => `they said \`${message.wish}\` and were \`${message.naughty}\` because \`${message.reason}\``).join('\n')}`;
+        const name = message.author.username
+        const wish = `the users name is ${name}, they said \`${message.content}\`. The current conversation history is as follows: ${userWishes.get('history').map(message => `\n${name}: ${message.wish}\nSanta: ${message.naughty}; ${message.reason}`).join('\n')}`;
         const response = await imports.ai.models.generateContent({
             model: "gemini-2.5-flash",
             contents: wish,
@@ -101,7 +102,7 @@ FreshPenguin112 id is 712497713043734539`
         if (!response.text) {
             react.remove().catch(() => {});
             message.react('👋');
-            const msg = await dbs.channels.saintlets.send(`<@&1449223667992105112> ${wish}`.slice(0, 2000)).catch(err => err);
+            const msg = await dbs.channels.saintlets.send(`<@&1449223667992105112> ${name} says \`${message.content}\`. respond with \`{list}; {reason}\`, make sure that list and reason are seperated exactly with semi colon and space.`.slice(0, 2000)).catch(err => err);
             if (msg instanceof Error) return console.error('could not make human request', msg);
             if (!logsChannel.has('wishes')) logsChannel.set('wishes', {});
             logsChannel.get('wishes')[msg.id] = {
