@@ -24,6 +24,16 @@
 			"naughty": "naughty",
 			"wish": "i wish for 7",
 			"reason": "Oh ho ho, Lordcat__! It seems you've learned nothing from your past incomplete wishes! Wishing for just \"7\" is even less clear than wishing for \"the pm port\"! Seven what, Lordcat__? Seven reindeer? Seven lumps of coal? Until you learn to make a complete and clear wish, you'll be getting a big, fat lump of coal in your stocking!"
+		},
+		{
+			"naughty": "naughty",
+			"wish": "I wish for a",
+			"reason": "Oh ho ho, Lordcat__! You've done it again! \"I wish for a\" is not a complete wish! Just like before when you wished for \"7\" and an empty wish, Santa needs to know what it is you truly desire. It seems you're still struggling with completing your sentences for Santa. Another lump of coal for you until you learn to articulate your wishes properly!"
+		},
+		{
+			"naughty": "nice",
+			"wish": "I wish for this bot to be enabled next year. Goodbye Santa this is the last wish for the year. Say your final words",
+			"reason": "Ho ho ho!"
 		}
 	]
 }

@@ -2,11 +2,6 @@
 	"history": [
 		{
 			"naughty": "naughty",
-			"wish": "i wish to know what percent I am good so I can improve myself #positivegoals",
-			"reason": "Oh, koolioguy, you're back with another one that's a bit too self-reflective! Wishing to know \"what percent I am good\" is very similar to your previous wishes to know \"if I’m evil\" and to \"not be delulu\" and \"for you to teach me rizz.\" My dear child, I cannot give you a percentage on your goodness, nor can I change who you are as a person. That's a journey of self-discovery you must embark on yourself! My job is to bring joy, not to quantify your moral standing!"
-		},
-		{
-			"naughty": "naughty",
 			"wish": "i wish to have a list of good things to do",
 			"reason": "Oh, koolioguy, you're back with another one that's a bit too self-reflective! Wishing for \"a list of good things to do\" is very similar to your previous wishes about your own nature, like \"if I’m evil\" and \"what percent I am good.\" While I appreciate your desire for positive goals, Santa simply cannot dictate your actions or provide a personalized moral compass. My job is to bring joy, not to guide your every step! That's a journey of self-discovery you must embark on yourself!"
 		},
@@ -49,6 +44,11 @@
 			"naughty": "nice",
 			"wish": "i wish for a freaky dog “tom” who plays ping pong with his neighbour “Rob”",
 			"reason": "Ho ho ho, koolioguy! A freaky dog named Tom who plays ping pong with his neighbor Rob! What a wonderfully imaginative and whimsical wish! This is exactly the kind of fun, creative request Santa loves to hear. No self-reflection, no questioning the nature of reality, just a delightful new canine companion with a sporting hobby. This definitely puts you on the nice list for this wish!"
+		},
+		{
+			"naughty": "nice",
+			"wish": "i wish for Didy kong to get the recognition he deserves and a new game",
+			"reason": "Ho ho ho, koolioguy! You wish for Diddy Kong to get the recognition he deserves and a new game! That's a grand wish, indeed! Santa can certainly see the appeal of a beloved character getting more time in the spotlight and a brand new adventure. It's a fun and imaginative request, not at all like those trickier wishes about your own nature or the rules of the universe. This puts a big smile on Santa's face!"
 		}
 	]
 }

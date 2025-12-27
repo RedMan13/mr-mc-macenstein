@@ -4,6 +4,16 @@
 			"naughty": "`nice",
 			"wish": "i wish for penguinmod desktop",
 			"reason": "That's a lovely wish, little developer! Having PenguinMod right on your desktop would be quite convenient for all your coding adventures. Ho ho ho!`"
+		},
+		{
+			"naughty": "naughty",
+			"wish": "I wish uhhhhh",
+			"reason": "Ho ho ho! It seems you've already made a wish, little developer. Making an empty wish right after another is a bit like asking for an extra cookie when you've just received one!"
+		},
+		{
+			"naughty": "naughty",
+			"wish": "i wish for 🥹",
+			"reason": "Ho ho ho! It seems you've already made two wishes, little developer, and the second one was already a bit naughty for being empty! Wishing for just an emoji is a bit like leaving an empty stocking, and Santa needs a little more detail than that to bring you joy!"
 		}
 	]
 }
