@@ -4,7 +4,7 @@ const path = require('path');
 
 module.exports = {
     name: 'ddededodediamante-furry',
-    category: 'dumb fun',
+    category: 'hidden',
     sDesc: 'Sends ddededodediamantes secret',
     lDesc: 'Sends ddededodediamantes fursona',
     args: [],

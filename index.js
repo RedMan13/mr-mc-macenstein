@@ -63,7 +63,8 @@ fs.readdir(commandsPath, async (err, files) => { // read commands folder into a 
             dbs.commands[command.comData.name] = {
                 description: command.comData.description,
                 command,
-                isSlash: command.slashCmd
+                isSlash: command.slashCmd,
+                file: filePath
             }
             return
         }
@@ -71,9 +72,64 @@ fs.readdir(commandsPath, async (err, files) => { // read commands folder into a 
         dbs.commands[command.name] = {
             description: command.sDesc,
             category: command.category,
-            command
+            command,
+            file: filePath
         }
     });
+});
+fs.watch('./commands', (type, filename) => {
+    const file = path.resolve('./commands', filename);
+    const exists = fs.existsSync(file);
+    for (const commandName in dbs.commands) {
+        const command = dbs.commands[commandName];
+        if (command.file !== file) continue;
+        delete dbs.commands[commandName];
+        if (!exists) return; // if the file nolonger exists then this is it
+        const newCommand = require(file);
+        if (newCommand.slashCmd) {
+            console.log(`pushed ${newCommand.comData.name} to slash command sync list`)
+            slashCommands.push(newCommand.comData)
+            dbs.commands[newCommand.comData.name] = {
+                description: newCommand.comData.description,
+                command: newCommand,
+                isSlash: newCommand.slashCmd,
+                file
+            }
+            // manually re-sync if a slash command gets updated
+            syncSlash(imports.client, slashCommands, { debug: true });
+            return;
+        }
+        console.log(`loading command ${newCommand.name}`)
+        dbs.commands[newCommand.name] = {
+            description: newCommand.sDesc,
+            category: newCommand.category,
+            command: newCommand,
+            file
+        }
+        return; // no reason to keep running the loop now
+    }
+    // fell through due to being a new file
+    if (exists && type === 'rename') {
+        const command = require(file)
+        if (command.slashCmd) {
+            console.log(`pushed ${command.comData.name} to slash command sync list`)
+            slashCommands.push(command.comData)
+            dbs.commands[command.comData.name] = {
+                description: command.comData.description,
+                command,
+                isSlash: command.slashCmd,
+                file: filePath
+            }
+            return
+        }
+        console.log(`loading command ${command.name}`)
+        dbs.commands[command.name] = {
+            description: command.sDesc,
+            category: command.category,
+            command,
+            file: filePath
+        }
+    }
 });
 console.log('\n')
 syncSlash(imports.client, slashCommands, { debug: true })
