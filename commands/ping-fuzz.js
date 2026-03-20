@@ -24,8 +24,8 @@ module.exports = {
         // ping count thing
         const imageUrl = pingCount === 6
             ? 'http://floppydisk-osc.github.io/random-assets/sixSeven.png'
-            : 'http://floppydisk-osc.github.io/random-assets/67_2.png';
-
+            : 'http://floppydisk-osc.github.io/random-assets/67_2.jpg';
+                //i hope this fixes it
         const attachment = new AttachmentBuilder(imageUrl);
 
         // attach image / log that stuff
