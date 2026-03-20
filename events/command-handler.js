@@ -2,6 +2,7 @@ module.exports = {
     name: 'messageCreate',
     once: false,
     execute: async (message) => {
+        if (!dbs.commandConfig.prefix) return;
         if (message.content.startsWith(dbs.commandConfig.prefix)) {
             let command = message.content.split(' ')
             command[0] = command[0].slice(dbs.commandConfig.prefix.length, command[0].length)
@@ -44,7 +45,7 @@ module.exports = {
                     embed.title = 'non-existant command'
                     embed.description = 'the command you provided doesnt exist'
                 }
-                message.channel.send({ embeds: [embed] })
+                message.reply({ embeds: [embed] })
                 return
             }
             if (!dbs.commands[command]) return
@@ -52,13 +53,13 @@ module.exports = {
             message.args = args
             message.arguments = await imports.getAllArgs(message, commandData.args)
             if (typeof message.arguments === 'string') {
-                message.channel.send(message.arguments)
+                message.reply(message.arguments)
                 return
             }
             try {
                 commandData.execute(message)
             } catch (err) {
-                message.channel.send('command failed :(')
+                message.reply('command failed :(')
                 console.warn(err);
                 imports.client.channels.cache.get(dbs.config.channels.console).send(err.stack)
             }

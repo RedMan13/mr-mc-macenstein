@@ -42,7 +42,7 @@ module.exports = {
         const suggestion = suggested[message.reference.messageId].suggestion;
         if (message.content.startsWith('accepted') || message.content.startsWith('rejected')) delete suggested[message.reference.messageId];
         const author = await imports.client.users.fetch(toForward);
-        await author.send(`${suggestion.split('\n').map(line => `> ${line}`)}\n${message.conent}`);
+        await author.send(`${suggestion.split('\n').map(line => `> ${line}`)}\n${message.content}`);
         data.flush();
     }
 };

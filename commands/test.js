@@ -47,7 +47,7 @@ module.exports = {
     ],
     execute(message) {
         const args = message.arguments
-        message.channel.send([
+        message.reply([
             args['demo1'], 
             args['demo2'], 
             args['demo3'], 
