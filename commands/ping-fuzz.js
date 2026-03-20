@@ -2,11 +2,21 @@ let lastPing = 0;
 const { AttachmentBuilder } = require('discord.js');
 
 module.exports = {
-    name: 'ping-electricfuzzball',
+    name: 'electricfuzzping',
     category: 'dumb fun',
     sDesc: 'Pings electricfuzzball',
-    lDesc: 'Pings <@1203782668928421949> six or seven times randomly',
-    args: [],
+    lDesc: 'Pings <@1203782668928421949> 6 or 7 times randomly',
+    // hoping this works lel
+    args: [
+        {
+            type: 'string',
+            //lBraket: '{',
+            //rBraket: '}',
+            name: 'text',
+            desc: 'Optional message to send after each ping',
+            required: false
+        }
+    ],
     /**
      * @param {import('discord.js').Message} message
      */
@@ -14,25 +24,27 @@ module.exports = {
         if ((Date.now() - lastPing) < 2 * 60 * 1000) return;
         lastPing = Date.now();
 
+        const args = message.arguments;
+        const extraMessage = args['text'] ? ' ' + args['text'] : '';
+
         const pingCount = Math.random() < 0.5 ? 6 : 7;
 
         // pings
         for (let i = 0; i < pingCount; i++) {
-            await message.channel.send('<@1203782668928421949>');
+            await message.channel.send(`<@1203782668928421949>${extraMessage}`);
         }
 
         // ping count thing
         const imageUrl = pingCount === 6
             ? 'http://floppydisk-osc.github.io/random-assets/sixSeven.png'
             : 'http://floppydisk-osc.github.io/random-assets/67_2.jpg';
-                //i hope this fixes it
+
         const attachment = new AttachmentBuilder(imageUrl);
 
-        // attach image / log that stuff
         await message.channel.send({
             content: `-# [Successfully pinged ElectricFuzzball ${pingCount} times] 🎉🎉`,
             files: [attachment]
         });
     },
 };
-//hehe six sevennnnnnn
+//hi ddededodediamante if you see this
