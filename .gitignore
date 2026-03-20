@@ -12,3 +12,8 @@ node_modules
 # anti replit spam 🤬
 .replit
 replit.nix
+
+databases/user/*
+databases/channel/*
+databases/server/*
+databases/global.json

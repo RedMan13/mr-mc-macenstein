@@ -32,7 +32,13 @@ module.exports = {
 
         // pings
         for (let i = 0; i < pingCount; i++) {
-            await message.channel.send(`<@1203782668928421949>${extraMessage}`);
+            await message.channel.send({
+                content: `<@1203782668928421949>${extraMessage}`,
+                allowedMentions: {
+                    user: ['1203782668928421949'],
+                    roles: []
+                }
+            });
         }
 
         // ping count thing
