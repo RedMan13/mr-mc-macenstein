@@ -11,6 +11,90 @@ let pixels;
 let emojis;
 let images;
 let fileId = 51;
+function rgbToHsv (rgb) {
+    const r = rgb[0] / 255;
+    const g = rgb[1] / 255;
+    const b = rgb[2] / 255;
+    const x = Math.min(Math.min(r, g), b);
+    const v = Math.max(Math.max(r, g), b);
+
+    // For grays, hue will be arbitrarily reported as zero. Otherwise, calculate
+    let h = 0;
+    let s = 0;
+    if (x !== v) {
+        const f = (r === x) ? g - b : ((g === x) ? b - r : r - g);
+        const i = (r === x) ? 3 : ((g === x) ? 5 : 1);
+        h = ((i - (f / (v - x))) * 60) % 360;
+        s = (v - x) / v;
+    }
+
+    return {
+        h: h,
+        s: s,
+        v: v,
+        r: rgb[0],
+        g: rgb[1],
+        b: rgb[2],
+        a: rgb[3]
+    };
+}
+function hsvToRgb (hsv) {
+    let h = hsv.h % 360;
+    if (h < 0) h += 360;
+    const s = Math.max(0, Math.min(hsv.s, 1));
+    const v = Math.max(0, Math.min(hsv.v, 1));
+
+    const i = Math.floor(h / 60);
+    const f = (h / 60) - i;
+    const p = v * (1 - s);
+    const q = v * (1 - (s * f));
+    const t = v * (1 - (s * (1 - f)));
+
+    let r;
+    let g;
+    let b;
+
+    switch (i) {
+    default:
+    case 0:
+        r = v;
+        g = t;
+        b = p;
+        break;
+    case 1:
+        r = q;
+        g = v;
+        b = p;
+        break;
+    case 2:
+        r = p;
+        g = v;
+        b = t;
+        break;
+    case 3:
+        r = p;
+        g = q;
+        b = v;
+        break;
+    case 4:
+        r = t;
+        g = p;
+        b = v;
+        break;
+    case 5:
+        r = v;
+        g = p;
+        b = q;
+        break;
+    }
+
+    return [
+        Math.floor(r * 255),
+        Math.floor(g * 255),
+        Math.floor(b * 255),
+        hsv.a
+    ];
+}
 (async () => {
     emojis = Object.keys(urls);
     pixels = [];
@@ -25,7 +109,13 @@ let fileId = 51;
         ctx.clearRect(0,0,width,height);
         ctx.drawImage(images[idx], 0,0, width,height);
         const data = ctx.getImageData(0,0, width,height).data;
-        const colors = data.reduce((c,v,i) => (c[i % 4] += v, c), [0,0,0,0]).map(v => v / (data.length / 4));
+        let count = 0;
+        const rgbColors = data.reduce((c,v,i) => (c[i % 4] += v, (i % 4) === 3 && (count += v / 255), c), [0,0,0,0]);
+        rgbColors[0] /= count;
+        rgbColors[1] /= count;
+        rgbColors[2] /= count;
+        rgbColors[3] /= data.length / 4;
+        const colors = rgbToHsv(rgbColors);
         pixels.push([emojis[idx], colors]);
         images[idx] = [emojis[idx], images[idx]];
     }
@@ -51,7 +141,13 @@ async function startDraw(message, file) {
     for (let y = 0; y < canvas.height; y += width)
         for (let x = 0; x < canvas.width; x += height) {
             const data = ctx.getImageData(x,y, width, height).data;
-            const colors = data.reduce((c,v,i) => (c[i % 4] += v, c), [0,0,0,0]).map(v => v / (data.length / 4));
+            let count = 0;
+            const rgbColors = data.reduce((c,v,i) => (c[i % 4] += v, (i % 4) === 3 && (count += v / 255), c), [0,0,0,0]);
+            rgbColors[0] /= count;
+            rgbColors[1] /= count;
+            rgbColors[2] /= count;
+            rgbColors[3] /= data.length / 4;
+            const colors = rgbToHsv(rgbColors);
             segments.push(colors);
         }
     // if (segments.length > 256) return rootMsg.edit('Your image must not produce any more then 256 emojis.');
@@ -69,10 +165,13 @@ async function startDraw(message, file) {
             for (; emoji < emojis.length && t(); emoji++) {
                 possible[idx][emoji] = {
                     emoji: pixels[emoji][0],
-                    weight: Math.abs(segments[idx][0] - pixels[emoji][1][0]) +
-                        Math.abs(segments[idx][1] - pixels[emoji][1][1]) +
-                        Math.abs(segments[idx][2] - pixels[emoji][1][2]) +
-                        Math.abs(segments[idx][3] - pixels[emoji][1][3])
+                    weight: Math.abs(segments[idx].h - pixels[emoji][1].h) +
+                        Math.abs(segments[idx].s - pixels[emoji][1].s) +
+                        Math.abs(segments[idx].v - pixels[emoji][1].v) +
+                        Math.abs(segments[idx].r - pixels[emoji][1].r) +
+                        Math.abs(segments[idx].g - pixels[emoji][1].g) +
+                        Math.abs(segments[idx].b - pixels[emoji][1].b) +
+                        Math.abs(segments[idx].a - pixels[emoji][1].a)
                 }
             }
         }
@@ -119,7 +218,7 @@ module.exports = {
             for (let y = 0; y < canvas.height; y += height) {
                 for (let x = 0; x < canvas.width; x += width +10) {
                     ctx.drawImage(images[pixels[i][0]], x,y, width, height);
-                    const color = '#' + pixels[i][1].slice(0, 3).map(v => Math.round((v / 255) * 100).toString(16).padStart(2, '0')).join('');
+                    const color = '#' + hsvToRgb(pixels[i][1]).slice(0, 3).map(v => Math.round((v / 255) * 100).toString(16).padStart(2, '0')).join('');
                     ctx.fillStyle = color;
                     ctx.fillRect(x + width, y, 10, height);
                     i++;
