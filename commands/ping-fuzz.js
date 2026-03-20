@@ -3,7 +3,7 @@ module.exports = {
     name: 'ping-electricfuzzball',
     category: 'dumb fun',
     sDesc: 'Pings electricfuzzball',
-    lDesc: 'Pings <@1203782668928421949> five times in a row',
+    lDesc: 'Pings <@1203782668928421949> six or seven times randomly',
     args: [],
     /**
      * @param {import('discord.js').Message} message
@@ -11,10 +11,11 @@ module.exports = {
     execute: async (message) => {
         if ((Date.now() - lastPing) < 2 * 60 * 1000) return;
         lastPing = Date.now();
-        message.channel.send('<@1203782668928421949>');
-        message.channel.send('<@1203782668928421949>');
-        message.channel.send('<@1203782668928421949>');
-        message.channel.send('<@1203782668928421949>');
-        message.channel.send('<@1203782668928421949>');
+
+        const pingCount = Math.random() < 0.5 ? 6 : 7;
+
+        for (let i = 0; i < pingCount; i++) {
+            message.channel.send('<@1203782668928421949>');
+        }
     },
 };
