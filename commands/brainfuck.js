@@ -16,7 +16,7 @@ function lexInput(string) {
             break;
         case ']':
             layer--;
-            const target = out.findIndex(lex => lex.layer === layer);
+            const target = out.findLastIndex(lex => lex.layer === layer);
             out[target].target = i;
             out.push({ op: 'loop', target });
             break;
@@ -49,9 +49,25 @@ module.exports = {
         let inPointer = 0;
         const output = [];
         const running = Date.now();
-        function end() {
+        function end(msg) {
+            let content = `Finished because ${msg}\n`;
+            content += `Output: ${output} (${output.map(b => String.fromCharCode(b)).join('')})\n`;
+            content += 'Memory: [';
+            let lastIdx = 0;
+            let earlyLarge = 0;
+            for (const idx in memory) {
+                let tooAdd = '';
+                if (idx - lastIdx > 1) tooAdd += `... ${idx}: `;
+                lastIdx = idx;
+                tooAdd += memory[idx] + ', ';
+                if ((content.length + tooAdd.length) > 2000) { earlyLarge = true; break; }
+                content += tooAdd
+            }
+            content = content.slice(0, -2);
+            if (content.length +4 <= 2000 && earlyLarge) content += '...';
+            if (content.length +1 <= 2000) content += ']';
             message.reply({
-                content: `Finished with: ${output} (${output.map(String.fromCharCode).join('')})`,
+                content,
                 allowedMentions: {
                     users: [],
                     roles: [],
@@ -60,13 +76,13 @@ module.exports = {
             });
             clearInterval(inter);
         }
-        console.log(instructions);
         const inter = setInterval(() => {
-            if (Date.now() - running > 10000) return end();
+            if (Date.now() - running > 10000) return end('Ran To Long');
             let i = 0;
             execLoop: while (i < 10000) {
                 const operation = instructions[instruction++];
-                if (!operation) return end();
+                if (!operation) return end('Done');
+                if (output.length > 400) return end('Output To Long');
                 switch (operation.op) {
                 case 'fore-byte': dataPointer++; break;
                 case 'back-byte': dataPointer--; if (dataPointer < 0) dataPointer = 0; break;

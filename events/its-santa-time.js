@@ -34,6 +34,7 @@ module.exports = {
      * @param {import('discord.js').Message} message
      */
     execute: async (message) => {
+        if (!dbs.commandConfig.prefix) return; // no prefix, not loaded yet
         const messageChannel = dbs.database.channel(message.channel.id);
         const logsChannel = dbs.database.channel(dbs.config.channels.saintlets);
         const userWishes = dbs.database.user(message.author.id);
