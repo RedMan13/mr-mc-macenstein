@@ -4,16 +4,16 @@ const Canvas = require('canvas');
 module.exports = {
     name: 'mewhenthe',
     category: 'dumb fun',
-    sDesc: 'random color "me when the"',
+    sDesc: 'hehehe me when the color',
     lDesc: 'Generates a random color with the text "Me when the"',
     args: [
-    {
-        type: 'string',
-        name: 'text',
-        desc: 'Text to display (separate top/bottom with |)',
-        required: false // changed from true to false
-    }
-],
+        {
+            type: 'string',
+            name: 'text',
+            desc: 'Text to display (top|bottom|#hex)',
+            required: false
+        }
+    ],
 
     /**
      * @param {import('discord.js').Message} message
@@ -21,16 +21,26 @@ module.exports = {
     execute: async (message) => {
         const args = message.arguments;
         const text = args['text'] || 'Me when the | Me when the';
-        const [topText, bottomText] = text.split('|').map(t => t.trim());
 
-        // generate random color
-        const randomColor = `#${Math.floor(Math.random()*16777215).toString(16).padStart(6,'0')}`;
+        // split
+        const parts = text.split('|').map(t => t.trim());
+        const topText = parts[0] || 'Me when the';
+        const bottomText = parts[1] || 'Me when the';
+        let chosenColor = parts[2];
+
+        // validate the hex but if it doesnt work just make it random
+        const isValidHex = /^#?[0-9A-Fa-f]{6}$/;
+        if (chosenColor && isValidHex.test(chosenColor)) {
+            if (!chosenColor.startsWith('#')) chosenColor = `#${chosenColor}`;
+        } else {
+            chosenColor = `#${Math.floor(Math.random()*16777215).toString(16).padStart(6,'0')}`;
+        }
 
         const canvas = Canvas.createCanvas(600, 600);
         const ctx = canvas.getContext('2d');
 
         // background
-        ctx.fillStyle = randomColor;
+        ctx.fillStyle = chosenColor;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // text
@@ -49,7 +59,7 @@ module.exports = {
         const attachment = new AttachmentBuilder(canvas.toBuffer(), { name: 'mewhenthe.png' });
 
         await message.channel.send({
-            content: `me when the ${randomColor}`,
+            content: `me when the ${chosenColor}`,
             files: [attachment]
         });
     },
