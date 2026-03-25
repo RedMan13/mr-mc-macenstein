@@ -17,7 +17,7 @@ module.exports = {
     ],
     execute(message) {
         const args = message.arguments;
-        const subject = args['subject'];
+        const subject = args['subject'] ?? 'you';
 
         // choose a date up to 30 days in the future
         const now = new Date();
