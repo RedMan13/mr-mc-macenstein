@@ -17,24 +17,17 @@ module.exports = {
     ],
     execute(message) {
         const args = message.arguments;
-        const subject = args['subject'];
-
-        // subject test
-        if (!subject || subject.trim() === '') {
-            return message.reply("You need to provide a subject! (Example: mc;predict John)");
-        }
+        const subject = args['subject'] || message.author.username;
 
         // choose a date up to 30 days in the future
-        const now = new Date();
-        const future = new Date(now.getTime() + Math.random() * 30 * 24 * 60 * 60 * 1000);
-        const dateString = future.toLocaleDateString();
+        const dateString = `<t:${Math.floor((Date.now() + Math.random() * 30 * 24 * 60 * 60 * 1000) / 1000)}:D>`;
 
         let action, outcome;
 
-        // chance for rare event 30%
-        if (Math.random() < 0.3) {
+        // chance for rare event 3%
+        if (Math.random() < 0.03) {
             action = rareEvents[Math.floor(Math.random() * rareEvents.length)];
-            outcome = "and nothing will ever be the same";
+            outcome = "nothing will ever be the same";
         } else {
             action = actions[Math.floor(Math.random() * actions.length)];
             outcome = outcomes[Math.floor(Math.random() * outcomes.length)];
@@ -42,6 +35,13 @@ module.exports = {
 
         const prediction = `On ${dateString}, ${subject} will ${action} and ${outcome}.`;
 
-        message.reply(prediction);
+        message.reply({
+            content: prediction,
+            allowedMentions: {
+                user: [message.author.id],
+                role: [],
+                parsed: []
+            }
+        });
     },
 };
