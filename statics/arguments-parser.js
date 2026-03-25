@@ -1,3 +1,10 @@
+/**
+ * Parses incoming arguments into a key:value format
+ * @param {import('discord.js').Message} message The message to get argument content from
+ * @param {Array<Object>} args The argument mapping
+ * @param {boolean} slash If the request is in a slash command
+ * @returns {Object|string}
+ */
 module.exports = async (message, args, slash) => {
     const result = {}
     if (slash) {
@@ -43,7 +50,7 @@ module.exports = async (message, args, slash) => {
             break;
         case 'number':
             const number = Number(argContent)
-            if (number === NaN) return `The argument "${name}" has to be a number` 
+            if (isNaN(number)) return `The argument "${name}" has to be a number` 
             result[name] = Math.min(Math.max(number, arg.min ?? -Infinity), arg.max ?? Infinity)
             break;
         case 'any':
@@ -51,26 +58,24 @@ module.exports = async (message, args, slash) => {
             break;
         case 'member':
             let member = argContent
-            if (!member.startsWith('<@') && !member.includes('&')) return `The argument "${name}" has to be a member`
-            member = member.replace('<@', '').replace('>', '')
-            await message.guild.members.fetch(member).then(member => {
-                result[name] = member
-            }).catch(err => console.warn(err));
+            member = member.match(/(?:<@!?)?([0-9]+)>?/i);
+            member = await message.guild.members.fetch(member[1]).catch(err => console.warn(err));
+            if (!member) return `The argument "${name}" has to be a real member`;
+            result[name] = member;
             break;
         case 'channel':
             let channel = argContent
-            if (!channel.startsWith('<#')) return `The argument "${name}" has to be a channel`
-            channel = channel.replace('<#', '').replace('>', '')
-            await imports.client.channels.fetch(channel).then(channel => {
-                result[name] = channel
-            }).catch(err => console.warn(err));
+            channel = channel.match(/(?:<#)?([0-9]+)>?/i);
+            channel = await imports.client.channels.fetch(channel).catch(err => console.warn(err));
+            if (!channel) return `The argument "${name}" has to be a real channel`;
+            result[name] = channel;
             break;
         case 'role':
             let role = argContent
-            if (!role.startsWith('<@&')) return `The argument "${name}" has to be a role`
-            role = role.replace('<@&', '').replace('>', '')
-            role = message.guild.roles.cache.get(role)
-            result[name] = role
+            role = role.match(/(?:<@&)?([0-9]+)>?/i);
+            role = await message.guild.roles.fetch(role).catch(err => console.warn(err));
+            if (!role) return `The argument "${name}" has to be a real role`
+            result[name] = role;
             break;
         }
     }

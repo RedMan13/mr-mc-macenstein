@@ -17,3 +17,4 @@ databases/user/*
 databases/channel/*
 databases/server/*
 databases/global.json
+assets/predictions.json
