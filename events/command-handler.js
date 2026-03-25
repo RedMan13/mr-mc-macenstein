@@ -36,7 +36,7 @@ module.exports = {
                     embed.fields = [];
                     for (const arg of commandData.args) {
                         embed.fields.push({
-                            name: `${arg.name} (${arg.type})`,
+                            name: `${arg.name} (${arg.type}${arg.required ? '' : ', optional'})`,
                             value: arg.desc || '',
                             inline: true
                         });

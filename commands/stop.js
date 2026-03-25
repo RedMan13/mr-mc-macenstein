@@ -1,7 +1,7 @@
 module.exports = {
     name: 'stop',
     category: 'operator',
-    sDesc: 'Stops the bot',
+    sDesc: 'stops the bot',
     lDesc: 'Makes the bot shut down entirely from discord',
     args: [],
     execute: async (message) => {

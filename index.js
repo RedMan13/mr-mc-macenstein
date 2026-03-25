@@ -48,31 +48,35 @@ globalThis.dbs = { // databases
 
 let slashCommands = []
 
+function loadCommand(file) {
+    const command = require(file);
+    delete require.cache[file]; // do not let commands get cached! they could change at any moment
+    if (command.slashCmd) {
+        console.log(`pushed ${command.comData.name} to slash command sync list`);
+        slashCommands.push(command.comData);
+        dbs.commands[command.comData.name] = {
+            description: command.comData.description,
+            command,
+            isSlash: command.slashCmd,
+            file
+        }
+        return;
+    }
+    console.log(`loading command ${command.name}`);
+    dbs.commands[command.name] = {
+        description: command.sDesc,
+        category: command.category,
+        command,
+        file
+    }
+}
 console.log('\n')
 const commandsPath = path.resolve(__dirname, 'commands');
 fs.readdir(commandsPath, async (err, files) => { // read commands folder into a list of commands
     console.log(err ? err : 'reading commands with no error')
     files.forEach(async file => {
         const filePath = path.resolve(commandsPath, file);
-        const command = require(filePath)
-        if (command.slashCmd) {
-            console.log(`pushed ${command.comData.name} to slash command sync list`)
-            slashCommands.push(command.comData)
-            dbs.commands[command.comData.name] = {
-                description: command.comData.description,
-                command,
-                isSlash: command.slashCmd,
-                file: filePath
-            }
-            return
-        }
-        console.log(`loading command ${command.name}`)
-        dbs.commands[command.name] = {
-            description: command.sDesc,
-            category: command.category,
-            command,
-            file: filePath
-        }
+        loadCommand(filePath);
     });
 });
 fs.watch('./commands', (type, filename) => {
@@ -83,51 +87,11 @@ fs.watch('./commands', (type, filename) => {
         if (command.file !== file) continue;
         delete dbs.commands[commandName];
         if (!exists) return; // if the file nolonger exists then this is it
-        const newCommand = require(file);
-        if (newCommand.slashCmd) {
-            console.log(`pushed ${newCommand.comData.name} to slash command sync list`)
-            slashCommands.push(newCommand.comData)
-            dbs.commands[newCommand.comData.name] = {
-                description: newCommand.comData.description,
-                command: newCommand,
-                isSlash: newCommand.slashCmd,
-                file
-            }
-            // manually re-sync if a slash command gets updated
-            syncSlash(imports.client, slashCommands, { debug: true });
-            return;
-        }
-        console.log(`loading command ${newCommand.name}`)
-        dbs.commands[newCommand.name] = {
-            description: newCommand.sDesc,
-            category: newCommand.category,
-            command: newCommand,
-            file
-        }
+        loadCommand(file);
         return; // no reason to keep running the loop now
     }
     // fell through due to being a new file
-    if (exists && type === 'rename') {
-        const command = require(file)
-        if (command.slashCmd) {
-            console.log(`pushed ${command.comData.name} to slash command sync list`)
-            slashCommands.push(command.comData)
-            dbs.commands[command.comData.name] = {
-                description: command.comData.description,
-                command,
-                isSlash: command.slashCmd,
-                file
-            }
-            return
-        }
-        console.log(`loading command ${command.name}`)
-        dbs.commands[command.name] = {
-            description: command.sDesc,
-            category: command.category,
-            command,
-            file
-        }
-    }
+    if (exists && type === 'rename') loadCommand(file);
 });
 console.log('\n')
 syncSlash(imports.client, slashCommands, { debug: true })

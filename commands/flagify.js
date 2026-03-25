@@ -35,7 +35,7 @@ module.exports = {
     lDesc: 'Takes any image and a color, or just a color, and makes it into a penguinmod flag',
     args: [
         {
-            type: 'any',
+            type: 'string',
             name: 'color',
             desc: 'The primary color of everything including the flag background',
             required: false
@@ -48,19 +48,9 @@ module.exports = {
         const canvas = new Canvas(canvasWidth, canvasHeight);
         const ctx = canvas.getContext('2d');
 
-        // resolve the primary and secondary colors
-        ctx.fillStyle = message.arguments.color || '#00a6ff';
-        ctx.fillRect(0,0, 1,1);
-        const color = rgbToHsv(ctx.getImageData(0,0, 1,1).data);
-        ctx.clearRect(0,0, 1,1);
-        const primaryColor = rgbToString(hsvToRgb(color));
-        const secondaryColor = rgbToString(hsvToRgb({ h: color.h + 13, s: color.s, v: color.v * 0.42, a: color.a }));
-
-        // composite each flag layer and get each pixel slice
-        const slices = [];
-        ctx.fillStyle = primaryColor;
-        ctx.fillRect(flagOutlineRadius,flagOutlineRadius, innerFlagWidth, innerFlagHeight);
-        if (message.attachments.size >= 1) { // insert attached image, if any
+        // load attached image, if any, and extract meta from it like the primary color
+        let imageDraw = () => {}
+        if (message.attachments.size >= 1) {
             const rootMsg = await message.reply('Loading target image...');
             const req = await fetch(message.attachments.at(0).proxyURL);
             let image = Buffer.from(await req.bytes());
@@ -69,8 +59,39 @@ module.exports = {
             const toTransform = await loadImage(image).catch(() => {});
             if (!toTransform) return rootMsg.edit('The image is in an unsupported format (supports png,jpeg,svg,webp,gif,avif,pdf ONLY)');
 
-            ctx.drawImage(toTransform, flagOutlineRadius,flagOutlineRadius, innerFlagWidth, innerFlagHeight);
+            const scale = Math.min(innerFlagWidth / toTransform.width, innerFlagHeight / toTransform.height);
+            const width = toTransform.width * scale;
+            const height = toTransform.height * scale;
+            const x = flagOutlineRadius + ((innerFlagWidth - width) / 2);
+            const y = flagOutlineRadius + ((innerFlagHeight - height) / 2);
+            imageDraw = () => ctx.drawImage(toTransform, x,y, width, height);
+            ctx.drawImage(toTransform, 0,0, width, height);
+            if (!message.arguments.color) {
+                const left = ctx.getImageData(0,0, 1,height);
+                const right = ctx.getImageData(width,0, 1,height);
+                const pixels = [...left.data, ...right.data];
+                const colors = Object.entries(pixels
+                    .reduce((c,v,i) => (!(i % 4) ? c.push([v]) : c.at(-1).push(v), c), [])
+                    .reduce((c,v) => (c[v] ??= 0, c[v]++, c), {}))
+                    .sort((a,b) => b[1] - a[1])
+                    .map(([color]) => color.split(','));
+                message.arguments.color = `rgb(${colors[0][0]} ${colors[0][1]} ${colors[0][2]} / ${(colors[0][3] / 255) * 100}%)`;
+            }
         }
+
+        // resolve the primary and secondary colors
+        ctx.fillStyle = message.arguments.color || '#00a6ff';
+        ctx.fillRect(0,0, 1,1);
+        const color = rgbToHsv(ctx.getImageData(0,0, 1,1).data);
+        const primaryColor = rgbToString(hsvToRgb(color));
+        const secondaryColor = rgbToString(hsvToRgb({ h: color.h + 13, s: color.s, v: color.v * 0.42, a: color.a }));
+
+        // composite each flag layer and get each pixel slice
+        const slices = [];
+        ctx.clearRect(0,0, canvasWidth, canvasHeight);
+        ctx.fillStyle = primaryColor;
+        ctx.fillRect(flagOutlineRadius,flagOutlineRadius, innerFlagWidth, innerFlagHeight);
+        imageDraw();
         ctx.fillStyle = gradient;
         ctx.fillRect(flagOutlineRadius, flagOutlineRadius, innerFlagWidth, innerFlagHeight);
         ctx.strokeStyle = secondaryColor;

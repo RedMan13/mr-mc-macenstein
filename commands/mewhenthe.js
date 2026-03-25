@@ -58,7 +58,7 @@ module.exports = {
 
         const attachment = new AttachmentBuilder(await canvas.toBuffer(), { name: 'mewhenthe.png' });
 
-        await message.channel.send({
+        await message.reply({
             content: `me when the ${chosenColor}`,
             files: [attachment]
         });
