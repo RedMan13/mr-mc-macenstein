@@ -79,8 +79,8 @@ fs.readdir(commandsPath, async (err, files) => { // read commands folder into a 
         loadCommand(filePath);
     });
 });
-fs.watch('./commands', (type, filename) => {
-    const file = path.resolve('./commands', filename);
+fs.watch(commandsPath, (type, filename) => {
+    const file = path.resolve(commandsPath, filename);
     const exists = fs.existsSync(file);
     for (const commandName in dbs.commands) {
         const command = dbs.commands[commandName];
