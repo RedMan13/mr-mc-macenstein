@@ -85,6 +85,7 @@ async function startDraw(message, file, perfect) {
     const possible = [];
     const inter = setInterval(async () => {
         const start = Date.now();
+        const startIdx = idx;
         const t = () => (Date.now() - start) >= 4000;
         topLoop: for (; idx < segments.length; idx++) {
             if (t()) break topLoop;
@@ -141,7 +142,8 @@ async function startDraw(message, file, perfect) {
         }
         const dt = Date.now() - lastTime;
         lastTime = Date.now();
-        rootMsg.edit(`Weighting emojis... ${Math.round((idx / segments.length) * 100)}% ETA <t:${Math.floor((Date.now() + (dt * (segments.length - idx))) / 1000)}:R>`);
+        const di = idx - startIdx;
+        rootMsg.edit(`Weighting emojis... ${Math.round((idx / segments.length) * 100)}% ETA <t:${Math.floor((Date.now() + (dt * ((segments.length - idx) / di))) / 1000)}:R>`);
     }, 4100);
 }
 
