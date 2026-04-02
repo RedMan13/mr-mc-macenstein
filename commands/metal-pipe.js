@@ -1,5 +1,6 @@
 const child = require('child_process');
 
+/** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'metal-pipe',
     category: 'dumb fun',

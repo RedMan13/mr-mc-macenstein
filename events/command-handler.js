@@ -32,9 +32,24 @@ module.exports = {
                 } else if (commands.includes(args)) {
                     const commandData = dbs.commands[args].command
                     embed.title = commandData.name
-                    embed.description = commandData.lDesc;
+                    embed.description = (dbs.commands[args].useCLI ? 'mc!<name> <args> default\n' : '') + commandData.lDesc;
                     embed.fields = [];
-                    for (const arg of commandData.args) {
+                    for (const argIdx in commandData.args) {
+                        const arg = commandData.args[argIdx];
+                        if (dbs.commands[args].useCLI) {
+                            const additionalInfo = [];
+                            if (arg[1].noValue) additionalInfo.push('takes no value');
+                            if (arg[1].repeatable) additionalInfo.push('can be repeated');
+                            if (arg[1].match) additionalInfo.push('matches: `' + arg[1].match.source + '`');
+                            if (arg[1].needs) additionalInfo.push('requires: `' + arg[1].needs.join(', ') + '`');
+                            if (arg[1].default) additionalInfo.push('default value: `' + arg[1].default + '`');
+                            embed.fields.push({
+                                name: `--${argIdx} (${arg[0].map(alt => alt.length > 1 ? `--${alt}` : `-${alt}`).join(', ')})`,
+                                value: additionalInfo.join(', ') + '\n' + (arg[2] || ''),
+                                inline: true
+                            });
+                            continue;
+                        }
                         embed.fields.push({
                             name: `${arg.name} (${arg.type}${arg.required ? '' : ', optional'})`,
                             value: arg.desc || '',
@@ -51,13 +66,15 @@ module.exports = {
             if (!dbs.commands[command]) return
             const commandData = dbs.commands[command].command;
             message.args = args
-            message.arguments = await imports.getAllArgs(message, commandData.args)
+            message.arguments = dbs.commands[command].useCLI
+                ? imports.parseArgs(message.args.split(' '), commandData.args)
+                : await imports.getAllArgs(message, commandData.args)
             if (typeof message.arguments === 'string') {
                 message.reply(message.arguments)
                 return
             }
             try {
-                commandData.execute(message)
+                await commandData.execute(message)
             } catch (err) {
                 message.reply('command failed :(')
                 console.warn(err);

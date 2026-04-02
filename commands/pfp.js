@@ -1,5 +1,6 @@
 const { AttachmentBuilder } = require('discord.js');
 
+/** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'pfp',
     category: 'general',

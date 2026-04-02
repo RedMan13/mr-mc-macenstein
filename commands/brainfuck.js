@@ -24,6 +24,7 @@ function lexInput(string) {
     }
     return out;
 }
+/** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'brainfuck',
     category: 'dumb fun',
@@ -37,9 +38,6 @@ module.exports = {
             required: true
         }
     ],
-    /**
-     * @param {import('discord.js').Message} message
-     */
     execute: async (message) => {
         const inputs = message.args.split(' ').slice(1).join(' ');
         const memory = {}

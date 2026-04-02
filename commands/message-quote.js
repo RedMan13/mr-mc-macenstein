@@ -1,5 +1,6 @@
 const { ApplicationIntegrationType, InteractionContextType, ApplicationCommandType } = require('discord.js');
 
+/** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     slashCmd: true,
     comData: {

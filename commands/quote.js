@@ -1,3 +1,4 @@
+/** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'quote',
     category: 'dumb fun',

@@ -6,25 +6,25 @@ const { rgbToHsv, hsvToRgb } = require('../statics/color');
 
 let ready = false;
 let width;
-let height;
+let height; 
 let pixels;
-let emojis;
-let images;
 (async () => {
-    emojis = Object.keys(urls);
+    const emojis = Object.keys(urls);
     pixels = [];
     console.log('Loading emoji graphics...');
-    images = await Promise.all(Object.values(urls).map(url => loadImage(url)));
+    if (dbs.channels.console) dbs.channels.console.send('Loading emoji graphics...');
+    const images = await Promise.all(Object.values(urls).map(url => loadImage(url)));
     width = 32;
     height = width;
     const canvas = new Canvas(width,height);
     const ctx = canvas.getContext('2d');
     console.log('Extracting emoji pixels...');
+    if (dbs.channels.console) dbs.channels.console.send('Extracting emoji pixels...');
     for (const idx in images) {
         ctx.clearRect(0,0,width,height);
         ctx.drawImage(images[idx], 0,0, canvas.width,canvas.height);
-        const data = ctx.getImageData(0,0, width,height).data;
-        const colors = Object.entries(data
+        const image = ctx.getImageData(0,0, width,height);
+        const colors = Object.entries(image.data
             .reduce((c,v,i) => (!(i % 4) ? c.push([v]) : c.at(-1).push(v), c), [])
             .map(v => [v, Math.floor(v[0] / 100).toString() + Math.floor(v[1] / 100).toString() + Math.floor(v[2] / 100).toString() + Math.floor(v[3] / 100).toString()])
             .reduce((c,v) => (c[v[1]] ??= [0, v[0]], c[v[1]][0]++, c), {}))
@@ -32,11 +32,10 @@ let images;
             // .slice(0, 3)
             .map(([_,[__, color]]) => color)
             .map(rgbToHsv);
-        pixels.push([emojis[idx], colors, data]);
-        images[idx] = [emojis[idx], images[idx]];
+        pixels.push([emojis[idx], colors, image]);
     }
-    images = Object.fromEntries(images);
-    console.log('Emoji command ready!')
+    console.log('Emoji command ready!');
+    if (dbs.channels.console) dbs.channels.console.send('Emoji command ready!');
     ready = true;
 })()
 async function startDraw(message, file, perfect) {
@@ -90,28 +89,28 @@ async function startDraw(message, file, perfect) {
         topLoop: for (; idx < segments.length; idx++) {
             if (t()) break topLoop;
             possible[idx] ??= [];
-            if (emoji >= emojis.length) emoji = 0;
-            for (; emoji < emojis.length; emoji++) {
+            if (emoji >= pixels.length) emoji = 0;
+            for (; emoji < pixels.length; emoji++) {
                 if (t()) break topLoop;
                 if (perfect) {
                     possible[idx][emoji] = {
-                        emoji: pixels[emoji][0],
+                        emojiIdx: emoji,
                         weight: 0
                     }
                     for (let i = 0; i < segments[idx].length; i += 8) {
-                        possible[idx][emoji].weight += Math.abs(segments[idx][i] - pixels[emoji][2][i]) +
-                            Math.abs(segments[idx][i +1] - pixels[emoji][2][i +1]) +
-                            Math.abs(segments[idx][i +2] - pixels[emoji][2][i +2]) +
-                            Math.abs(segments[idx][i +3] - pixels[emoji][2][i +3]) +
+                        possible[idx][emoji].weight += Math.abs(segments[idx][i] - pixels[emoji][2].data[i]) +
+                            Math.abs(segments[idx][i +1] - pixels[emoji][2].data[i +1]) +
+                            Math.abs(segments[idx][i +2] - pixels[emoji][2].data[i +2]) +
+                            Math.abs(segments[idx][i +3] - pixels[emoji][2].data[i +3]) +
 
-                            Math.abs(segments[idx][i +4] - pixels[emoji][2][i +4]) +
-                            Math.abs(segments[idx][i +5] - pixels[emoji][2][i +5]) +
-                            Math.abs(segments[idx][i +6] - pixels[emoji][2][i +6]) +
-                            Math.abs(segments[idx][i +7] - pixels[emoji][2][i +7]);
+                            Math.abs(segments[idx][i +4] - pixels[emoji][2].data[i +4]) +
+                            Math.abs(segments[idx][i +5] - pixels[emoji][2].data[i +5]) +
+                            Math.abs(segments[idx][i +6] - pixels[emoji][2].data[i +6]) +
+                            Math.abs(segments[idx][i +7] - pixels[emoji][2].data[i +7]);
                     }
                 } else {
                     possible[idx][emoji] = {
-                        emoji: pixels[emoji][0],
+                        emojiIdx: emoji,
                         weight: Math.abs(segments[idx].h - pixels[emoji][1][0].h) +
                             Math.abs(segments[idx].s - pixels[emoji][1][0].s) +
                             Math.abs(segments[idx].v - pixels[emoji][1][0].v) +
@@ -143,7 +142,7 @@ async function startDraw(message, file, perfect) {
             for (let i = 0; i < possible.length; i++) {
                 const x = (i % tilesWide) * width;
                 const y = Math.floor(i / tilesWide) * height;
-                ctx.drawImage(images[possible[i][0].emoji], x,y, width, height);
+                ctx.drawImage(pixels[possible[i][0].emojiIdx][2], x,y, width, height);
             }
             message.reply({
                 content: 'Finished;',
@@ -158,38 +157,30 @@ async function startDraw(message, file, perfect) {
     }, 4100);
 }
 
+/** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'emojify',
     category: 'dumb fun',
     sDesc: 'Converts an image to emojis',
     lDesc: 'Converts any one image into a set of discord emojis',
-    args: [
-        {
-            type: 'any',
-            name: 'scale',
-            desc: 'The scale to use for the image',
-            required: false
-        },
-        {
-            type: 'any',
-            name: 'perfect',
-            desc: 'Adding `perfect` to the message will use a slower, but more accurate, converter',
-            required: false
-        }
-    ],
+    args: {
+        scale: [['s'], { match: /^[0-9]+(?:\.[0-9]+)?$/i, default: 1 }, 'The scale factor to apply to the image'],
+        dump: [[], { noValue: true }, 'Dumps all of the internal emoji data'],
+        perfect: [['p'], { noValue: true }, 'If the image should be rendered perfectly']
+    },
     /**
      * @param {import('discord.js').Message} message
      */
     execute: async (message) => {
         if (!ready) return message.reply('Command not ready for use.');
-        if (message.args === 'dump') {
+        if (message.arguments.dump) {
             const sqaureSize = Math.ceil(Math.sqrt(pixels.length)); 
             const canvas = new Canvas(sqaureSize * (width +10), sqaureSize * height);
             const ctx = canvas.getContext('2d');
             let i = 0;
             for (let y = 0; y < canvas.height; y += height) {
                 for (let x = 0; x < canvas.width; x += width +10) {
-                    ctx.drawImage(images[pixels[i][0]], x,y, width, height);
+                    ctx.putImageData(pixels[i][2], x,y);
                     const length = Math.min(pixels[i][1].length, height);
                     for (let j = 0; j < length; j++) {
                         if (!pixels[i][1][j]) break;
@@ -206,8 +197,7 @@ module.exports = {
             });
             return;
         }
-        message.arguments.perfect = !!message.arguments.perfect || message.arguments.scale === 'perfect';
-        message.arguments.scale = Math.max(Math.min(Number(message.arguments.scale) || 1, 10), 0);
+        message.arguments.scale = Math.max(Math.min(Number(message.arguments.scale), 10), 0);
         // use a far stricter boundary for perfect resolves
         if (message.arguments.perfect) message.arguments.scale = Math.max(Math.min(message.arguments.scale, 3), 0);
         if (message.attachments.size < 1) return message.reply('Must have atleast one attached image.');

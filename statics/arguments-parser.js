@@ -1,3 +1,30 @@
+
+/**
+ * @typedef {Object} GenericArgument
+ * @prop {string} type
+ * @prop {string} name
+ * @prop {string} desc
+ * @prop {boolean} required
+ */
+/**
+ * @typedef {Object} NumberArgument
+ * @prop {'number'} type
+ * @prop {string} name
+ * @prop {string} desc
+ * @prop {boolean} required
+ * @prop {number} min
+ * @prop {number} max
+ */
+/**
+ * @typedef {Object} StringArgument
+ * @prop {'string'} type
+ * @prop {string} name
+ * @prop {string} desc
+ * @prop {boolean} required
+ * @prop {string} lBraket
+ * @prop {string} rBraket
+ */
+/** @typedef {NumberArgument|StringArgument|GenericArgument} Argument */
 /**
  * Parses incoming arguments into a key:value format
  * @param {import('discord.js').Message} message The message to get argument content from

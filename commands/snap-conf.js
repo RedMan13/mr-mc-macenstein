@@ -1,6 +1,7 @@
 
 const { ApplicationIntegrationType, InteractionContextType, ApplicationCommandType, LabelBuilder, ModalBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 
+/** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'snap-conf',
     /**

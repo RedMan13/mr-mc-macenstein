@@ -1,6 +1,7 @@
 const { AttachmentBuilder } = require('discord.js');
 const { Canvas } = require('skia-canvas');
 
+/** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'mewhenthe',
     category: 'dumb fun',

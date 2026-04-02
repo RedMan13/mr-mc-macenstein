@@ -1,5 +1,6 @@
 const { actions, outcomes, rareEvents } = require('../assets/predictions.json');
 
+/** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'prediction',
     category: 'dumb fun',

@@ -39,6 +39,7 @@ globalThis.imports = {
     Discord: require('discord.js'),
     db: require('./statics/database-manager.js'),
     getAllArgs: require('./statics/arguments-parser'),
+    parseArgs: require('./statics/argument-parser.js'),
     client: new Client({ 
         intents: [
             GatewayIntentBits.Guilds, 
@@ -60,7 +61,20 @@ globalThis.dbs = { // databases
 
 let slashCommands = []
 
+/**
+ * @typedef {Object} CommandDefinition
+ * @prop {boolean} slashCmd
+ * @prop {Object?} comData
+ * @prop {string?} name
+ * @prop {string?} category
+ * @prop {string?} sDesc
+ * @prop {string?} lDesc
+ * @prop {import('./statics/argument-parser.js').CLIArguments|import('./statics/arguments-parser.js').Argument[]|null} args
+ * @prop {(message: import('discord.js').Message) => void} execute
+ */
+
 function loadCommand(file) {
+    /** @type {CommandDefinition} */
     const command = require(file);
     delete require.cache[file]; // do not let commands get cached! they could change at any moment
     if (command.slashCmd) {
@@ -72,15 +86,17 @@ function loadCommand(file) {
             isSlash: command.slashCmd,
             file
         }
-        return;
+        return command.name;
     }
     console.log(`loading command ${command.name}`);
     dbs.commands[command.name] = {
         description: command.sDesc,
         category: command.category,
         command,
+        useCLI: !Array.isArray(command.args),
         file
     }
+    return command.name;
 }
 console.log('\n')
 const commandsPath = path.resolve(__dirname, 'commands');
@@ -98,12 +114,17 @@ fs.watch(commandsPath, (type, filename) => {
         const command = dbs.commands[commandName];
         if (command.file !== file) continue;
         delete dbs.commands[commandName];
-        if (!exists) return; // if the file nolonger exists then this is it
+        if (!exists) return dbs.channels.console.send(`Command ${commandName} has been deleted`); // if the file nolonger exists then this is it
         loadCommand(file);
+        dbs.channels.console.send(`Command ${commandName} has been reloaded`);
         return; // no reason to keep running the loop now
     }
     // fell through due to being a new file
-    if (exists && type === 'rename') loadCommand(file);
+    if (exists && type === 'rename') {
+        const name = loadCommand(file);
+        dbs.channels.console.send(`Command ${name} has been loaded`);
+    }
+
 });
 console.log('\n')
 syncSlash(imports.client, slashCommands, { debug: true })

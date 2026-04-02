@@ -28,6 +28,7 @@ const pole = ctx => {
     ctx.stroke();
 }
 
+/** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'flagify',
     category: 'dumb fun',

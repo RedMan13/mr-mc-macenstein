@@ -2,6 +2,7 @@ const { AttachmentBuilder } = require('discord.js');
 const fs = require('fs/promises');
 const path = require('path');
 
+/** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'ddededodediamante-furry',
     category: 'hidden',

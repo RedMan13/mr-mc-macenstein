@@ -2,6 +2,7 @@ let lastPing = 0;
 const { AttachmentBuilder } = require('discord.js');
 
 const toWait = 2 * 60 * 1000;
+/** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'electricfuzzping',
     category: 'dumb fun',

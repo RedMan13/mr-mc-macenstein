@@ -1,6 +1,7 @@
 const util = require('util');
 const AsyncFunction = Object.getPrototypeOf(async function() {}).constructor;
 
+/** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'eval',
     category: 'operator',
