@@ -96,7 +96,18 @@ async function startDraw(message, file, perfect) {
                 if (perfect) {
                     possible[idx][emoji] = {
                         emoji: pixels[emoji][0],
-                        weight: segments[idx].reduce((c,px,i) => c + Math.abs(px - pixels[emoji][2][i]), 0)
+                        weight: 0
+                    }
+                    for (let i = 0; i < segments[idx].length; i += 8) {
+                        possible[idx][emoji].weight += Math.abs(segments[idx][i] - pixels[emoji][2][i]) +
+                            Math.abs(segments[idx][i +1] - pixels[emoji][2][i +1]) +
+                            Math.abs(segments[idx][i +2] - pixels[emoji][2][i +2]) +
+                            Math.abs(segments[idx][i +3] - pixels[emoji][2][i +3]) +
+
+                            Math.abs(segments[idx][i +4] - pixels[emoji][2][i +4]) +
+                            Math.abs(segments[idx][i +5] - pixels[emoji][2][i +5]) +
+                            Math.abs(segments[idx][i +6] - pixels[emoji][2][i +6]) +
+                            Math.abs(segments[idx][i +7] - pixels[emoji][2][i +7]);
                     }
                 } else {
                     possible[idx][emoji] = {

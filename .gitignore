@@ -18,3 +18,4 @@ databases/channel/*
 databases/server/*
 databases/global.json
 assets/predictions.json
+errors.log

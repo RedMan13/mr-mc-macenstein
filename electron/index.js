@@ -37,16 +37,27 @@ const createOverlayWindow = async () => {
 app.whenReady().then(() => {
     createOverlayWindow();
     const server = require('express')();
+    server.use((req,res,next) => {
+        res.header('Access-Control-Allow-Origin', '*');
+        next();
+    })
     server.get('/cancel', (req,res) => {
-        window.webContents.send('cancel');
+        window.webContents.send('cancel', req.query.id);
         res.send('Gaa');
+    });
+    server.get('/update', (req, res) => {
+        window.webContents.send('update', req.query.id, req.query.playing !== 'false', req.query.x, req.query.y, req.query.w, req.query.h);
+        res.send(req.query.id ?? 'Goo');
     });
     server.get(/^(?<file>\/.*)/, (req, res) => {
         if (!window) return res.send('Not Yet');
-        const file = req.params.file.replace(/^\/?~/, process.env.HOME);
+        let file = req.params.file.replace(/^\/?~/, process.env.HOME);
+        if (/^\/https?:\/\//i.test(file)) file = file.slice(1);
         console.log('Loading', file);
-        window.webContents.send('play', file);
-        res.send('Goo');
+        if ((req.query.x || req.query.y || req.query.w || req.query.h) && !req.query.id)
+            req.query.id = (req.query.x || 0) + (req.query.y || 0) + Math.random();
+        window.webContents.send('play', file, req.query.id, req.query.x, req.query.y, req.query.w, req.query.h, req.query.loop === 'true');
+        res.send(req.query.id ?? 'Goo');
     });
     server.listen(8080);
 });
