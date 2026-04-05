@@ -29,6 +29,7 @@ module.exports = function parseArgs(argv, keys) {
             : [lookup['default'] ?? 'default'];
         let needsAdvance = false;
         for (const key of keys) {
+            if (key === 'default') continue;
             if (!props[key]) return `Argument ${arg} does not exist`;
             const hasValue = !props[key].noValue && ((arg[0] === '-' && (argv[i +1]?.[0] ?? '-') !== '-') || key === 'default' || key === lookup['default']);
             needsAdvance ||= arg[0] === '-' && hasValue;
