@@ -11,7 +11,6 @@ const process = require('process');
 const config = require('./statics/config.json');
 const syncSlash = require('@frostzzone/discord-sync-commands');
 const { createQuoteCard, createQuoteMessage } = require('./statics/quote-generator.js');
-const electron = require('electron');
 const util = require('util');
 
 const logs = fs.createWriteStream(path.resolve(__dirname, './errors.log'));
@@ -25,11 +24,14 @@ for (const func of ['log', 'warn', 'error', 'debug', 'info']) {
 }
 process.on('beforeExit', () => logs.close());
 
-process.on('uncaughtException', err => console.warn(err));
-const child = spawn(electron, [require.resolve('./electron/index.js')], { stdio: 'inherit', windowsHide: false });
-process.on('SIGINT', () => { child.kill(); process.exit(); });
-process.on('SIGTERM', () => { child.kill(); process.exit(); });
-process.on('SIGUSR2', () => { child.kill(); process.exit(); });
+try {
+    const electron = require('electron');
+    process.on('uncaughtException', err => console.warn(err));
+    const child = spawn(electron, [require.resolve('./electron/index.js')], { stdio: 'inherit', windowsHide: false });
+    process.on('SIGINT', () => { child.kill(); process.exit(); });
+    process.on('SIGTERM', () => { child.kill(); process.exit(); });
+    process.on('SIGUSR2', () => { child.kill(); process.exit(); });
+} catch (err) { console.warn(err) }
 
 globalThis.imports = {
     exec,
