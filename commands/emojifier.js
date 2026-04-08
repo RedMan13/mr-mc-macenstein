@@ -33,16 +33,14 @@ async function convert(id, message, file, pixels) {
     await rootMsg.edit(`(${id}) Extracting image squares...`);
     image.resize(pixelsWide, pixelsHigh);
     const promises = [];
-    for (let y = 0; y < pixelsHigh; y += height) {
+    for (let y = 0; y < pixelsHigh; y += height)
         for (let x = 0; x < pixelsWide; x += width)
             promises.push(image
                 .extract({ left: x, top: y, width, height })
                 .ensureAlpha()
                 .raw()
                 .toBuffer()
-                .then(buf => buf.toJSON().data));
-        process.stdout.write('On row ' + y + '\r');
-    }
+                .then(buf => (process.stdout.write('Resolved image' + x + ':' + y + '\r'), buf.toJSON().data)));
     const segments = await Promise.all(promises);
     console.log('Begining image weighting.');
     await rootMsg.edit(`(${id}) Weighting emojis...`);
@@ -187,16 +185,14 @@ module.exports = {
             image.resize(tilesWide * width, tilesHigh * height);
             console.log('Extracting', tilesWide * tilesHigh, 'tiles from image for pixels');
             const promises = [];
-            for (let y = 0; y < pixelsHigh; y += height) {
+            for (let y = 0; y < pixelsHigh; y += height)
                 for (let x = 0; x < pixelsWide; x += width)
                     promises.push(image
                         .extract({ left: x, top: y, width, height })
                         .ensureAlpha()
                         .raw()
                         .toBuffer()
-                        .then(buf => buf.toJSON().data));
-                process.stdout.write('On row ' + y + '\r');
-            }
+                        .then(buf => (process.stdout.write('Resolved image' + x + ':' + y + '\r'), buf.toJSON().data)));
             usedPixels = await Promise.all(promises);
         }
         message.arguments.scale = Math.max(Math.min(Number(message.arguments.scale), 16), 0);
