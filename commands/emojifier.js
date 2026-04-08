@@ -1,10 +1,8 @@
 const pixels = require('../assets/emojis.js');
-const { Canvas, loadImage, ImageData } = require('skia-canvas');
 const sharp = require('sharp');
 const child = require('child_process');
 const os = require('os');
 const { AttachmentBuilder } = require('discord.js');
-const { rgbToHsv, hsvToRgb } = require('../statics/color');
 
 const processes = [];
 async function startConvert(message, file, pixels) {
@@ -140,18 +138,28 @@ module.exports = {
         const height = width;
         if (message.arguments.dump) {
             const sqaureSize = Math.ceil(Math.sqrt(pixels.length)); 
-            const canvas = new Canvas(sqaureSize * width, sqaureSize * height);
-            const ctx = canvas.getContext('2d');
-            let i = 0;
-            for (let y = 0; y < canvas.height; y += height) {
-                for (let x = 0; x < canvas.width; x += width) {
-                    ctx.drawImage(pixels[i], x,y);
-                    i++;
-                    if (i >= pixels.length) break;
+            const image = await sharp(new Uint8ClampedArray([0,0,0,0]), {
+                raw: {
+                    channels: 4,
+                    width: 1, 
+                    height: 1
                 }
-            }
+            })
+                .resize(sqaureSize * width, sqaureSize * height)
+                .composite(result.map((emoji, i) => ({
+                    left: (i % sqaureSize) * width,
+                    top: Math.floor(i / sqaureSize) * height,
+                    input: pixels[i].data,
+                    raw: {
+                        channels: 4,
+                        width,
+                        height
+                    }
+                })))
+                .png()
+                .toBuffer();
             message.reply({
-                files: [new AttachmentBuilder(await canvas.toBuffer(), { name: 'debug.png' })]
+                files: [new AttachmentBuilder(image, { name: 'debug.png' })]
             });
             return;
         }
@@ -170,29 +178,18 @@ module.exports = {
             if (message.attachments.size < 2) return message.reply('Must have atleast two attached images.');
             usedPixels = [];
             const req = await fetch(message.attachments.at(0).proxyURL);
-            let image = Buffer.from(await req.bytes());
-            if (['image/webp', 'image/gif', 'image/avif'].includes(req.headers.get('content-type')))
-                image = sharp(image);
-            const toTransform = await loadImage(image).catch(() => {});
-            const canvas = new Canvas(Math.round(toTransform.width / width) * width, Math.round(toTransform.height / height) * height);
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(toTransform, 0,0, canvas.width, canvas.height);
-            if (dbs.channels.console) message.reply('Extracting emoji pixels...');
-            for (let y = 0; y < canvas.height; y += height) {
-                for (let x = 0; x < canvas.width; x += width) {
-                    const image = ctx.getImageData(x,y, width, height);
-                    const colors = Object.entries(image.data
-                        .reduce((c,v,i) => (!(i % 4) ? c.push([v]) : c.at(-1).push(v), c), [])
-                        .map(v => [v, Math.floor(v[0] / 100).toString() + Math.floor(v[1] / 100).toString() + Math.floor(v[2] / 100).toString() + Math.floor(v[3] / 100).toString()])
-                        .reduce((c,v) => (c[v[1]] ??= [0, v[0]], c[v[1]][0]++, c), {}))
-                        .sort((a,b) => b[1][0] - a[1][0])
-                        // .slice(0, 3)
-                        .map(([_,[__, color]]) => color)
-                        .map(rgbToHsv);
-                    if (colors.length < 3) colors.push(...new Array(3 - colors.length).fill(colors.at(-1) ?? { h: 0, s: 0, v: 0, a: 0 }));
-                    usedPixels.push(image);
-                }
-            }
+            const image = sharp(Buffer.from(await req.bytes()));
+            image.resize(Math.round(toTransform.width / width) * width, Math.round(toTransform.height / height) * height);
+            const promises = [];
+            for (let y = 0; y < pixelsHigh; y += height)
+                for (let x = 0; x < pixelsWide; x += width)
+                    promises.push(image
+                        .extract({ left: x, top: y, width, height })
+                        .ensureAlpha()
+                        .raw()
+                        .toBuffer()
+                        .then(buf => buf.toJSON().data));
+            usedPixels = await Promise.all(promises);
         }
         message.arguments.scale = Math.max(Math.min(Number(message.arguments.scale), 16), 0);
         if (message.attachments.size < 1) return message.reply('Must have atleast one attached image.');
