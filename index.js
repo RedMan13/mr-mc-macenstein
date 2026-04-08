@@ -3,7 +3,7 @@ console.log('starting...')
 // require('./statics/uptimer');
 const { Client, GatewayIntentBits } = require('discord.js');
 const { GoogleGenAI } = require("@google/genai");
-const { exec, spawn } = require("child_process");
+const { exec, spawn } = require("child_process"); 
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
