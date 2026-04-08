@@ -40,7 +40,7 @@ async function convert(id, message, file, pixels) {
                 .ensureAlpha()
                 .raw()
                 .toBuffer()
-                .then(buf => (process.stdout.write('Resolved image' + x + ':' + y + '\r'), buf.toJSON().data)));
+                .then(buf => (process.stdout.write('Resolved image ' + x + ':' + y + '        \r'), buf.toJSON().data)));
     const segments = await Promise.all(promises);
     console.log('Begining image weighting.');
     await rootMsg.edit(`(${id}) Weighting emojis...`);
@@ -192,7 +192,7 @@ module.exports = {
                         .ensureAlpha()
                         .raw()
                         .toBuffer()
-                        .then(buf => (process.stdout.write('Resolved image' + x + ':' + y + '\r'), buf.toJSON().data)));
+                        .then(buf => (process.stdout.write('Resolved image ' + x + ':' + y + '        \r'), buf.toJSON().data)));
             usedPixels = await Promise.all(promises);
         }
         message.arguments.scale = Math.max(Math.min(Number(message.arguments.scale), 16), 0);
