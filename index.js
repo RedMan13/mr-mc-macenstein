@@ -31,7 +31,7 @@ try {
     process.on('SIGINT', () => { child.kill(); process.exit(); });
     process.on('SIGTERM', () => { child.kill(); process.exit(); });
     process.on('SIGUSR2', () => { child.kill(); process.exit(); });
-} catch (err) { console.warn(err) }
+} catch (err) { console.warn(err.message) }
 
 globalThis.imports = {
     exec,
@@ -76,29 +76,34 @@ let slashCommands = []
  */
 
 function loadCommand(file) {
-    /** @type {CommandDefinition} */
-    const command = require(file);
-    delete require.cache[file]; // do not let commands get cached! they could change at any moment
-    if (command.slashCmd) {
-        console.log(`pushed ${command.comData.name} to slash command sync list`);
-        slashCommands.push(command.comData);
-        dbs.commands[command.comData.name] = {
-            description: command.comData.description,
+    try {
+        /** @type {CommandDefinition} */
+        const command = require(file);
+        delete require.cache[file]; // do not let commands get cached! they could change at any moment
+        if (command.slashCmd) {
+            console.log(`pushed ${command.comData.name} to slash command sync list`);
+            slashCommands.push(command.comData);
+            dbs.commands[command.comData.name] = {
+                description: command.comData.description,
+                command,
+                isSlash: command.slashCmd,
+                file
+            }
+            return command.name;
+        }
+        console.log(`loading command ${command.name}`);
+        dbs.commands[command.name] = {
+            description: command.sDesc,
+            category: command.category,
             command,
-            isSlash: command.slashCmd,
+            useCLI: !Array.isArray(command.args),
             file
         }
         return command.name;
+    } catch (err) {
+        console.warn(err.message);
+        return null
     }
-    console.log(`loading command ${command.name}`);
-    dbs.commands[command.name] = {
-        description: command.sDesc,
-        category: command.category,
-        command,
-        useCLI: !Array.isArray(command.args),
-        file
-    }
-    return command.name;
 }
 console.log('\n')
 const commandsPath = path.resolve(__dirname, 'commands');
@@ -124,6 +129,7 @@ fs.watch(commandsPath, (type, filename) => {
     // fell through due to being a new file
     if (exists && type === 'rename') {
         const name = loadCommand(file);
+        if (!name) return dbs.channels.console.send(`Command ${commandName} has been deleted`);
         dbs.channels.console.send(`Command ${name} has been loaded`);
     }
 
