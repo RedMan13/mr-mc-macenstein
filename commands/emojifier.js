@@ -32,6 +32,7 @@ async function convert(id, message, file, pixels) {
     const pixelsWide = tilesWide * width;
     await rootMsg.edit(`(${id}) Extracting image squares...`);
     image.resize(pixelsWide, pixelsHigh);
+    console.log('Extracting', tilesWide * tilesHigh, 'tiles from image');
     const promises = [];
     for (let y = 0; y < pixelsHigh; y += height)
         for (let x = 0; x < pixelsWide; x += width)
@@ -187,6 +188,7 @@ module.exports = {
             const pixelsHigh = tilesHigh * height;
             image.resize(pixelsWide, pixelsHigh);
             console.log('Extracting', tilesWide * tilesHigh, 'tiles from image for pixels');
+            message.reply('Extracting mapping pixels...');
             const promises = [];
             for (let y = 0; y < pixelsWide; y += height)
                 for (let x = 0; x < pixelsHigh; x += width)
@@ -195,7 +197,7 @@ module.exports = {
                         .ensureAlpha()
                         .raw()
                         .toBuffer()
-                        .then(buf => (process.stdout.write('Resolved image ' + x + ':' + y + '        \r'), buf.toJSON().data)));
+                        .then(buf => (process.stdout.write('Resolved image ' + x + ':' + y + '        \r'), new Uint8ClampedArray(buf.toJSON().data))));
             usedPixels = await Promise.all(promises);
         }
         message.arguments.scale = Math.max(Math.min(Number(message.arguments.scale), 16), 0);
