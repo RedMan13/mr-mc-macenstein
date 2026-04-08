@@ -67,7 +67,7 @@ async function convert(id, message, file, pixels) {
                 .composite(result.map((emoji, i) => ({
                     left: (i % tilesWide) * width,
                     top: Math.floor(i / tilesWide) * height,
-                    input: pixels[emoji].data,
+                    input: pixels[emoji],
                     raw: {
                         channels: 4,
                         width,
@@ -86,7 +86,7 @@ async function convert(id, message, file, pixels) {
         for (let j = 0; j < cpus; j++) {
             progress[j] = 0;
             const proc = child.fork(require.resolve('../statics/emojifier-thread.js'));
-            proc.once('spawn', () => proc.send([segments.slice(i, i += walk), pixels.map(p => [...p.data])]));
+            proc.once('spawn', () => proc.send([segments.slice(i, i += walk), pixels.map(p => [...p])]));
             proc.on('message', content => {
                 if ('status' in content) {
                     console.log('process', j, 'at', content.status * 100, 'percent');
@@ -146,10 +146,10 @@ module.exports = {
                 }
             })
                 .resize(sqaureSize * width, sqaureSize * height)
-                .composite(result.map((emoji, i) => ({
+                .composite(pixels.map((emoji, i) => ({
                     left: (i % sqaureSize) * width,
                     top: Math.floor(i / sqaureSize) * height,
-                    input: pixels[i].data,
+                    input: emoji,
                     raw: {
                         channels: 4,
                         width,

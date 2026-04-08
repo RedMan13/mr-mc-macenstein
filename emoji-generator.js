@@ -18,18 +18,14 @@ const files = emojis.map(icon => {
     ctx.fillText(icon, 16,16);
     const image = ctx.getImageData(0,0, 32,32);
     const text = "const { ImageData } = require('skia-canvas');\n" +
-        "module.exports = new ImageData(\n" +
-        `    new Uint8ClampedArray([\n` +
-        `        ${image.data
-                    .reduce((c,v,i) => (!(i % 4) ? c.push([v]) : c.at(-1).push(v), c), [])
-                    .reduce((c,v,i) => (!(i % 32) ? c.push([v]) : c.at(-1).push(v), c), [])
-                    .map(row => row.map(color => color.map(c => '0x' + c.toString(16).padStart(2, '0')).join(',')).join(', '))
-                    .join(',\n        ')
-                }\n` +
-        `    ]),\n` +
-        `    ${JSON.stringify(image.width)},\n` +
-        `    ${JSON.stringify(image.height)}\n` +
-        `);\n`;
+        `module.exports = new Uint8ClampedArray([\n` +
+        `    ${image.data
+                .reduce((c,v,i) => (!(i % 4) ? c.push([v]) : c.at(-1).push(v), c), [])
+                .reduce((c,v,i) => (!(i % 32) ? c.push([v]) : c.at(-1).push(v), c), [])
+                .map(row => row.map(color => color.map(c => '0x' + c.toString(16).padStart(2, '0')).join(',')).join(', '))
+                .join(',\n    ')
+            }\n` +
+        `]);\n`;
     const str = Buffer.from(icon).toString('hex');
     const file = path.resolve(__dirname, './assets/emojis', str + '.js');
     fs.writeFileSync(file, text);
