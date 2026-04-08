@@ -41,9 +41,10 @@ async function convert(id, message, file, pixels) {
                 .raw()
                 .toBuffer()
                 .then(buf => buf.toJSON().data));
-        process.stdout.write('On row ' + y);
+        process.stdout.write('On row ' + y + '\r');
     }
     const segments = await Promise.all(promises);
+    console.log('Begining image weighting.');
     await rootMsg.edit(`(${id}) Weighting emojis...`);
     return new Promise(resolve => {
         const cpus = Math.floor(os.cpus().length / 2) || 1;
@@ -194,7 +195,7 @@ module.exports = {
                         .raw()
                         .toBuffer()
                         .then(buf => buf.toJSON().data));
-                process.stdout.write('On row ' + y);
+                process.stdout.write('On row ' + y + '\r');
             }
             usedPixels = await Promise.all(promises);
         }
