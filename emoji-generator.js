@@ -16,9 +16,9 @@ ctx.textAlign = 'center';
 const files = emojis.map(icon => {
     ctx.clearRect(0,0, 32,32);
     ctx.fillText(icon, 16,16);
+    process.stdout.write(icon);
     const image = ctx.getImageData(0,0, 32,32);
-    const text = "const { ImageData } = require('skia-canvas');\n" +
-        `module.exports = new Uint8ClampedArray([\n` +
+    const text = `module.exports = new Uint8ClampedArray([\n` +
         `    ${image.data
                 .reduce((c,v,i) => (!(i % 4) ? c.push([v]) : c.at(-1).push(v), c), [])
                 .reduce((c,v,i) => (!(i % 32) ? c.push([v]) : c.at(-1).push(v), c), [])
