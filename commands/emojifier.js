@@ -183,11 +183,13 @@ module.exports = {
             const meta = await image.metadata();
             const tilesHigh = Math.round(meta.height / height);
             const tilesWide = Math.round(meta.width / width);
-            image.resize(tilesWide * width, tilesHigh * height);
+            const pixelsWide = tilesWide * width;
+            const pixelsHigh = tilesHigh * height;
+            image.resize(pixelsWide, pixelsHigh);
             console.log('Extracting', tilesWide * tilesHigh, 'tiles from image for pixels');
             const promises = [];
-            for (let y = 0; y < pixelsHigh; y += height)
-                for (let x = 0; x < pixelsWide; x += width)
+            for (let y = 0; y < pixelsWide; y += height)
+                for (let x = 0; x < pixelsHigh; x += width)
                     promises.push(image
                         .extract({ left: x, top: y, width, height })
                         .ensureAlpha()
