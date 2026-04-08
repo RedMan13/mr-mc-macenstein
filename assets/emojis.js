@@ -1,3 +1,4 @@
+/** @type {import('skia-canvas').ImageData[]} */
 module.exports = [
     require("./emojis/f09f9880.js"),
     require("./emojis/f09f9883.js"),

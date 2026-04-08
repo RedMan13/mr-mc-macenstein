@@ -35,6 +35,7 @@ const files = emojis.map(icon => {
     fs.writeFileSync(file, text);
     return path.relative(path.resolve(__dirname, 'assets'), file);
 });
-fs.writeFileSync('./assets/emojis.js', 'module.exports = [\n' +
+fs.writeFileSync('./assets/emojis.js', "/** @type {import('skia-canvas').ImageData[]} */\n" +
+'module.exports = [\n' +
 `    ${files.map(file => `require("./${JSON.stringify(file).slice(1,-1)}")`).join(',\n    ')}\n` +
 `];\n`);

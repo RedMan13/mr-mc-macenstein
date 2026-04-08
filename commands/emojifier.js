@@ -1,11 +1,11 @@
 const pixels = require('../assets/emojis.js');
-const { Canvas, loadImage } = require('skia-canvas');
+const { Canvas, loadImage, ImageData } = require('skia-canvas');
 const sharp = require('sharp');
+const child = require('child_process');
+const os = require('os');
 const { AttachmentBuilder } = require('discord.js');
 const { rgbToHsv, hsvToRgb } = require('../statics/color');
 
-const width = 32;
-const height = width;
 const processes = [];
 async function startConvert(message, file, pixels) {
     const id = Math.round(Math.random() * Number.MAX_SAFE_INTEGER).toString(16);
@@ -16,87 +16,103 @@ async function startConvert(message, file, pixels) {
     processes.splice(idx, 1);
 }
 async function convert(id, message, file, pixels) {
+    const width = message.arguments.tileSize || 32;
+    const height = width;
     const rootMsg = await message.reply(`(${id}) Loading target image...`);
     const req = await fetch(message.attachments.at(file).proxyURL);
-    let image = Buffer.from(await req.bytes());
-    if (['image/webp', 'image/gif', 'image/avif'].includes(req.headers.get('content-type')))
-        image = sharp(image);
-    const toTransform = await loadImage(image).catch(() => {});
-    if (!toTransform) return rootMsg.edit('The image is in an unsupported format (supports png,jpeg,svg,webp,gif,avif,pdf ONLY)');
-    let tilesWide = Math.round(toTransform.width / width);
-    let tilesHigh = Math.round(toTransform.height / height);
-    const scale = Math.min(24 / tilesWide, 24 / tilesHigh) * (message.arguments.scale || 1);
+    const image = sharp(Buffer.from(await req.bytes()));
+    if (!image) return rootMsg.edit('The image is in an unsupported format (supports png,jpeg,svg,webp,gif,avif,pdf ONLY)');
+    const meta = await image.metadata();
+    let tilesWide = Math.round(meta.width / width);
+    let tilesHigh = Math.round(meta.height / height);
+    const scale = (message.arguments.scale || 1);
     tilesWide *= scale;
     tilesHigh *= scale;
     tilesWide = Math.round(tilesWide);
     tilesHigh = Math.round(tilesHigh);
-    const canvas = new Canvas(tilesWide * width, tilesHigh * height);
-    const ctx = canvas.getContext('2d');
-    await rootMsg.edit(`(${id}) Extracting image squares at ${message.arguments.scale}x scale...`);
-    ctx.drawImage(toTransform, 0,0, canvas.width, canvas.height);
-    const segments = [];
-    if (((canvas.height / height) * (canvas.width / width)) > 16000) return rootMsg.edit('Image or image scale is to big.');
-    for (let y = 0; y < canvas.height; y += height)
-        for (let x = 0; x < canvas.width; x += width) {
-            const data = ctx.getImageData(x,y, width,height).data;
-            segments.push(data);
-        }
-    // if (segments.length > 256) return rootMsg.edit('Your image must not produce any more then 256 emojis.');
+    const pixelsHigh = tilesHigh * height;
+    const pixelsWide = tilesWide * width;
+    await rootMsg.edit(`(${id}) Extracting image squares...`);
+    image.resize(pixelsWide, pixelsHigh);
+    const promises = [];
+    for (let y = 0; y < pixelsHigh; y += height)
+        for (let x = 0; x < pixelsWide; x += width)
+            promises.push(image
+                .extract({ left: x, top: y, width, height })
+                .ensureAlpha()
+                .raw()
+                .toBuffer()
+                .then(buf => buf.toJSON().data));
+    const segments = await Promise.all(promises);
     await rootMsg.edit(`(${id}) Weighting emojis...`);
-    let idx = 0;
-    let emoji = 0;
-    let lastTime = Date.now();
-    const possible = [];
     return new Promise(resolve => {
+        const cpus = os.cpus().length / 2;
+        let i = 0;
+        const output = [];
+        const progress = [];
+        const walk = Math.ceil(segments.length / cpus);
+        const subProcesses = [];
+        console.log('spawning', cpus, 'processes');
+        async function finish() {
+            clearInterval(inter);
+            subProcesses.forEach(proc => proc.kill()); // make certain to kill all humans
+            await rootMsg.edit(`(${id}) Generating output image...`);
+            const result = output.flat();
+            const image = await sharp(new Uint8ClampedArray([0,0,0,0]), {
+                raw: {
+                    channels: 4,
+                    width: 1, 
+                    height: 1
+                }
+            })
+                .resize(tilesWide * width, tilesHigh * height)
+                .composite(result.map((emoji, i) => ({
+                    left: (i % tilesWide) * width,
+                    top: Math.floor(i / tilesWide) * height,
+                    input: pixels[emoji].data,
+                    raw: {
+                        channels: 4,
+                        width,
+                        height
+                    }
+                })))
+                .png()
+                .toBuffer();
+            rootMsg.delete();
+            message.reply({
+                content: 'Finished;',
+                files: [new AttachmentBuilder(image, { name: 'converted.png' })]
+            });
+            return resolve(); 
+        }
+        for (let j = 0; j < cpus; j++) {
+            progress[j] = 0;
+            const proc = child.fork(require.resolve('../statics/emojifier-thread.js'));
+            proc.once('spawn', () => proc.send([segments.slice(i, i += walk), pixels.map(p => [...p.data])]));
+            proc.on('message', content => {
+                if ('status' in content) {
+                    console.log('process', j, 'at', content.status * 100, 'percent');
+                    progress[j] = content.status * 100;
+                    return;
+                }
+                console.log('process', j, 'finished');
+                progress[j] = 100;
+                output[j] = content;
+                if (progress.every(p => p === 100)) finish();
+            });
+            subProcesses.push(proc);
+        }
         const inter = setInterval(async () => {
-            const start = Date.now();
-            const startIdx = idx;
-            const t = () => (Date.now() - start) >= 4000;
-            topLoop: for (; idx < segments.length; idx++) {
-                if (t()) break topLoop;
-                possible[idx] ??= [];
-                if (emoji >= pixels.length) emoji = 0;
-                for (; emoji < pixels.length; emoji++) {
-                    if (t()) break topLoop;
-                    possible[idx][emoji] = {
-                        emojiIdx: emoji,
-                        weight: 0
-                    }
-                    for (let i = 0; i < segments[idx].length; i += 8) {
-                        possible[idx][emoji].weight += Math.abs(segments[idx][i] - pixels[emoji].data[i]) +
-                            Math.abs(segments[idx][i +1] - pixels[emoji].data[i +1]) +
-                            Math.abs(segments[idx][i +2] - pixels[emoji].data[i +2]) +
-                            Math.abs(segments[idx][i +3] - pixels[emoji].data[i +3]) +
-
-                            Math.abs(segments[idx][i +4] - pixels[emoji].data[i +4]) +
-                            Math.abs(segments[idx][i +5] - pixels[emoji].data[i +5]) +
-                            Math.abs(segments[idx][i +6] - pixels[emoji].data[i +6]) +
-                            Math.abs(segments[idx][i +7] - pixels[emoji].data[i +7]);
-                    }
-                }
-            }
-            if (idx >= segments.length || !processes.includes(id)) {
+            const percent = progress.reduce((c,v) => c + v, 0) / progress.length;
+            if (percent >= 100) return finish();
+            if (!processes.includes(id)) {
                 clearInterval(inter);
-                await rootMsg.edit(`(${id}) Finding best suited emojis...`);
-                possible.forEach(list => list.sort((a,b) => a.weight - b.weight));
-                rootMsg.delete();
-                ctx.clearRect(0,0, canvas.width, canvas.height);
-                for (let i = 0; i < possible.length; i++) {
-                    const x = (i % tilesWide) * width;
-                    const y = Math.floor(i / tilesWide) * height;
-                    ctx.drawImage(pixels[possible[i][0].emojiIdx], x,y, width, height);
-                }
-                message.reply({
-                    content: 'Finished;',
-                    files: [new AttachmentBuilder(await canvas.toBuffer(), { name: 'converted.png' })]
-                });
+                await rootMsg.edit(`(${id}) Conversion canceled.`);
+                subProcesses.forEach(proc => proc.kill());
                 return resolve();
             }
-            const dt = Date.now() - lastTime;
-            lastTime = Date.now();
-            const di = idx - startIdx;
-            rootMsg.edit(`(${id}) Weighting emojis... ${Math.round((idx / segments.length) * 100)}% ETA <t:${Math.floor((Date.now() + (dt * ((segments.length - idx) / di))) / 1000)}:R>`);
-        }, 4100);
+            rootMsg.edit(`(${id}) Weighting emojis... ${Math.round(percent)}% (${progress.map(per => Math.round(per) + '%').join(', ')})`);
+        }, 4250);
     });
 }
 
@@ -109,8 +125,9 @@ module.exports = {
     args: {
         scale: [['s'], { match: /^[0-9]+(?:\.[0-9]+)?$/i, default: 1 }, 'The scale factor to apply to the image'],
         dump: [[], { noValue: true }, 'Dumps all of the internal emoji data'],
+        tileSize: [['tile-size', 'ts', 't'], { match: /^[0-9]+(?:\.[0-9]+)?$/i, default: 32 }, 'The pixel size to use for emoji tiles.'],
         // perfect: [['p'], { noValue: true }, 'If the image should be rendered perfectly'],
-        mapping: [['m'], { noValue: true }, 'If the first supplied image should be used as the emoji mapping. Formatting is identical to the output of dump'],
+        mapping: [['m'], { noValue: true }, 'If the first supplied image should be used as the emoji mapping. Can optionally include a number to state how many pixels each square should be.'],
         list: [['l'], { noValue: true }, 'List all currently running image processes'],
         cancel: [['c'], { match: /^[0-9a-f]+$/i }, 'Cancels any running image process']
     },
@@ -118,6 +135,9 @@ module.exports = {
      * @param {import('discord.js').Message} message
      */
     execute: async (message) => {
+        message.arguments.tileSize = Number(message.arguments.tileSize) || 32
+        const width = message.arguments.tileSize;
+        const height = width;
         if (message.arguments.dump) {
             const sqaureSize = Math.ceil(Math.sqrt(pixels.length)); 
             const canvas = new Canvas(sqaureSize * width, sqaureSize * height);
@@ -125,7 +145,7 @@ module.exports = {
             let i = 0;
             for (let y = 0; y < canvas.height; y += height) {
                 for (let x = 0; x < canvas.width; x += width) {
-                    ctx.putImageData(pixels[i][2], x,y);
+                    ctx.drawImage(pixels[i], x,y);
                     i++;
                     if (i >= pixels.length) break;
                 }
@@ -170,11 +190,11 @@ module.exports = {
                         .map(([_,[__, color]]) => color)
                         .map(rgbToHsv);
                     if (colors.length < 3) colors.push(...new Array(3 - colors.length).fill(colors.at(-1) ?? { h: 0, s: 0, v: 0, a: 0 }));
-                    usedPixels.push(['', colors, image]);
+                    usedPixels.push(image);
                 }
             }
         }
-        message.arguments.scale = Math.max(Math.min(Number(message.arguments.scale), 6), 0);
+        message.arguments.scale = Math.max(Math.min(Number(message.arguments.scale), 16), 0);
         if (message.attachments.size < 1) return message.reply('Must have atleast one attached image.');
         startConvert(message, message.arguments.mapping ? 1 : 0, usedPixels);
     },
