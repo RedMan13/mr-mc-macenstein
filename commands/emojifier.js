@@ -44,7 +44,7 @@ async function convert(id, message, file, pixels) {
     const segments = await Promise.all(promises);
     await rootMsg.edit(`(${id}) Weighting emojis...`);
     return new Promise(resolve => {
-        const cpus = os.cpus().length / 2;
+        const cpus = Math.floor(os.cpus().length / 2) || 1;
         let i = 0;
         const output = [];
         const progress = [];
