@@ -180,8 +180,9 @@ module.exports = {
             usedPixels = [];
             const req = await fetch(message.attachments.at(0).proxyURL);
             const image = sharp(Buffer.from(await req.bytes()));
-            const tilesHigh = Math.round(toTransform.height / height);
-            const tilesWide = Math.round(toTransform.width / width);
+            const meta = await image.metadata();
+            const tilesHigh = Math.round(meta.height / height);
+            const tilesWide = Math.round(meta.width / width);
             image.resize(tilesWide * width, tilesHigh * height);
             console.log('Extracting', tilesWide * tilesHigh, 'tiles from image for pixels');
             const promises = [];
