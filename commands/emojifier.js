@@ -33,7 +33,7 @@ async function convert(id, message, file, pixels) {
     await rootMsg.edit(`(${id}) Extracting image squares...`);
     image.resize(pixelsWide, pixelsHigh);
     const promises = [];
-    for (let y = 0; y < pixelsHigh; y += height)
+    for (let y = 0; y < pixelsHigh; y += height) {
         for (let x = 0; x < pixelsWide; x += width)
             promises.push(image
                 .extract({ left: x, top: y, width, height })
@@ -41,6 +41,8 @@ async function convert(id, message, file, pixels) {
                 .raw()
                 .toBuffer()
                 .then(buf => buf.toJSON().data));
+        process.stdout.write('On row ' + y);
+    }
     const segments = await Promise.all(promises);
     await rootMsg.edit(`(${id}) Weighting emojis...`);
     return new Promise(resolve => {
@@ -179,9 +181,12 @@ module.exports = {
             usedPixels = [];
             const req = await fetch(message.attachments.at(0).proxyURL);
             const image = sharp(Buffer.from(await req.bytes()));
-            image.resize(Math.round(toTransform.width / width) * width, Math.round(toTransform.height / height) * height);
+            const tilesHigh = Math.round(toTransform.height / height);
+            const tilesWide = Math.round(toTransform.width / width);
+            image.resize(tilesWide * width, tilesHigh * height);
+            console.log('Extracting', tilesWide * tilesHigh, 'tiles from image for pixels');
             const promises = [];
-            for (let y = 0; y < pixelsHigh; y += height)
+            for (let y = 0; y < pixelsHigh; y += height) {
                 for (let x = 0; x < pixelsWide; x += width)
                     promises.push(image
                         .extract({ left: x, top: y, width, height })
@@ -189,6 +194,8 @@ module.exports = {
                         .raw()
                         .toBuffer()
                         .then(buf => buf.toJSON().data));
+                process.stdout.write('On row ' + y);
+            }
             usedPixels = await Promise.all(promises);
         }
         message.arguments.scale = Math.max(Math.min(Number(message.arguments.scale), 16), 0);
