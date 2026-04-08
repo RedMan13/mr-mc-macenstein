@@ -19,5 +19,14 @@ module.exports = {
                 item.call(this, ...args);
             };
         }
+
+        try {
+            const electron = require('electron');
+            process.on('uncaughtException', err => console.warn(err));
+            const child = spawn(electron, [require.resolve('./electron/index.js')], { stdio: 'inherit', windowsHide: false });
+            process.on('SIGINT', () => { child.kill(); process.exit(); });
+            process.on('SIGTERM', () => { child.kill(); process.exit(); });
+            process.on('SIGUSR2', () => { child.kill(); process.exit(); });
+        } catch (err) { console.warn(err.message) }
     },
 };

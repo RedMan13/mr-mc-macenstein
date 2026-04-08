@@ -22,16 +22,10 @@ for (const func of ['log', 'warn', 'error', 'debug', 'info']) {
         logs.write(text + '\n');
     }
 }
-process.on('beforeExit', () => logs.close());
-
-try {
-    const electron = require('electron');
-    process.on('uncaughtException', err => console.warn(err));
-    const child = spawn(electron, [require.resolve('./electron/index.js')], { stdio: 'inherit', windowsHide: false });
-    process.on('SIGINT', () => { child.kill(); process.exit(); });
-    process.on('SIGTERM', () => { child.kill(); process.exit(); });
-    process.on('SIGUSR2', () => { child.kill(); process.exit(); });
-} catch (err) { console.warn(err.message) }
+process.on('exit', () => {
+    dbs.channels.console.send('Bot turned off...');
+    logs.close();
+});
 
 globalThis.imports = {
     exec,
@@ -129,7 +123,7 @@ fs.watch(commandsPath, (type, filename) => {
     // fell through due to being a new file
     if (exists && type === 'rename') {
         const name = loadCommand(file);
-        if (!name) return dbs.channels.console.send(`Command ${commandName} has been deleted`);
+        if (!name) return;
         dbs.channels.console.send(`Command ${name} has been loaded`);
     }
 
