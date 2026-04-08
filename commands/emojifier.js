@@ -124,9 +124,9 @@ module.exports = {
     args: {
         scale: [['s'], { match: /^[0-9]+(?:\.[0-9]+)?$/i, default: 1 }, 'The scale factor to apply to the image'],
         dump: [[], { noValue: true }, 'Dumps all of the internal emoji data'],
-        tileSize: [['tile-size', 'ts', 't'], { match: /^[0-9]+(?:\.[0-9]+)?$/i, default: 32 }, 'The pixel size to use for emoji tiles.'],
+        tileSize: [['tile-size', 'ts', 't'], { match: /^[0-9]+(?:\.[0-9]+)?$/i, default: 32 }, 'The pixel size to use for emoji tiles. Applies to mapping tiles aswell'],
         // perfect: [['p'], { noValue: true }, 'If the image should be rendered perfectly'],
-        mapping: [['m'], { noValue: true }, 'If the first supplied image should be used as the emoji mapping. Can optionally include a number to state how many pixels each square should be.'],
+        mapping: [['m'], { noValue: true }, 'If the first supplied image should be used as the emoji mapping.'],
         list: [['l'], { noValue: true }, 'List all currently running image processes'],
         cancel: [['c'], { match: /^[0-9a-f]+$/i }, 'Cancels any running image process']
     },
