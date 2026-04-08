@@ -11,5 +11,14 @@ module.exports = {
             return;
         }
         process.send({ pull: true });
+        process.once('message', msg => {
+            if (msg.noChanged) return message.reply('No changes!');
+            if (msg.couldntMerge) return message.reply('Failed to merge because: ' + msg.couldntMerge.join('\n'));
+            if (msg.updated) return message.reply('Finished! updated ' + msg.updated.length + ' files. ' + (msg.restartNeeded ? 'Bot requires restart to implement' : ''));
+            if (msg.restartNeeded && msg.args === 'restart') {
+                message.reply('Restarting....');
+                stop();
+            }
+        });
     },
 };
