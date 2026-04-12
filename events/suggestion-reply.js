@@ -34,6 +34,7 @@ module.exports = {
      * @param {import('discord.js').Message} message
      */
     execute: async (message) => {
+        if (!dbs?.database) return;
         const data = dbs.database.channel(dbs.channels.suggestions.id);
         const suggested = data.get('suggested');
         if (!suggested) return;

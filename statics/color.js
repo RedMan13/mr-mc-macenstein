@@ -3,8 +3,8 @@ function rgbToHsv (rgb) {
     const r = rgb[0] / 255;
     const g = rgb[1] / 255;
     const b = rgb[2] / 255;
-    const x = Math.min(Math.min(r, g), b);
-    const v = Math.max(Math.max(r, g), b);
+    const x = Math.min(r,g,b);
+    const v = Math.max(r,g,b);
 
     // For grays, hue will be arbitrarily reported as zero. Otherwise, calculate
     let h = 0;

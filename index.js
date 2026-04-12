@@ -151,6 +151,5 @@ imports.client.login(process.env.token);
 
 globalThis.stop = () => {
     imports.client.destroy();
-    imports.exec('kill 1');
-    child.kill();
+    process.exit();
 }
