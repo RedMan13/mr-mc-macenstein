@@ -1,4 +1,16 @@
 const child = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const logs = fs.createWriteStream(path.resolve(__dirname, './errors.log'));
+for (const func of ['log', 'warn', 'error', 'debug', 'info']) {
+    const old = console[func];
+    console[func] = function(...args) {
+        old(...args);
+        const text = util.format(...args);
+        logs.write(text + '\n');
+    }
+}
 
 const spawn = () => {
     let allowStop = false;

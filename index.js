@@ -13,18 +13,8 @@ const syncSlash = require('@frostzzone/discord-sync-commands');
 const { createQuoteCard, createQuoteMessage } = require('./statics/quote-generator.js');
 const util = require('util');
 
-const logs = fs.createWriteStream(path.resolve(__dirname, './errors.log'));
-for (const func of ['log', 'warn', 'error', 'debug', 'info']) {
-    const old = console[func];
-    console[func] = function(...args) {
-        old(...args);
-        const text = util.format(...args);
-        logs.write(text + '\n');
-    }
-}
 process.on('exit', () => {
     dbs.channels.console.send('Bot turned off...');
-    logs.close();
 });
 
 globalThis.imports = {
@@ -52,7 +42,8 @@ globalThis.dbs = { // databases
     channels: {},
     database: imports.db,
     commands: {},
-    commandConfig: config.commands
+    commandConfig: config.commands,
+    startedAt: Date.now()
 }
 
 let slashCommands = []
