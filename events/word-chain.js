@@ -21,7 +21,7 @@ module.exports = {
         if (!dbs.channelsLoaded) return; // no prefix, not loaded yet
         if (message.channel.id !== dbs.channels.wordChain.id) return;
         const messageChannel = dbs.database.channel(dbs.channels.wordChain.id);
-        const filtered = message.content.replaceAll(/[^0-9a-z\-']+/gi, '-');
+        const filtered = message.content.replaceAll(/[^0-9a-z\-']+/gi, '-').toLowerCase();
         
         if (messageChannel.get('lastUser') === message.author.id) return fail(message, `You are not allowed to submit back to back!`);
 
