@@ -1,7 +1,7 @@
 const { EmbedBuilder } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
-const words = fs.readFileSync(path.resolve(__dirname, '../assets/words.txt'), 'utf8').split(',');
+const words = fs.readFileSync(path.resolve(__dirname, '../assets/words.txt'), 'utf8');
 
 /**
  * @param {import('discord.js').Message} message
@@ -21,7 +21,7 @@ module.exports = {
         if (!dbs.channelsLoaded) return; // no prefix, not loaded yet
         if (message.channel.id !== dbs.channels.wordChain.id) return;
         const messageChannel = dbs.database.channel(dbs.channels.wordChain.id);
-        const filtered = message.content.replaceAll(/[^a-z\-']+/gi, '-');
+        const filtered = message.content.replaceAll(/[^0-9a-z\-']+/gi, '-');
         
         if (messageChannel.get('lastUser') === message.author.id) return fail(message, `You are not allowed to submit back to back!`);
 
@@ -31,7 +31,7 @@ module.exports = {
         const locator = new RegExp(`(?:^|,)${filtered}(?:$|,)`);
         if (locator.test(used)) return fail(message, `\`${filtered}\` has already been used!`);
 
-        if (!words.includes(filtered)) return fail(message, `\`${filtered}\` is not a word!`);
+        if (!locator.test(words)) return fail(message, `\`${filtered}\` is not a word!`);
 
         messageChannel.set('words', used + ',' + filtered);
         messageChannel.set('lastUser', message.author.id);
