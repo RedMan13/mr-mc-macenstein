@@ -10,6 +10,7 @@ module.exports = {
         console.log(`Ready! Logged in as ${client.user.tag}`);
         dbs.channels = Object.fromEntries(await Promise.all(Object.entries(dbs.config.channels)
             .map(async ([name, id]) => [name, await client.channels.fetch(id).catch(console.warn)])));
+        dbs.channelsLoaded = true;
         dbs.channels.console.send(`Ready! Logged in as ${client.user.tag}`);
         for (const name of ['log', 'warn', 'error', 'debug', 'info']) {
             const item = console[name];
