@@ -10,6 +10,11 @@ module.exports = {
             message.reply(`you are not authorized to use this`);
             return;
         }
+        await message.channel.send('Restarting bot...');
+        const global = dbs.database.global();
+        global.set('restarted', true);
+        global.set('restartMessage', message.id);
+        global.set('restartChannel', message.channel.id);
         stop();
     },
 };

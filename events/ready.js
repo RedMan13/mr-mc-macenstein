@@ -29,5 +29,21 @@ module.exports = {
             process.on('SIGTERM', () => { child.kill(); process.exit(); });
             process.on('SIGUSR2', () => { child.kill(); process.exit(); });
         } catch (err) { console.warn(err.message) }
+
+        const global = dbs.database.global();
+        await global.loaded;
+        if (global.get('restarted')) {
+            if (global.has('restartChannel')) {
+                /** @type {import('discord.js').TextChannel} */
+                const channel = await client.channels.fetch(global.get('restartChannel'));
+                channel?.send?.({
+                    content: 'Bot restarted!',
+                    reply: { messageReference: global.get('restartMessage') }
+                });
+                global.delete('restartChannel');
+                global.delete('restartMessage');
+            }
+            global.set('restarted', false);
+        }
     },
 };

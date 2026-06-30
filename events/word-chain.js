@@ -30,7 +30,6 @@ module.exports = {
 
         const locator = new RegExp(`(?:^|,)${filtered}(?:$|,)`);
         if (locator.test(used)) return fail(message, `\`${filtered}\` has already been used!`);
-
         if (!locator.test(words)) return fail(message, `\`${filtered}\` is not a word!`);
 
         messageChannel.set('words', used + ',' + filtered);

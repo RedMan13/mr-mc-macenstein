@@ -13,6 +13,16 @@ const syncSlash = require('@frostzzone/discord-sync-commands');
 const { createQuoteCard, createQuoteMessage } = require('./statics/quote-generator.js');
 const util = require('util');
 
+const logs = fs.createWriteStream(path.resolve(__dirname, './errors.log'));
+for (const func of ['log', 'warn', 'error', 'debug', 'info']) {
+    const old = console[func];
+    console[func] = function(...args) {
+        old(...args);
+        const text = util.format(...args);
+        logs.write(text + '\n');
+    }
+}
+
 process.on('exit', () => {
     dbs.channels.console.send('Bot turned off...');
 });
@@ -140,7 +150,9 @@ for (const file of eventFiles) { // add events via files
 /* login */
 imports.client.login(process.env.token);
 
-globalThis.stop = () => {
+globalThis.stop = async () => {
+    console.log('Forcing shut down...')
+    await dbs.database.forceSave();
     imports.client.destroy();
     process.exit();
 }

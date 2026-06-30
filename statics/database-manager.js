@@ -5,9 +5,20 @@ class Database {
     #path = '';
     #data = {};
     #needsWrite = false;
+    #resolveLoaded = null
+    loaded = null;
     constructor(dir) {
+        this.loaded = new Promise(resolve => this.#resolveLoaded = resolve);
         this.#path = dir;
         this.#setupSaving();
+    }
+    async save(forced) {
+        if (!this.#needsWrite && !forced) return;
+        console.log(`saving ${path.basename(this.#path)}...`);
+        await fs.mkdir(path.dirname(this.#path), { recursive: true }).catch(err => console.warn(err));
+        await fs.writeFile(this.#path, JSON.stringify(this.#data, null, '\t')).catch(err => console.warn(err));
+        this.#needsWrite = false;
+        console.log(`Finished saving ${path.basename(this.#path)}`);
     }
     async #setupSaving() {
         // ignore file errors, we will just create it when we need to
@@ -15,14 +26,9 @@ class Database {
         if (isReal) console.log(`Reading database ${path.basename(this.#path)}`);
         const data = await fs.readFile(this.#path, 'utf8').catch(() => '{}');
         this.#data = Object.assign(JSON.parse(data), this.#data);
-        setInterval(async () => {
-            if (!this.#needsWrite) return;
-            console.log(`saving ${path.basename(this.#path)}...`);
-            await fs.mkdir(path.dirname(this.#path), { recursive: true }).catch(err => console.warn(err));
-            await fs.writeFile(this.#path, JSON.stringify(this.#data, null, '\t')).catch(err => console.warn(err));
-            this.#needsWrite = false;
-            console.log(`Finished saving ${path.basename(this.#path)}`);
-        }, 1000);
+        this.#resolveLoaded(true);
+        this.loaded = true;
+        setInterval(this.save.bind(this), 1000);
     }
     has(key) { return key in this.#data; }
     get(key) { return this.#data[key]; }
@@ -52,6 +58,9 @@ class DatabaseManager {
         const dir = path.resolve(__dirname, '../databases/global.json');
         if (!(dir in this.databases)) this.databases[dir] = new Database(dir);
         return this.databases[dir];
+    }
+    static forceSave() {
+        return Promise.all(Object.values(this.databases).map(base => base.save(true)));
     }
 }
 
