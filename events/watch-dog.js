@@ -28,16 +28,16 @@ module.exports = {
                     .filter(host => host.rating.available > 0)
                     .sort((a,b) => a.rating.ping - b.rating.ping)
                     .sort((a,b) => b.rating.available - a.rating.available);
-                console.log(dbs.id, usable);
                 dbs.major = rated.length <= 1 || usable[0].id === dbs.id;
-                console.log(dbs.major);
                 for (const command in dbs.commands) {
                     if (dbs.commands[command].work === 0) { dbs.commands[command].enabled = true; continue; }
                     const bestId = usable.find(host => host.rating.commands.includes(command))?.id;
                     // if no one else is capable (i.e. no one else exists) then we must bear the given iregardless of capacity
                     dbs.commands[command].enabled = bestId && bestId === dbs.id;
-                    console.log(dbs.commands[command].enabled, bestId, bestId === dbs.id);
                 }
+                if (dbs.major) console.log('This bot is handling events.');
+                else console.log('This bot will nolonger handle events.');
+                console.log('The following commands are enabled: ', Object.entries(dbs.commands).filter(([n, command]) => command.enabled).map(n => n[0]));
             }, 30000);
         }
         if (message.author.id !== '1455453433565020306') return; // ddededodediamantes gabriel
