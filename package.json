@@ -20,6 +20,7 @@
         "express": "^4.22.1",
         "opencl-raub": "^2.0.1",
         "os-utils": "0.0.14",
+        "sharp": "@img/sharp-wasm32",
         "skia-canvas": "^3.0.8"
     }
 }
