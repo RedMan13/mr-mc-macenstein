@@ -36,5 +36,5 @@ module.exports = function rate(initiator) {
     if (ping > 20000) ratings.splice(0, ratings.length, 0);
 
     const available = ratings.reduce((c,v) => c + v, 0) * (1 / ratings.length);
-    return { available, ping, commands: Object.entries(dbs.commands).filter(([n, command]) => command.work >= available).map(v => v[0]) };
+    return { available, ping, commands: Object.entries(dbs.commands).filter(([n, command]) => command.work <= available).map(v => v[0]) };
 }
