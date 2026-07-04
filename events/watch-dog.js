@@ -15,13 +15,20 @@ module.exports = {
         if (message.channelId !== dbs.config.channels.watchDog) return;
         if (message.author.id === imports.client.user.id) {
             const jsonStart = message.content.indexOf('{');
-            rated.push(JSON.parse(message.content.slice(jsonStart)));
+            const meta = JSON.parse(message.content.slice(jsonStart));
+            if (!rated.some(v => v.id === meta.id)) rated.push(meta);
+            else {
+                const idx = rated.findIndex(v => v.id === meta.id);
+                rated.splice(idx, 1, meta);
+            }
             clearTimeout(handleRated);
             handleRated = setTimeout(() => {
+                if (!rated.some(v => v.id === dbs.id)) rated.push(rate(message.createdTimestamp));
                 const usable = rated
                     .filter(host => host.rating.available > 0)
                     .sort((a,b) => a.rating.ping - b.rating.ping)
                     .sort((a,b) => b.rating.available - a.rating.available);
+                console.log(usable);
                 dbs.major = rated.length <= 1 || rated[0].id === dbs.id;
                 for (const command in dbs.commands) {
                     if (dbs.commands[command].work === 0) { dbs.commands[command].enabled = true; continue; }
