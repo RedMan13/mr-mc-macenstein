@@ -12,7 +12,7 @@ module.exports = {
      * @param {import('discord.js').Message} message
      */
     execute: async (message) => {
-        if (message.channelId !== dbs.channels.watchDog.id) return;
+        if (message.channelId !== dbs.config.channels.watchDog) return;
         if (message.author.id === imports.client.user.id) {
             const jsonStart = message.content.indexOf('{');
             rated.push(JSON.parse(message.content.slice(jsonStart)));
