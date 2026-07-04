@@ -1,5 +1,6 @@
 const util = require('util');
 const os = require('os');
+const rate = require('../statics/self-rating');
 
 module.exports = {
     name: 'clientReady',
@@ -10,6 +11,7 @@ module.exports = {
      */
     async execute(client) {
         console.log(`Ready! Logged in as ${client.user.tag}`);
+        dbs.id = Date.now();
         dbs.channels = Object.fromEntries(await Promise.all(Object.entries(dbs.config.channels)
             .map(async ([name, id]) => [name, await client.channels.fetch(id).catch(console.warn)])));
         dbs.channelsLoaded = true;
@@ -47,5 +49,8 @@ module.exports = {
             }
             global.set('restarted', false);
         }
+
+        const rating = rate(message.createdTimestamp);
+        dbs.channels.watchDog.reply(`Hello gabriel! i am ${JSON.stringify({ id: dbs.id, rating })}`);
     },
 };
