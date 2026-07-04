@@ -61,7 +61,7 @@ module.exports = {
             .map(category => ({
                 name: category,
                 value: commands
-                    .filter(command => dbs.commands[command].category === category)
+                    .filter(command => dbs.commands[command].category === category && dbs.commands[command].enabled)
                     .map(command => `\`${command}\` ${dbs.commands[command].description}`)
                     .join('\n'),
                 inline: false
