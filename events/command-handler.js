@@ -7,7 +7,7 @@ module.exports = {
         if (message.content.startsWith(dbs.commandConfig.prefix)) {
             const args = message.content.split(' ');
             const command = args.shift().slice(dbs.config.commands.prefix.length);
-            if (!dbs.commands[command]) return;
+            if (!dbs.commands[command]?.enabled) return;
             const commandData = dbs.commands[command].command;
             message.args = args.join(' ');
             message.arguments = dbs.commands[command].useCLI

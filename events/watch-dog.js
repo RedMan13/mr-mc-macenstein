@@ -36,8 +36,8 @@ function rate(initiator) {
     if (ping > 4000) ratings.splice(0, ratings.length, 1);
     if (ping > 20000) ratings.splice(0, ratings.length, 0);
 
-    console.log(ratings);
-    return { available: ratings.reduce((c,v) => c + v, 0) * (1 / ratings.length), ping, commands: Object.keys(dbs.commands) };
+    const available = ratings.reduce((c,v) => c + v, 0) * (1 / ratings.length);
+    return { available, ping, commands: Object.entries(dbs.commands).filter(([n, command]) => command.work >= available) };
 }
 
 const rated = [];
@@ -64,6 +64,7 @@ module.exports = {
                     .sort((a,b) => b.rating.available - a.rating.available);
                 dbs.major = rated.length <= 1 || rated[0].id === id;
                 for (const command in dbs.commands) {
+                    if (dbs.commands[command].work === 0) { dbs.commands[command].enabled = true; continue; }
                     const bestId = usable.find(host => host.rating.commands.includes(command))?.id;
                     // if no one else is capable (i.e. no one else exists) then we must bear the given iregardless of capacity
                     dbs.commands[command].enabled = bestId === id || !bestId;

@@ -4,7 +4,7 @@ module.exports = {
     category: 'operator',
     sDesc: 'pulls from github',
     lDesc: 'pulls from github, restarting the bot if necessary',
-    work: 1,
+    work: 0,
     args: [],
     execute: async (message) => {
         if (message.author.id !== "860531746294726736") {

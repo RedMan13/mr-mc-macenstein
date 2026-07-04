@@ -4,7 +4,7 @@ module.exports = {
     category: 'operator',
     sDesc: 'restarts the bot',
     lDesc: 'Restarts the entire discord bot.',
-    work: 1,
+    work: 0,
     args: [],
     execute: async (message) => {
         if (message.author.id !== "860531746294726736") {
