@@ -27,8 +27,7 @@ module.exports = {
                     if (dbs.commands[command].work === 0) { dbs.commands[command].enabled = true; continue; }
                     const bestId = usable.find(host => host.rating.commands.includes(command))?.id;
                     // if no one else is capable (i.e. no one else exists) then we must bear the given iregardless of capacity
-                    dbs.commands[command].enabled = bestId === dbs.id || !bestId;
-                    console.log(command, dbs.commands[command].enabled)
+                    dbs.commands[command].enabled = bestId && bestId === dbs.id;
                 }
             }, 30000);
         }
