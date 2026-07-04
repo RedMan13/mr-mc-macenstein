@@ -29,7 +29,7 @@ module.exports = {
                     .sort((a,b) => a.rating.ping - b.rating.ping)
                     .sort((a,b) => b.rating.available - a.rating.available);
                 console.log(dbs.id, usable);
-                dbs.major = rated.length <= 1 || rated[0].id === dbs.id;
+                dbs.major = rated.length <= 1 || usable[0].id === dbs.id;
                 console.log(dbs.major);
                 for (const command in dbs.commands) {
                     if (dbs.commands[command].work === 0) { dbs.commands[command].enabled = true; continue; }
