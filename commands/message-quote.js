@@ -3,6 +3,7 @@ const { ApplicationIntegrationType, InteractionContextType, ApplicationCommandTy
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     slashCmd: true,
+    work: 2,
     comData: {
         type: ApplicationCommandType.Message,
         name: 'Quote',

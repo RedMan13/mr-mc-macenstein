@@ -53,7 +53,8 @@ globalThis.dbs = { // databases
     database: imports.db,
     commands: {},
     commandConfig: config.commands,
-    startedAt: Date.now()
+    startedAt: Date.now(),
+    major: true
 }
 
 let slashCommands = []
@@ -61,7 +62,7 @@ let slashCommands = []
 /**
  * @typedef {Object} CommandDefinition
  * @prop {boolean} slashCmd
- * @prop {Object?} comData
+ * @prop {import('discord.js').ApplicationCommandDataResolvable?} comData
  * @prop {string?} name
  * @prop {string?} category
  * @prop {string?} sDesc
@@ -81,7 +82,9 @@ function loadCommand(file) {
             dbs.commands[command.comData.name] = {
                 description: command.comData.description,
                 command,
-                isSlash: command.slashCmd,
+                enabled: true,
+                work: command.work,
+                isSlash: true,
                 file
             }
             return command.name;
@@ -91,6 +94,8 @@ function loadCommand(file) {
             description: command.sDesc,
             category: command.category,
             command,
+            enabled: true,
+            work: command.work,
             useCLI: !Array.isArray(command.args),
             file
         }
@@ -140,10 +145,16 @@ for (const file of eventFiles) { // add events via files
     console.log(`applying event ${file}`)
     const filePath = path.resolve(eventsPath, file);
     const event = require(filePath);
+    const onRun = event.global 
+        ? async (...args) => event.execute(...args)
+        : async (...args) => {
+            if (!dbs.major) return;
+            event.execute(...args);
+        }
     if (event.once) {
-        imports.client.once(event.name, async (...args) => event.execute(...args))
+        imports.client.once(event.name, onRun)
     } else {
-        imports.client.on(event.name, async (...args) => event.execute(...args))
+        imports.client.on(event.name, onRun)
     }
 }
 

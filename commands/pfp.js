@@ -6,6 +6,7 @@ module.exports = {
     category: 'general',
     sDesc: 'Gets a users PFP',
     lDesc: 'Gets the Profile Picture of whoever you mention',
+    work: 1,
     args: [
         {
             type: 'member',

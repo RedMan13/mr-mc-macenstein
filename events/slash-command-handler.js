@@ -1,6 +1,7 @@
 module.exports = {
     name: 'interactionCreate',
     once: false,
+    global: true,
     /** @param {import('discord.js').BaseInteraction} interaction */
     execute: async (interaction) => {
         if (!interaction.isCommand()) {

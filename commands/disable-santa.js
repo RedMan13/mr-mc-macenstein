@@ -4,6 +4,7 @@ module.exports = {
     category: 'operator',
     sDesc: 'enables santa clause',
     lDesc: 'enables santa clause, can only be used by <@860531746294726736>',
+    work: 1,
     args: [],
     /**
      * @param {import('discord.js').Message} message

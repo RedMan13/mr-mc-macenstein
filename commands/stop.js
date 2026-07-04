@@ -4,6 +4,7 @@ module.exports = {
     category: 'operator',
     sDesc: 'stops the bot',
     lDesc: 'Makes the bot shut down entirely from discord',
+    work: 1,
     args: [],
     execute: async (message) => {
         if (message.author.id !== "860531746294726736") {

@@ -30,6 +30,7 @@ module.exports = {
     category: 'dumb fun',
     sDesc: 'Runs any brainfuck code',
     lDesc: 'Simply runs brainfuck code. Can optionally include data to be given as input, added to the end of this command',
+    work: 1,
     args: [
         {
             type: 'any',

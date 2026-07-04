@@ -34,6 +34,7 @@ module.exports = {
     category: 'dumb fun',
     sDesc: 'Makes any image a flag',
     lDesc: 'Takes any image and a color, or just a color, and makes it into a penguinmod flag',
+    work: 2,
     args: [
         {
             type: 'string',

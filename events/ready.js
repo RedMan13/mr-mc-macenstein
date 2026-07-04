@@ -1,8 +1,10 @@
 const util = require('util');
+const os = require('os');
 
 module.exports = {
     name: 'clientReady',
     once: true,
+    global: true,
     /**
      * @param {import("discord.js").Client} client 
      */

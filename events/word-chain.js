@@ -14,6 +14,7 @@ function fail(message, reason) {
 module.exports = {
     name: 'messageCreate',
     once: false,
+    global: false,
     /**
      * @param {import('discord.js').Message} message
      */

@@ -46,7 +46,7 @@ async function convert(id, message, file, pixels) {
     console.log('Begining image weighting.');
     await rootMsg.edit(`(${id}) Weighting emojis...`);
     return new Promise(resolve => {
-        const cpus = Math.floor(os.cpus().length / 2) || 1;
+        const cpus = os.availableParallelism();
         let i = 0;
         const output = [];
         const progress = [];
@@ -122,6 +122,7 @@ module.exports = {
     category: 'dumb fun',
     sDesc: 'Converts an image to emojis',
     lDesc: 'Converts any one image into a set of discord emojis',
+    work: 3,
     args: {
         scale: [['s'], { match: /^[0-9]+(?:\.[0-9]+)?$/i, default: 1 }, 'The scale factor to apply to the image'],
         dump: [[], { noValue: true }, 'Dumps all of the internal emoji data'],

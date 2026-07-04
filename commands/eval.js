@@ -7,6 +7,7 @@ module.exports = {
     category: 'operator',
     sDesc: 'Evaluates javascript',
     lDesc: 'Runs any arbitrary javascript inside of the bot',
+    work: 1,
     args: [
         {
             type: 'string',

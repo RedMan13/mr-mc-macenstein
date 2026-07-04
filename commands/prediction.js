@@ -6,6 +6,7 @@ module.exports = {
     category: 'dumb fun',
     sDesc: 'predict the future',
     lDesc: 'Generates a random prophecy about someone.',
+    work: 1,
     args: [
         {
             type: 'string',

@@ -1,6 +1,7 @@
 module.exports = {
     name: 'messageCreate',
     once: false,
+    global: true,
     execute: async (message) => {
         if (!dbs.commandConfig.prefix) return;
         if (message.content.startsWith(dbs.commandConfig.prefix)) {

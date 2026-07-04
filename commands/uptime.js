@@ -25,6 +25,7 @@ module.exports = {
     category: 'operator',
     sDesc: 'lists the current uptime',
     lDesc: 'lists out how long the bot has been running and how long my computer has been running.',
+    work: 0,
     args: [],
     /**
      * @param {import('discord.js').Message} message

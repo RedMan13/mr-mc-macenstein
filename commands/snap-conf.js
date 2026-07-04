@@ -4,6 +4,7 @@ const { ApplicationIntegrationType, InteractionContextType, ApplicationCommandTy
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'snap-conf',
+    work: 2,
     /**
      * @param {import('discord.js').ModalSubmitInteraction} interaction
      */

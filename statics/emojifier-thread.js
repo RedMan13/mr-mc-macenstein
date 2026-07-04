@@ -1,4 +1,3 @@
-const pixelLength = (32 * 32 * 4) / 8; // (imageWidth * imageHeight * colorBytes) / walkLength
 process.on('message', ([segments, pixels]) => {
     const weights = [];
     let idx = 0;
