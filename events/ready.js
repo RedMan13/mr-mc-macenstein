@@ -1,5 +1,4 @@
 const util = require('util');
-const os = require('os');
 const rate = require('../statics/self-rating');
 
 module.exports = {

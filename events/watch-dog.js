@@ -1,4 +1,3 @@
-const os = require('os');
 const rate = require('../statics/self-rating');
 
 const rated = [];

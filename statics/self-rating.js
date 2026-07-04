@@ -1,3 +1,5 @@
+const os = require('os');
+
 let lastCpus = os.cpus().map(cpu => Object.entries(cpu.times));
 module.exports = function rate(initiator) {
     const ratings = [];
