@@ -7,7 +7,7 @@ let lost = false;
 module.exports = {
     name: 'messageCreate',
     once: false,
-    global: false,
+    global: true,
     /**
      * @param {import('discord.js').Message} message
      */
