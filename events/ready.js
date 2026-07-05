@@ -51,6 +51,6 @@ module.exports = {
         }
 
         const rating = rate(client.readyTimestamp);
-        dbs.channels.watchDog.send(`Hello gabriel! i am ${JSON.stringify({ id: dbs.id, rating })}`);
+        dbs.channels.watchDog.send(`mc;rate ${JSON.stringify({ id: dbs.id, rating })}`);
     },
 };
