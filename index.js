@@ -54,7 +54,7 @@ globalThis.dbs = { // databases
     commands: {},
     commandConfig: config.commands,
     startedAt: Date.now(),
-    major: true
+    major: false
 }
 
 let slashCommands = []
@@ -82,7 +82,7 @@ function loadCommand(file) {
             dbs.commands[command.comData.name] = {
                 description: command.comData.description,
                 command,
-                enabled: true,
+                enabled: false,
                 work: command.work,
                 isSlash: true,
                 file
@@ -94,7 +94,7 @@ function loadCommand(file) {
             description: command.sDesc,
             category: command.category,
             command,
-            enabled: true,
+            enabled: false,
             work: command.work,
             useCLI: !Array.isArray(command.args),
             file
