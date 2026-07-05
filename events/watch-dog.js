@@ -15,7 +15,9 @@ module.exports = {
         if (message.channelId !== dbs.config.channels.watchDog) return;
         if (message.author.id === imports.client.user.id) {
             const jsonStart = message.content.indexOf('{');
-            const meta = JSON.parse(message.content.slice(jsonStart));
+            const jsonEnd = message.content.lastIndexOf('}');
+            if (jsonStart <= -1) return;
+            const meta = JSON.parse(message.content.slice(jsonStart, jsonEnd +1));
             if (!rated.some(v => v.id === meta.id)) rated.push(meta);
             else {
                 const idx = rated.findIndex(v => v.id === meta.id);
@@ -33,7 +35,7 @@ module.exports = {
                     if (dbs.commands[command].work === 0) { dbs.commands[command].enabled = true; continue; }
                     const bestId = usable.find(host => host.rating.commands.includes(command))?.id;
                     // if no one else is capable (i.e. no one else exists) then we must bear the given iregardless of capacity
-                    dbs.commands[command].enabled = bestId && bestId === dbs.id;
+                    dbs.commands[command].enabled = !bestId || bestId === dbs.id;
                 }
                 if (dbs.major) console.log('This bot is handling events.');
                 else console.log('This bot will nolonger handle events.');

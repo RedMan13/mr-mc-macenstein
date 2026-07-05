@@ -1,5 +1,6 @@
 const util = require('util');
 const rate = require('../statics/self-rating');
+const { v7: uuid } = require('uuid');
 
 module.exports = {
     name: 'clientReady',
@@ -10,7 +11,7 @@ module.exports = {
      */
     async execute(client) {
         console.log(`Ready! Logged in as ${client.user.tag}`);
-        dbs.id = Date.now();
+        dbs.id = uuid();
         dbs.channels = Object.fromEntries(await Promise.all(Object.entries(dbs.config.channels)
             .map(async ([name, id]) => [name, await client.channels.fetch(id).catch(console.warn)])));
         dbs.channelsLoaded = true;

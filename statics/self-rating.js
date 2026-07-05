@@ -37,5 +37,5 @@ module.exports = function rate(initiator) {
 
     const available = ratings.reduce((c,v) => c + v, 0) * (1 / ratings.length);
     console.log('Device rated at', available, 'because', ratings);
-    return { available, ping, commands: Object.entries(dbs.commands).filter(([n, command]) => command.work <= available).map(v => v[0]) };
+    return { available, ping, commands: Object.keys(dbs.commands) };
 }
