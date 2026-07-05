@@ -40,7 +40,7 @@ module.exports = {
                 if (dbs.major) console.log('This bot is handling events.');
                 else console.log('This bot will nolonger handle events.');
                 console.log('The following commands are enabled: ', Object.entries(dbs.commands).filter(([n, command]) => command.enabled).map(n => n[0]));
-            }, 30000);
+            }, 3000);
         }
         if (message.author.id !== '1455453433565020306') return; // ddededodediamantes gabriel
         if (time) clearTimeout(time);
