@@ -1,4 +1,4 @@
-const simulate = require('../statics/emojifier-thread.js');
+const simulate = require('../statics/partical-processor.js');
 const sharp = require('sharp');
 const { AttachmentBuilder } = require('discord.js');
 
