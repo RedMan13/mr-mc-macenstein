@@ -7,7 +7,7 @@ const words = fs.readFileSync(path.resolve(__dirname, '../assets/words.txt'), 'u
  * @param {import('discord.js').Message} message
  */
 function fail(message, reason) {
-    if (dbs.major) return;
+    if (!dbs.major) return;
     dbs.channels.wordErrors.send(`${message.author} ${reason}`);
     message.delete();
 }
