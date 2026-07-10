@@ -7,6 +7,7 @@ const words = fs.readFileSync(path.resolve(__dirname, '../assets/words.txt'), 'u
  * @param {import('discord.js').Message} message
  */
 function fail(message, reason) {
+    if (dbs.major) return;
     dbs.channels.wordErrors.send(`${message.author} ${reason}`);
     message.delete();
 }
@@ -14,7 +15,7 @@ function fail(message, reason) {
 module.exports = {
     name: 'messageCreate',
     once: false,
-    global: false,
+    global: true,
     /**
      * @param {import('discord.js').Message} message
      */
@@ -35,7 +36,7 @@ module.exports = {
 
         messageChannel.set('words', used + ',' + filtered);
         messageChannel.set('lastUser', message.author.id);
-        message.react('<:yes:1164828602609717248>')
+        if (dbs.major) message.react('<:yes:1164828602609717248>')
     }
 };
 
