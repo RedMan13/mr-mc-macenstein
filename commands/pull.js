@@ -1,4 +1,4 @@
-/** @type {import('../index.js').CommandDefinition} */
+/** @type {import('../index.js').CommandDefinition} */ 
 module.exports = { 
     name: 'pull',
     category: 'operator',
