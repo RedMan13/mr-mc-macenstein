@@ -1,5 +1,5 @@
 /** @type {import('../index.js').CommandDefinition} */
-module.exports = {
+module.exports = { 
     name: 'pull',
     category: 'operator',
     sDesc: 'pulls from github',
