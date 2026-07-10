@@ -29,17 +29,18 @@ module.exports = {
         let used = messageChannel.get('words') ?? '';
 
         // our database isnt entirely certainly correct, since we may have not had access to the channel at the times of some messages
-        const lastMessages = await Promise.all((await message.channel.messages.fetch({ limit: 200 }))
-            .map(message => message.reactions.resolve('<:yes:1164828602609717248>')))
-            .filter(reaction => reaction.users.some(u => u.id === imports.client.user.id))
-            .map(reaction => [reaction.message.replaceAll(unsafeMessageChars, safeReplacer).toLowerCase(), reaction.author.id])
+        const lastMessages = (await Promise.all((await message.channel.messages.fetch({ limit: 100 }))
+            .map(message => message.reactions.resolve('1164828602609717248'))))
+            .filter(reaction => reaction && reaction.users.cache.some(user => user.id === imports.client.user.id))
+            .map(reaction => [reaction.message.content.replaceAll(unsafeMessageChars, safeReplacer).toLowerCase(), reaction.message.author.id])
             .map(info => ({ filtered: info[0], locator: new RegExp(`(?:^|,)${info[0]}(?:$|,)`), author: info[1] }));
-        if (!lastMessages[0].locator.test(used)) { // patch our reality with the one visible in discord
+        if (lastMessages[0].filtered.at(-1) !== used.at(-1)) { // patch our reality with the one visible in discord
             for (let i = lastMessages.length -1; i >= 0; i--) {
-                if (lastMessages[0].locator.test(used)) continue;
-                used += ',' + filtered;
+                if (lastMessages[i].locator.test(used)) continue;
+                used += ',' + lastMessages[i].filtered;
                 messageChannel.set('lastUser', lastMessages[i].author);
             }
+            messageChannel.set('words', used);
         }
         
         if (messageChannel.get('lastUser') === message.author.id) return fail(message, `You are not allowed to submit back to back!`);
@@ -52,7 +53,7 @@ module.exports = {
 
         messageChannel.set('words', used + ',' + filtered);
         messageChannel.set('lastUser', message.author.id);
-        if (dbs.major) message.react('<:yes:1164828602609717248>')
+        if (dbs.major) message.react('<:yes:1164828602609717248>');
     }
 };
 

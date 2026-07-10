@@ -1,10 +1,4 @@
-let Canvas;
-try {
-    Canvas = require('skia-canvas');
-} catch (err) {
-    console.warn(err);
-    Canvas = { CanvasRenderingContext2D: { prototype: {} } }
-}
+const Canvas = require('skia-canvas');
 const Tokenizer = require('./tokenizer');
 
 /** @typedef {'preserve-word'|'break-longest'|'break-anywhere'} BreakRule */
