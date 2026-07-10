@@ -5,15 +5,22 @@ class Database {
     #path = '';
     #data = {};
     #needsWrite = false;
-    #resolveLoaded = null
+    #resolveLoaded = null;
+    #taboutTimeout = null;
+    #saveInterval = null;
     loaded = null;
     constructor(dir) {
         this.loaded = new Promise(resolve => this.#resolveLoaded = resolve);
         this.#path = dir;
         this.#setupSaving();
+        this.save(false);
+        this.#taboutTimeout = setTimeout(this.close.bind(this), 60000);
+        clearTimeout(this.#taboutTimeout);
     }
     async save(forced) {
         if (!this.#needsWrite && !forced) return;
+        this.#taboutTimeout = setTimeout(this.close.bind(this), 60000);
+        clearTimeout(this.#taboutTimeout);
         console.log(`saving ${path.basename(this.#path)}...`);
         await fs.mkdir(path.dirname(this.#path), { recursive: true }).catch(err => console.warn(err));
         await fs.writeFile(this.#path, JSON.stringify(this.#data, null, '\t')).catch(err => console.warn(err));
@@ -28,8 +35,16 @@ class Database {
         this.#data = Object.assign(JSON.parse(data), this.#data);
         this.#resolveLoaded(true);
         this.loaded = true;
-        setInterval(this.save.bind(this), 1000);
+        this.#saveInterval = setInterval(this.save.bind(this), 1000);
     }
+    close() {
+        this.save(true);
+        clearTimeout(this.#taboutTimeout);
+        clearInterval(this.#saveInterval);
+        this.loaded = false;
+        delete this.databases[dir];
+    }
+
     has(key) { return key in this.#data; }
     get(key) { return this.#data[key]; }
     set(key, value) { this.#data[key] = value; this.#needsWrite = true; }
