@@ -11,8 +11,7 @@ module.exports = {
             message.reply(`you are not authorized to use this`);
             return;
         }
-        process.send({ pull: true });
-        process.once('message', msg => {
+        process.once('message', async msg => {
             if (msg.noChanges) message.reply('No changes!');
             if (msg.couldntMerge) message.reply('Failed to merge because: ' + Array.isArray(msg.couldntMerge) ? msg.couldntMerge.join('\n') : msg.couldntMerge);
             if (msg.updated) message.reply('Finished! updated ' + msg.updated.length + ' files. ' + (msg.restartNeeded ? 'Bot requires restart to implement' : ''));
@@ -25,5 +24,6 @@ module.exports = {
                 stop();
             }
         });
+        process.send({ pull: true });
     },
 };
