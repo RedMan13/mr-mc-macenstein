@@ -13,11 +13,15 @@ module.exports = {
         }
         process.send({ pull: true });
         process.once('message', msg => {
-            if (msg.noChanges) return message.reply('No changes!');
-            if (msg.couldntMerge) return message.reply('Failed to merge because: ' + msg.couldntMerge.join('\n'));
-            if (msg.updated) return message.reply('Finished! updated ' + msg.updated.length + ' files. ' + (msg.restartNeeded ? 'Bot requires restart to implement' : ''));
+            if (msg.noChanges) message.reply('No changes!');
+            if (msg.couldntMerge) message.reply('Failed to merge because: ' + Array.isArray(msg.couldntMerge) ? msg.couldntMerge.join('\n') : msg.couldntMerge);
+            if (msg.updated) message.reply('Finished! updated ' + msg.updated.length + ' files. ' + (msg.restartNeeded ? 'Bot requires restart to implement' : ''));
             if (msg.restartNeeded && msg.args === 'restart') {
-                message.reply('Restarting....');
+                await message.channel.send('Restarting bot...');
+                const global = dbs.database.global();
+                global.set('restarted', true);
+                global.set('restartMessage', message.id);
+                global.set('restartChannel', message.channel.id);
                 stop();
             }
         });
