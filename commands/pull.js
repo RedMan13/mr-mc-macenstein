@@ -12,10 +12,10 @@ module.exports = {
             return;
         }
         process.once('message', async msg => {
-            if (msg.noChanges) message.reply('No changes!');
-            if (msg.couldntMerge) message.reply('Failed to merge because: ' + Array.isArray(msg.couldntMerge) ? msg.couldntMerge.join('\n') : msg.couldntMerge);
-            if (msg.updated) message.reply('Finished! updated ' + msg.updated.length + ' files. ' + (msg.restartNeeded ? 'Bot requires restart to implement' : ''));
-            if (msg.restartNeeded && msg.args === 'restart') {
+            if (msg.noChanges) return message.reply('No changes!');
+            if (msg.couldntMerge) return message.reply('Failed to merge because: ' + (Array.isArray(msg.couldntMerge) ? msg.couldntMerge.join('\n') : msg.couldntMerge));
+            if (msg.updated) await message.reply('Finished! updated ' + msg.updated.length + ' files. ');
+            if (msg.restartNeeded) {
                 await message.channel.send('Restarting bot...');
                 const global = dbs.database.global();
                 global.set('restarted', true);
