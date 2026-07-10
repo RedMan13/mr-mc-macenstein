@@ -1,4 +1,4 @@
-console.log('starting...') 
+console.log('starting...')  
 
 // require('./statics/uptimer');
 const { Client, GatewayIntentBits } = require('discord.js');
