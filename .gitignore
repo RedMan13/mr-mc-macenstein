@@ -20,3 +20,4 @@ databases/global.json
 assets/predictions.json
 errors.log
 nohup.out
+logs

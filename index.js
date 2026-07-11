@@ -3,7 +3,7 @@ console.log('starting...')
 // require('./statics/uptimer');
 const { Client, GatewayIntentBits } = require('discord.js');
 const { GoogleGenAI } = require("@google/genai");
-const { exec, spawn } = require("child_process");
+const { exec } = require("child_process");
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
@@ -12,19 +12,8 @@ const config = require('./statics/config.json');
 const syncSlash = require('@frostzzone/discord-sync-commands');
 const util = require('util');
 
-const logs = fs.createWriteStream(path.resolve(__dirname, './errors.log'));
-for (const func of ['log', 'warn', 'error', 'debug', 'info']) {
-    const old = console[func];
-    console[func] = function(...args) {
-        old(...args);
-        const text = util.format(...args);
-        logs.write(text + '\n');
-    }
-}
-
-process.on('exit', () => {
-    dbs.channels.console.send('Bot turned off...');
-});
+process.on('uncaughtException', err => console.warn(err));
+process.send({ spawn: path.resolve(__dirname, './media-status.js'), name: 'media-status-manager' });
 
 globalThis.imports = {
     exec,

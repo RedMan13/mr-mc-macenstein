@@ -1,5 +1,5 @@
 const { ApplicationIntegrationType, InteractionContextType, ApplicationCommandType } = require('discord.js');
-const { createQuoteCard, createQuoteMessage } = require('./statics/quote-generator.js');
+const { createQuoteCard, createQuoteMessage } = require('../statics/quote-generator.js');
 
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {

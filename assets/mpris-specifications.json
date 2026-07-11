@@ -1,0 +1,161 @@
+{
+    "org.freedesktop.DBus": {
+        "method": {
+            "Hello": { "in": [], "out": ["s"] },
+            "RequestName": { "in": ["s","u"], "out": ["u"] },
+            "ReleaseName": { "in": ["s"], "out": ["u"] },
+            "StartServiceByName": { "in": ["s","u"], "out": ["u"] },
+            "UpdateActivationEnvironment": { "in": ["a{ss}"], "out": [] },
+            "NameHasOwner": { "in": ["s"], "out": ["b"] },
+            "ListNames": { "in": [], "out": ["as"] },
+            "ListActivatableNames": { "in": [], "out": ["as"] },
+            "AddMatch": { "in": ["s"], "out": [] },
+            "RemoveMatch": { "in": ["s"], "out": [] },
+            "GetNameOwner": { "in": ["s"], "out": ["s"] },
+            "ListQueuedOwners": { "in": ["s"], "out": ["as"] },
+            "GetConnectionUnixUser": { "in": ["s"], "out": ["u"] },
+            "GetConnectionUnixProcessID": { "in": ["s"], "out": ["u"] },
+            "GetAdtAuditSessionData": { "in": ["s"], "out": ["ay"] },
+            "GetConnectionSELinuxSecurityContext": { "in": ["s"], "out": ["ay"] },
+            "GetConnectionAppArmorSecurityContext": { "in": ["s"], "out": ["s"] },
+            "ReloadConfig": { "in": [], "out": [] },
+            "GetId": { "in": [], "out": ["s"] },
+            "GetConnectionCredentials": { "in": ["s"], "out": ["a{sv}"] }
+        },
+        "property": {
+            "Features": { "type": "as", "access": "read" },
+            "Interfaces": { "type": "as", "access": "read" }
+        },
+        "signal": {
+            "NameOwnerChanged": ["s", "s", "s"],
+            "NameLost": ["s"],
+            "NameAcquired": ["s"],
+            "ActivatableServicesChanged": []
+        }
+    },
+    "org.freedesktop.DBus.Properties": {
+        "method": {
+            "Get": { "in": ["s","s"], "out": ["v"] },
+            "GetAll": { "in": ["s"], "out": ["a{sv}"] },
+            "Set": { "in": ["s","s","v"], "out": [] }
+        },
+        "property": {},
+        "signal": {
+            "PropertiesChanged": ["s", "a{sv}", "as"]
+        }
+    },
+    "org.freedesktop.DBus.Introspectable": {
+        "method": {
+            "Introspect": { "in": [], "out": ["s"] }
+        },
+        "property": {},
+        "signal": {}
+    },
+    "org.freedesktop.DBus.Monitoring": {
+        "method": {
+            "BecomeMonitor": { "in": ["as","u"], "out": [] }
+        },
+        "property": {},
+        "signal": {}
+    },
+    "org.freedesktop.DBus.Debug.Stats": {
+        "method": {
+            "GetStats": { "in": [], "out": ["a{sv}"] },
+            "GetConnectionStats": { "in": ["s"], "out": ["a{sv}"] },
+            "GetAllMatchRules": { "in": [], "out": ["a{sas}"] }
+        },
+        "property": {},
+        "signal": {}
+    },
+    "org.freedesktop.DBus.Peer": {
+        "method": {
+            "GetMachineId": { "in": [], "out": ["s"] },
+            "Ping": { "in": [], "out": [] }
+        },
+        "property": {},
+        "signal": {}
+    },
+    "org.mpris.MediaPlayer2": {
+        "method": {
+            "Raise": { "in": [], "out": [] },
+            "Quit": { "in": [], "out": [] }
+        },
+        "property": {
+            "CanQuit": { "type": "b", "access": "read" },
+            "Fullscreen": { "type": "b", "access": "readwrite" },
+            "CanSetFullscreen": { "type": "b", "access": "read" },
+            "CanRaise": { "type": "b", "access": "read" },
+            "HasTrackList": { "type": "b", "access": "read" },
+            "Identity": { "type": "s", "access": "read" },
+            "DesktopEntry": { "type": "s", "access": "read" },
+            "SupportedUriSchemes": { "type": "as", "access": "read" },
+            "SupportedMimeTypes": { "type": "as", "access": "read" }
+        },
+        "signal": {}
+    },
+    "org.mpris.MediaPlayer2.Player": {
+        "method": {
+            "Next": { "in": [], "out": [] },
+            "Previous": { "in": [], "out": [] },
+            "Pause": { "in": [], "out": [] },
+            "PlayPause": { "in": [], "out": [] },
+            "Stop": { "in": [], "out": [] },
+            "Play": { "in": [], "out": [] },
+            "Seek": { "in": ["x"], "out": [] },
+            "SetPosition": { "in": ["o", "x"], "out": [] },
+            "OpenUri": { "in": ["s"], "out": [] }
+        },
+        "property": {
+            "PlaybackStatus": { "type": "s", "access": "read" },
+            "LoopStatus": { "type": "s", "access": "readwrite" },
+            "Rate": { "type": "d", "access": "readwrite" },
+            "Shuffle": { "type": "b", "access": "readwrite" },
+            "Metadata": { "type": "a{sv}", "access": "read" },
+            "Volume": { "type": "d", "access": "readwrite" },
+            "Position": { "type": "x", "access": "read" },
+            "MinimumRate": { "type": "d", "access": "read" },
+            "MaximumRate": { "type": "d", "access": "read" },
+            "CanGoNext": { "type": "b", "access": "read" },
+            "CanGoPrevious": { "type": "b", "access": "read" },
+            "CanPlay": { "type": "b", "access": "read" },
+            "CanPause": { "type": "b", "access": "read" },
+            "CanSeek": { "type": "b", "access": "read" },
+            "CanControl": { "type": "b", "access": "read" }
+        },
+        "signal": {
+            "Seeked": ["x"]
+        }
+    },
+    "org.mpris.MediaPlayer2.TrackList": {
+        "method": {
+            "GetTracksMetadata": { "in": ["ao"], "out": ["aa{sv}"] },
+            "AddTrack": { "in": ["s", "o", "b"], "out": [] },
+            "RemoveTrack": { "in": ["o"], "out": [] },
+            "GoTo": { "in": ["o"], "out": [] }
+        },
+        "property": {
+            "Tracks": { "type": "ao", "access": "read" },
+            "CanEditTracks": { "type": "b", "access": "read" }
+        },
+        "signal": {
+            "TrackListReplaced": ["ao", "o"],
+            "TrackAdded": ["a{sv}", "o"],
+            "TrackRemoved": ["o"],
+            "TrackMetadataChanged": ["o", "a{sv}"]
+        }
+    },
+    "org.mpris.MediaPlayer2.Playlists": {
+        "method": {
+            "ActivatePlaylist": { "in": ["o"], "out": [] },
+            "GetPlaylists": { "in": ["u", "u", "s", "b"], "out": ["a(oss)"] }
+        },
+        "property": {
+            "PlaylistCount": { "type": "u", "access": "read" },
+            "Orderings": { "type": "as", "access": "read" },
+            "ActivePlaylist": { "type": "(b(oss))", "access": "read" }
+        },
+        "signal": {
+            "PlaylistChanged": ["(oss)"]
+        }
+    }
+}

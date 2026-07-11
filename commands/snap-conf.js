@@ -1,4 +1,4 @@
-const { createQuoteCard, createQuoteMessage } = require('./statics/quote-generator.js');
+const { createQuoteCard, createQuoteMessage } = require('../statics/quote-generator.js');
 const { ApplicationIntegrationType, InteractionContextType, ApplicationCommandType, LabelBuilder, ModalBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 
 /** @type {import('../index.js').CommandDefinition} */

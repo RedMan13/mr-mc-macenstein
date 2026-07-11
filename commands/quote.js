@@ -1,4 +1,4 @@
-const { createQuoteCard } = require('./statics/quote-generator.js');
+const { createQuoteCard } = require('../statics/quote-generator.js');
 
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
