@@ -1,4 +1,5 @@
 const { ApplicationIntegrationType, InteractionContextType, ApplicationCommandType } = require('discord.js');
+const { createQuoteCard, createQuoteMessage } = require('./statics/quote-generator.js');
 
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
@@ -16,7 +17,7 @@ module.exports = {
     execute: async (interaction) => {
         await interaction.deferReply().catch(err => console.warn(err));
         /** @type {Blob} */
-        const blob = await imports.createQuoteCard(await interaction.targetMessage);
+        const blob = await createQuoteCard(await interaction.targetMessage);
         interaction.editReply({
             files: [
                 {

@@ -1,3 +1,5 @@
+const { createQuoteCard } = require('./statics/quote-generator.js');
+
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'quote',
@@ -15,7 +17,7 @@ module.exports = {
             return;
         }
         /** @type {Blob} */
-        const blob = await imports.createQuoteCard(await message.channel.messages.fetch(message.reference.messageId));
+        const blob = await createQuoteCard(await message.channel.messages.fetch(message.reference.messageId));
         message.reply({
             files: [
                 {

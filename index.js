@@ -10,7 +10,6 @@ require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const process = require('process');
 const config = require('./statics/config.json');
 const syncSlash = require('@frostzzone/discord-sync-commands');
-const { createQuoteCard, createQuoteMessage } = require('./statics/quote-generator.js');
 const util = require('util');
 
 const logs = fs.createWriteStream(path.resolve(__dirname, './errors.log'));
@@ -30,8 +29,6 @@ process.on('exit', () => {
 globalThis.imports = {
     exec,
     process,
-    createQuoteCard,
-    createQuoteMessage,
     Discord: require('discord.js'),
     db: require('./statics/database-manager.js'),
     getAllArgs: require('./statics/arguments-parser'),

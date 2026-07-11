@@ -1,4 +1,4 @@
-
+const { createQuoteCard, createQuoteMessage } = require('./statics/quote-generator.js');
 const { ApplicationIntegrationType, InteractionContextType, ApplicationCommandType, LabelBuilder, ModalBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 
 /** @type {import('../index.js').CommandDefinition} */
@@ -18,7 +18,7 @@ module.exports = {
         });
 
         /** @type {Blob} */
-        const blob = await imports.createQuoteMessage([...messages.values()]);
+        const blob = await createQuoteMessage([...messages.values()]);
         interaction.editReply({
             files: [
                 {
