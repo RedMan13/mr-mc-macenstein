@@ -40,6 +40,6 @@ for slash commands, the format is as follows
 
 ## Argument Format
 
-There are also TWO argument formats, you can either format them like POSIXS CLI arguments, or you can format them like discord message arguments.
+There are also TWO argument formats, you can either format them like POSIXs CLI arguments, or you can format them like discord message arguments.
 
 idk, read [argument-parser.js (CLI)](<./statics/argument-parser.js>) and [arguments-parser.js (Discord)](<./statics/arguments-parser.js>)
