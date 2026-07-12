@@ -53,7 +53,7 @@ module.exports = {
 
         messageChannel.set('words', used + ',' + filtered);
         messageChannel.set('lastUser', message.author.id);
-        if (dbs.major) message.react('<:yes:1164828602609717248>');
+        message.react('<:yes:1164828602609717248>');
     }
 };
 
