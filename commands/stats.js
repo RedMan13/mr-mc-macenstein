@@ -20,6 +20,19 @@ function makeVerbose(rawSeconds) {
     
     return out;
 }
+function makeMega(bytes) {
+    const kilo = bytes / 1000;
+    const mega = bytes / 1000_000;
+    const giga = bytes / 1000_000_000;
+    const tera = bytes / 1000_000_000_000;
+
+    if (tera >= 1) return tera.toFixed(2) + 'TB';
+    if (giga >= 1) return giga.toFixed(2) + 'GB';
+    if (mega >= 1) return mega.toFixed(2) + 'MB';
+    if (kilo >= 1) return kilo.toFixed(2) + 'KB';
+    return bytes + 'B';
+}
+
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'stats',
@@ -45,6 +58,9 @@ module.exports = {
                     .setTitle('Capacities')
                     .addFields([
                         { name: 'Ping', value: String(rating.ping) },
+                        { name: 'Max parallel', value: String(rating.cores) },
+                        { name: 'CPU Usages', value: String(rating.usages.map(v => `${v.user.toFixed(0)}%`).join(', ')) },
+                        { name: 'Free memory', value: makeMega(rating.freeMem) },
                         { name: 'Rating', value: `${['N/A', 'Terrible', 'Meh', 'Perfect'][Math.floor(rating.available)]} (${rating.available}) (${rating.ratings.map(v => `${v[0]}: ${v[1]}`).join(', ')})` },
                         { name: 'Commands', value: rating.commands.join(',') }
                     ])
