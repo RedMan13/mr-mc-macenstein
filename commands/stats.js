@@ -43,7 +43,7 @@ module.exports = {
                     ]),
                 new EmbedBuilder()
                     .setTitle('Ping')
-                    .setDescription(rating.ping),
+                    .setDescription(String(rating.ping)),
                 new EmbedBuilder()
                     .setTitle('Capacities')
                     .addFields([
