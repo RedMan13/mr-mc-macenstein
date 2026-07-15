@@ -3,7 +3,7 @@ const rate = require('../statics/self-rating.js');
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'rate',
-    category: 'operator',
+    category: 'hidden',
     sDesc: 'Rates the hosts performance.',
     lDesc: 'Reports an assortment of information about how all current hosts are performing',
     work: 0,

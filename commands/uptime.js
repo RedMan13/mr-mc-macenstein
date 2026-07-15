@@ -1,5 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
 const os = require('os');
+const rate = require('../statics/self-rating.js');
 
 function makeVerbose(rawSeconds) {
     const seconds = Math.floor(rawSeconds % 60);
@@ -21,16 +22,17 @@ function makeVerbose(rawSeconds) {
 }
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
-    name: 'uptime',
+    name: 'stats',
     category: 'operator',
-    sDesc: 'lists the current uptime',
-    lDesc: 'lists out how long the bot has been running and how long my computer has been running.',
+    sDesc: 'lists the current statistics',
+    lDesc: 'lists out various nuggets, like how long the bot has been running.',
     work: 0,
     args: [],
     /**
      * @param {import('discord.js').Message} message
      */
     execute: async (message) => {
+        const rating = rate(message.createdTimestamp);
         message.reply({
             embeds: [
                 new EmbedBuilder()
@@ -38,7 +40,16 @@ module.exports = {
                     .addFields([
                         { name: 'Computer', value: makeVerbose(os.uptime()) },
                         { name: 'Bot', value: makeVerbose((Date.now() - dbs.startedAt) / 1000) }
-                    ])
+                    ]),
+                new EmbedBuilder()
+                    .setTitle('Ping')
+                    .setDescription(rating.ping),
+                new EmbedBuilder()
+                    .setTitle('Capacities')
+                    .addFields([
+                        { name: 'Rating', value: `${['N/A', 'Terrible', 'Meh', 'Perfect'][Math.floor(rating.available)]} (${rating.available})` },
+                        { name: 'Commands', value: rating.commands.join(',') }
+                    ]),
             ]
         })
     },
