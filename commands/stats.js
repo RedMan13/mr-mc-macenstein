@@ -32,7 +32,7 @@ module.exports = {
      * @param {import('discord.js').Message} message
      */
     execute: async (message) => {
-        const rating = rate(message.createdTimestamp);
+        const rating = rate(message.createdTimestamp, true);
         message.reply({
             embeds: [
                 new EmbedBuilder()
@@ -45,7 +45,7 @@ module.exports = {
                     .setTitle('Capacities')
                     .addFields([
                         { name: 'Ping', value: String(rating.ping) },
-                        { name: 'Rating', value: `${['N/A', 'Terrible', 'Meh', 'Perfect'][Math.floor(rating.available)]} (${rating.available})` },
+                        { name: 'Rating', value: `${['N/A', 'Terrible', 'Meh', 'Perfect'][Math.floor(rating.available)]} (${rating.available}) (${rating.ratings.map(v => `${v[0]}: ${v[1]}`).join(', ')})` },
                         { name: 'Commands', value: rating.commands.join(',') }
                     ])
             ]

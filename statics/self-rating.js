@@ -1,17 +1,17 @@
 const os = require('os');
 
 let lastCpus = os.cpus().map(cpu => Object.entries(cpu.times));
-module.exports = function rate(initiator) {
+module.exports = function rate(initiator, describe = false) {
     const ratings = [];
 
     // if this particular 
     const parrel = os.availableParallelism();
-    ratings.push(Math.min((parrel / 16) * 3, 3));
+    ratings.push(['Cores', Math.min((parrel / 16) * 3, 3)]);
 
     // if the currently present cpus are over tasked, try to evade using this particular host
     const cpus = os.cpus().map(cpu => Object.entries(cpu.times));
+    const usages = [];
     if (cpus.length > 0) { // what, why can there be no cpus listed
-        const usages = [];
         for (let i = 0; i < cpus.length; i++) {
             const diffs = [];
             for (let j = 0; j < cpus[i].length; j++)
@@ -21,21 +21,23 @@ module.exports = function rate(initiator) {
         }
         lastCpus = cpus;
         const taxed = usages.filter(cpu => cpu.user > 75);
-        ratings.push(Math.min(Math.max((1- (taxed.length / 4)) * 3, 1), 3));
-        if (taxed.length > 5) ratings.splice(0, ratings.length, 0);
+        ratings.push(['CPU Usage', Math.min(Math.max((1- (taxed.length / 4)) * 3, 1), 3)]);
+        if (taxed.length > 5) ratings.splice(0, ratings.length, ['CPU Usage', 0]);
     }
 
     // memory rating, 1 = perfect, 0 = unusable
     const freeMem = os.freemem();
-    ratings.push(Math.min(freeMem / (1024 ** 3), 1) * 3);
-    if (freeMem <= 0.15) ratings.splice(0, ratings.length, 0); // adding zero isnt enough, if we dont have enough memory we need to simply never use this host
+    ratings.push(['Memory', Math.min(freeMem / (1024 ** 3), 1) * 3]);
+    if (freeMem <= 0.15) ratings.splice(0, ratings.length, ['Memory', 0]); // adding zero isnt enough, if we dont have enough memory we need to simply never use this host
 
     // piss poor ping will disqualify this particular host
     const ping = Date.now() - initiator;
-    if (ping > 4000) ratings.splice(0, ratings.length, 1);
-    if (ping > 20000) ratings.splice(0, ratings.length, 0);
+    if (ping > 4000) ratings.splice(0, ratings.length, ['Ping', 1]);
+    if (ping > 20000) ratings.splice(0, ratings.length, ['Ping', 0]);
 
-    const available = ratings.reduce((c,v) => c + v, 0) * (1 / ratings.length);
+    const available = ratings.reduce((c,v) => c + v[1], 0) * (1 / ratings.length);
     console.log('Device rated at', available, 'because', ratings);
-    return { available, ping, commands: Object.keys(dbs.commands) };
+    const rating = { available, ping, commands: Object.keys(dbs.commands) }
+    if (describe) Object.assign(rating, { ratings, freeMem, cores: parrel, usages });
+    return rating;
 }
