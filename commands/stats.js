@@ -42,14 +42,12 @@ module.exports = {
                         { name: 'Bot', value: makeVerbose((Date.now() - dbs.startedAt) / 1000) }
                     ]),
                 new EmbedBuilder()
-                    .setTitle('Ping')
-                    .setDescription(String(rating.ping)),
-                new EmbedBuilder()
                     .setTitle('Capacities')
                     .addFields([
+                        { name: 'Ping', value: String(rating.ping) },
                         { name: 'Rating', value: `${['N/A', 'Terrible', 'Meh', 'Perfect'][Math.floor(rating.available)]} (${rating.available})` },
                         { name: 'Commands', value: rating.commands.join(',') }
-                    ]),
+                    ])
             ]
         })
     },

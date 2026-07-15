@@ -1,6 +1,7 @@
 const DBus = require('dbus');
 const { Client } = require('@xhayper/discord-rpc');
 const MprisSpecs = require('./assets/mpris-specifications.json');
+const path = require('path');
 
 // small media player scrapper that then also intends to setup things like discord status
 const client = new Client({ clientId: '993334503290454030' });
@@ -76,17 +77,12 @@ client.on('ready', async () => {
                 artist = raw.Metadata['xesam:artist']?.join?.(', ') ?? '';
                 title = raw.Metadata['xesam:title'] ?? '';
                 if ('mpris:artUrl' in raw.Metadata) {
-                    if (raw.Metadata['mpris:artUrl'].startsWith('file:')) {
-                        const parsed = new URL(raw.Metadata['mpris:artUrl']);
-                        const icon = path.basename(decodeURI(parsed.pathname));
-                        share._removeFile(lastIcon);
-                        lastIcon = icon;
-                        share._addFile(decodeURI(parsed.pathname), icon);
-                        artUrl = `https://godslayerakp.serv00.net/${encodeURI(share.name)}/file/${encodeURI(icon)}`;
-                    } else artUrl = raw.Metadata['mpris:artUrl'];
+                    if (!raw.Metadata['mpris:artUrl'].startsWith('file:'))
+                        artUrl = raw.Metadata['mpris:artUrl'];
                 } else artUrl = null;
                 if ('xesam:url' in raw.Metadata) {
-                    if (!raw.Metadata['xesam:url'].startsWith('file:')) link = raw.Metadata['xesam:url'];
+                    if (!raw.Metadata['xesam:url'].startsWith('file:'))
+                        link = raw.Metadata['xesam:url'];
                 } else link = null; // assume metadata update is complete
             }
             if ('Position' in raw) start = Date.now() - ((raw.Position / rate) / 1000);
