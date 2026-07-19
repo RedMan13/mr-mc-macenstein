@@ -7,7 +7,7 @@ fs.mkdirSync(logDir, { recursive: true });
 const logs = fs.readdirSync(logDir, { recursive: true });
 
 // prune old logs
-setInterval(() => {
+function pruneLogs() {
     for (const file of logs) {
         if (!file.endsWith('.log')) continue;
         const { name } = path.parse(file);
@@ -16,7 +16,9 @@ setInterval(() => {
         if ((Date.now() - dated) < expires) continue;
         fs.rm(path.resolve(logDir, file), () => {});
     }
-}, 24 * 60 * 60 * 1000); // every day
+}
+pruneLogs() // but what if we restart before this ever runs
+setInterval(pruneLogs, 24 * 60 * 60 * 1000); // every day
 
 const open = {};
 

@@ -17,6 +17,7 @@ const createOverlayWindow = async () => {
         transparent: true,
         resizable: false,
         frame: false,
+        focusable: false,
         webPreferences: {
             preload: require.resolve('./preload.js'),
             nodeIntegration: true,
@@ -24,11 +25,13 @@ const createOverlayWindow = async () => {
         }
     });
 
-    await win.loadFile(path.join(__dirname, './player.html'));
     win.setIgnoreMouseEvents(true);
     win.setAlwaysOnTop(true, "screen-saver");
     win.setPosition(x, y, false);
     win.blur();
+
+    win.on('load', () => win.setIgnoreMouseEvents(true));
+    await win.loadFile(path.join(__dirname, './player.html'));
     win.on("close", () => {});
 
     window = win;

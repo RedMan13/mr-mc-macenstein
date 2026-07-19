@@ -25,6 +25,10 @@ const spawn = () => {
             sister.stderr.pipe(log);
             sister.stdout.pipe(process.stdout);
             sister.stderr.pipe(process.stderr);
+            sister.on('exit', code => {
+                log.write('\nSister closed with exit code ' + code);
+                log.close();
+            })
             spawned[msg.name] = sister;
         }
         if (msg.kill) spawned[msg.name].kill();
@@ -43,7 +47,9 @@ const spawn = () => {
             bot.send({ updated: files });
         });
     })
-    bot.on('exit', () => {
+    bot.on('exit', code => {
+        mainLog.write('\nBot closed with exit code ' + code);
+        mainLog.close();
         releaseFiles('mister-mc-macenstein');
         if (allowStop) process.exit();
         spawn();
