@@ -59,6 +59,7 @@ module.exports = {
      */
     execute: async (message) => {
         let char = message.arguments.char || chars.find(v => Math.floor(Math.random() * total) <= v[1])[0];
+        while (char === '\n') char = chars.find(v => Math.floor(Math.random() * total) <= v[1])[0];
         let acc = char;
         while (char !== '\n') {
             char = findNext(char);
