@@ -3,7 +3,6 @@ const rate = require('../statics/self-rating');
 const rated = [];
 let handleRated = null;
 let time = null;
-let lost = false;
 module.exports = {
     name: 'messageCreate',
     once: false,
@@ -44,8 +43,8 @@ module.exports = {
         }
         if (message.author.id !== '1455453433565020306') return; // ddededodediamantes gabriel
         if (time) clearTimeout(time);
-        if (lost) {
-            lost = false;
+        if (imports.lost) {
+            imports.lost = false;
             console.log('Watch-dog signal reappeared!');
         }
 
@@ -56,7 +55,7 @@ module.exports = {
         time = setTimeout(() => {
             message.reply('Gabriel? you there?');
             console.log('Lost watch-dog signal.');
-            lost = true;
+            imports.lost = true;
         }, ((5 * 60) * 60) * 1000);
     }
 };

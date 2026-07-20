@@ -5,7 +5,7 @@ const { AttachmentBuilder } = require('discord.js');
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'simulate',
-    category: 'dumb fun',
+    category: '',
     sDesc: 'Runs a partical simulation',
     lDesc: 'Takes any image, turns it into only four colors, then runs those colors as a particle simulation',
     work: 3,
@@ -65,6 +65,7 @@ module.exports = {
             if (!applied)
                 ranges.push([[r,g,b,a], [r,g,b,a], [i], [r,g,b,a]]);
         }
+        const toReplaceWith = {};
         for (let i = 0; i < ranges.length; i++) {
             const color = [
                 ((ranges[i][1][0] - ranges[i][0][0]) / 2) + ranges[i][0][0],
@@ -72,8 +73,11 @@ module.exports = {
                 ((ranges[i][1][2] - ranges[i][0][2]) / 2) + ranges[i][0][2],
                 ((ranges[i][1][3] - ranges[i][0][3]) / 2) + ranges[i][0][3]
             ];
-            for (let j = 0; j < ranges[i][2].length; j++)
-                pallet[ranges[i][2][j]] = color;
+            for (let j = 1; j < ranges[i][2].length; j++) {
+                toReplaceWith[ranges[i][2][j]] = ranges[i][2][0];
+                delete pallet[ranges[i][2][j]];
+            }
+            pallet[ranges[i][2][0]] = color;
         }
 
         const finalPixels = new Uint8ClampedArray(palletized.flatMap(v => pallet[v]));
