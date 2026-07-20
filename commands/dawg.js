@@ -4,13 +4,13 @@ const rate = require('../statics/self-rating.js');
 module.exports = {
     name: 'dawg',
     category: 'hidden',
-    sDesc: 'Rates the hosts performance.',
-    lDesc: 'Reports an assortment of information about how all current hosts are performing',
+    sDesc: 'Checks if the bot got that dawg inum.',
+    lDesc: 'Replies to the message with a dawg emoji, according to however many hosts there are currently.',
     work: 0,
     args: [],
     execute: async (message) => {
         message.reply(`<:dawg:1282237696424677377>`);
         const rating = rate(message.createdTimestamp);
-        dbs.channels.watchDog.send(`mc;rate ${JSON.stringify({ id: dbs.id, rating })}`);
+        message.reply(`i am \`\`\`json\n${JSON.stringify({ id: dbs.id, rating }, null, 4)}\`\`\``);
     },
 };
