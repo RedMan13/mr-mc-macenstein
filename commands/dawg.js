@@ -10,7 +10,7 @@ module.exports = {
     args: [],
     execute: async (message) => {
         message.reply(`<:dawg:1282237696424677377>`);
-        const rating = rate(client.readyTimestamp);
+        const rating = rate(message.createdTimestamp);
         dbs.channels.watchDog.send(`mc;rate ${JSON.stringify({ id: dbs.id, rating })}`);
     },
 };
