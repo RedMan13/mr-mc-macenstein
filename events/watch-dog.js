@@ -43,8 +43,8 @@ module.exports = {
         }
         if (message.author.id !== '1455453433565020306') return; // ddededodediamantes gabriel
         if (time) clearTimeout(time);
-        if (imports.lost) {
-            imports.lost = false;
+        if (dbs.lost) {
+            dbs.lost = false;
             console.log('Watch-dog signal reappeared!');
         }
 
@@ -55,7 +55,7 @@ module.exports = {
         time = setTimeout(() => {
             message.reply('Gabriel? you there?');
             console.log('Lost watch-dog signal.');
-            imports.lost = true;
+            dbs.lost = true;
         }, ((5 * 60) * 60) * 1000);
     }
 };

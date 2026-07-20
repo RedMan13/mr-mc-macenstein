@@ -40,7 +40,8 @@ globalThis.dbs = { // databases
     commands: {},
     commandConfig: config.commands,
     startedAt: Date.now(),
-    major: false
+    major: false,
+    lost: true
 }
 
 let slashCommands = []
