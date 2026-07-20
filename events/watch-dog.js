@@ -1,5 +1,6 @@
 const rate = require('../statics/self-rating');
 
+const interval = ((5 * 60) * 60) * 1000;
 const rated = [];
 let handleRated = null;
 let time = null;
@@ -39,6 +40,8 @@ module.exports = {
                 if (dbs.major) console.log('This bot is handling events.');
                 else console.log('This bot will nolonger handle events.');
                 console.log('The following commands are enabled: ', Object.entries(dbs.commands).filter(([n, command]) => command.enabled).map(n => n[0]));
+                if (dbs.lost) // if no gabe, just try our best. this isnt really good because all hosts will send `mc;rate`, but this should be good enough
+                    setTimeout(() => dbs.channels.watchDog.send('mc;rate'), interval);
             }, 3000);
         }
         if (message.author.id !== '1455453433565020306') return; // ddededodediamantes gabriel
@@ -56,7 +59,7 @@ module.exports = {
             message.reply('Gabriel? you there?');
             console.log('Lost watch-dog signal.');
             dbs.lost = true;
-        }, ((5 * 60) * 60) * 1000);
+        }, interval);
     }
 };
 
