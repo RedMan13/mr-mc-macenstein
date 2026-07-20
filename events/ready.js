@@ -25,14 +25,15 @@ module.exports = {
             };
         }
 
-        try {
-            const electron = require('electron');
-            process.send({
-                spawn: electron, args: [require.resolve('../electron/index.js')],
-                options: { windowsHide: false },
-                name: 'overlay-manager'
-            });
-        } catch (err) { console.warn(err.message) }
+        // not used for now, cant fgure out why its blocking mouse inputs
+        // try {
+        //     const electron = require('electron');
+        //     process.send({
+        //         spawn: electron, args: [require.resolve('../electron/index.js')],
+        //         options: { windowsHide: false },
+        //         name: 'overlay-manager'
+        //     });
+        // } catch (err) { console.warn(err.message) }
 
         const global = dbs.database.global();
         await global.loaded;

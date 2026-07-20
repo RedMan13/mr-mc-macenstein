@@ -1,5 +1,6 @@
 const { app, screen, BrowserWindow } = require('electron');
 const path = require('path');
+// not used for now, cant fgure out why its blocking mouse inputs
 
 /** @type {BrowserWindow} */
 let window;
