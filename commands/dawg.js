@@ -11,6 +11,6 @@ module.exports = {
     execute: async (message) => {
         message.reply(`<:dawg:1282237696424677377>`);
         const rating = rate(message.createdTimestamp);
-        message.reply(`i am \`\`\`json\n${JSON.stringify({ id: dbs.id, rating }, null, 4)}\`\`\``);
+        dbs.channels.watchDog.reply(`i am \`\`\`json\n${JSON.stringify({ id: dbs.id, rating }, null, 4)}\`\`\``);
     },
 };
