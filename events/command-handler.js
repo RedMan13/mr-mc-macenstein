@@ -8,7 +8,7 @@ module.exports = {
             const args = message.content.split(' ');
             const command = args.shift().slice(dbs.config.commands.prefix.length);
             if (!dbs.commands[command]) return message.react('<:no:1164832595478069299>');
-            if (!dbs.commands[command].enabled) return;
+            if (!dbs.commands[command].enabled && dbs.commands[command].work > 0) return;
             const commandData = dbs.commands[command].command;
             message.args = args.join(' ');
             message.arguments = dbs.commands[command].useCLI

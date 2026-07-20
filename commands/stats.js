@@ -1,6 +1,7 @@
 const { EmbedBuilder } = require('discord.js');
 const os = require('os');
 const rate = require('../statics/self-rating.js');
+const path = require('path');
 
 function makeVerbose(rawSeconds) {
     const seconds = Math.floor(rawSeconds % 60);
@@ -56,6 +57,16 @@ module.exports = {
                     ]),
                 new EmbedBuilder()
                     .setTitle('Capacities')
+                    .setThumbnail({
+                        aix: 'https://cdn.discordapp.com/attachments/983516228691824641/1528856243781767288/aix.png',
+                        android: 'https://cdn.discordapp.com/attachments/983516228691824641/1528856244063043674/android.png',
+                        darwin: 'https://cdn.discordapp.com/attachments/983516228691824641/1528856244352454676/darwin.png',
+                        freebsd: 'https://cdn.discordapp.com/attachments/983516228691824641/1528856244616433796/freebsd.png',
+                        linux: 'https://cdn.discordapp.com/attachments/983516228691824641/1528856244956430356/linux.png',
+                        openbsd: 'https://cdn.discordapp.com/attachments/983516228691824641/1528856245237453041/openbsd.png',
+                        sunos: 'https://cdn.discordapp.com/attachments/983516228691824641/1528856245593706548/sunos.png',
+                        win32: 'https://cdn.discordapp.com/attachments/983516228691824641/1528856245858078730/win32.png'
+                    }[process.platform])
                     .addFields([
                         { name: 'Watch dog presence', value: dbs.lost ? 'Missing' : 'Live' },
                         { name: 'Ping', value: String(rating.ping) },
