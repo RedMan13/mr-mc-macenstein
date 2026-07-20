@@ -10,6 +10,6 @@ module.exports = {
      * @param {import('discord.js').Message} message
      */
     execute: async (message) => {
-        
+        message.reply('v');
     },
 };
