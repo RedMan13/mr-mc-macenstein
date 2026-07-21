@@ -1,3 +1,10 @@
+const { SectionBuilder, ButtonBuilder, Message, MessageFlags } = require('discord.js');
+
+const defaultBoard = 'rnbkqbnr-pppppppp-++++++++-++++++++-++++++++-++++++++-PPPPPPPP-RNBKQBNR';
+
+function parseBoard(state) { return state.split('-').map(row => row.split('')) }
+function stringifyBoard(board) { return board.map(row => row.join('')).join('-') }
+
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'chess',
@@ -9,7 +16,28 @@ module.exports = {
     /**
      * @param {import('discord.js').Message} message
      */
-    execute: async (message) => {
-        message.reply('v');
+    execute: async (message, state = defaultBoard) => {
+        let board = parseBoard(state);
+        if (message instanceof Message) {
+            message.reply({
+                // flags: MessageFlags.IsComponentsV2,
+                components: [
+                    new SectionBuilder({
+                        components: [
+                            new ButtonBuilder({ disabled: true, emoji: '☑️' }),
+                            new ButtonBuilder({ disabled: true, emoji: '☑️' }),
+                            new ButtonBuilder({ disabled: true, emoji: '☑️' }),
+                            new ButtonBuilder({ disabled: true, emoji: '☑️' }),
+                            new ButtonBuilder({ disabled: true, emoji: '☑️' }),
+                            new ButtonBuilder({ disabled: true, emoji: '☑️' }),
+                            new ButtonBuilder({ disabled: true, emoji: '☑️' }),
+                            new ButtonBuilder({ disabled: true, emoji: '☑️' }),
+                            new ButtonBuilder({ disabled: true, emoji: '☑️' })
+                        ]
+                    })
+                ]
+            });
+            return;
+        }
     },
 };

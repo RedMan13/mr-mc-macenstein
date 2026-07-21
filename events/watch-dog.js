@@ -25,7 +25,7 @@ module.exports = {
             }
             clearTimeout(handleRated);
             handleRated = setTimeout(() => {
-                if (!rated.some(v => v.id === dbs.id)) rated.push(rate(message.createdTimestamp));
+                if (!rated.some(v => v.id === dbs.id)) rated.push({ id: dbs.id, rating: rate(message.createdTimestamp) });
                 const usable = rated
                     .filter(host => host.rating.available > 0)
                     .sort((a,b) => a.rating.ping - b.rating.ping)

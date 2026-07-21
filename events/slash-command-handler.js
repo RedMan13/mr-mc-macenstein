@@ -4,6 +4,7 @@ module.exports = {
     global: true,
     /** @param {import('discord.js').BaseInteraction} interaction */
     execute: async (interaction) => {
+        if (!dbs.commands[command]?.enabled) return;
         if (!interaction.isCommand()) {
             const [id, ...clues] = interaction.customId.split('.');
             const command = dbs.commands[id];

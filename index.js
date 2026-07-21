@@ -69,8 +69,8 @@ function loadCommand(file) {
             dbs.commands[command.comData.name] = {
                 description: command.comData.description,
                 command,
-                enabled: false,
-                work: command.work,
+                enabled: dbs.commands[command.name] ?? false,
+                work: Math.max(command.work, 1), // cant have globally executing slash commands
                 isSlash: true,
                 file
             }
@@ -81,7 +81,7 @@ function loadCommand(file) {
             description: command.sDesc,
             category: command.category,
             command,
-            enabled: false,
+            enabled: dbs.commands[command.name] ?? false,
             work: command.work,
             useCLI: !Array.isArray(command.args),
             file
