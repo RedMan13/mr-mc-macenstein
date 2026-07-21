@@ -17,7 +17,10 @@ databases/user/*
 databases/channel/*
 databases/server/*
 databases/global.json
+
 assets/predictions.json
+assets/samples.txt
+
 errors.log
 nohup.out
 logs
