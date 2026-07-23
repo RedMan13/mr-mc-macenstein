@@ -57,6 +57,7 @@ module.exports = async (message, args, slash) => {
         if (typeof messageSplit[argIndex] !== 'string') break;
         const argContent = String(messageSplit[argIndex]);
         if (!argContent && arg.required) return `The argument "${name}" is required` 
+        if (!argContent && !arg.required) continue;
         switch (arg.type) {
         case 'string':
             let valid = true

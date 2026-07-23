@@ -58,7 +58,7 @@ let slashCommands = []
  * @prop {(message: import('discord.js').Message) => void} execute
  */
 
-function loadCommand(file) {
+function loadCommand(file, enabled = false) {
     try {
         /** @type {CommandDefinition} */
         const command = require(file);
@@ -69,7 +69,7 @@ function loadCommand(file) {
             dbs.commands[command.comData.name] = {
                 description: command.comData.description,
                 command,
-                enabled: dbs.commands[command.name] ?? false,
+                enabled,
                 work: Math.max(command.work, 1), // cant have globally executing slash commands
                 isSlash: true,
                 file
@@ -81,14 +81,14 @@ function loadCommand(file) {
             description: command.sDesc,
             category: command.category,
             command,
-            enabled: dbs.commands[command.name] ?? false,
+            enabled,
             work: command.work,
             useCLI: !Array.isArray(command.args),
             file
         }
         return command.name;
     } catch (err) {
-        console.warn(err.message);
+        console.warn(err);
         return null
     }
 }
@@ -107,9 +107,10 @@ fs.watch(commandsPath, (type, filename) => {
     for (const commandName in dbs.commands) {
         const command = dbs.commands[commandName];
         if (command.file !== file) continue;
+        const enabled = dbs.commands[commandName].enabled;
         delete dbs.commands[commandName];
         if (!exists) return dbs.channels.console.send(`Command ${commandName} has been deleted`); // if the file nolonger exists then this is it
-        loadCommand(file);
+        loadCommand(file, enabled);
         dbs.channels.console.send(`Command ${commandName} has been reloaded`);
         return; // no reason to keep running the loop now
     }

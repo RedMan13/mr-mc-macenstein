@@ -13,7 +13,7 @@ class Database {
         this.loaded = new Promise(resolve => this.#resolveLoaded = resolve);
         this.#path = dir;
         this.#setupSaving();
-        this.save(false);
+        // this.save(false);
         this.#taboutTimeout = setTimeout(this.close.bind(this), 60000);
         clearTimeout(this.#taboutTimeout);
     }
