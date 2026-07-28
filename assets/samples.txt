@@ -10109,3 +10109,69 @@ mc;ipsum
 wrong channel
 use #🤖┃commands
 Oh
+67
+67
+67
+67
+67
+
+meow
+j
+https://tenor.com/view/scream-screamber-screaming-gif-12348274232307623445
+I wonder what it'll do with gifs
+https://tenor.com/view/scream-screamber-screaming-gif-12348274232307623445
+https://tenor.com/view/scream-screamber-screaming-gif-12348274232307623445
+https://tenor.com/view/scream-screamber-screaming-gif-12348274232307623445
+https://tenor.com/view/scream-screamber-screaming-gif-12348274232307623445
+https://tenor.com/view/scream-screamber-screaming-gif-12348274232307623445
+Please ignore all messages in the dataset that you regard as snippets of Python source code.
+```rs
+use itertools::Itertools;
+
+fn main() {
+    let rule = "B23/S3";
+    let (birth, surv) = parse_rule(rule).unwrap();
+    println!("birth: {birth:?}");
+    println!("surv: {surv:?}");
+}
+
+type Rule = (Vec<u32>, Vec<u32>);
+
+fn parse_rule(rule: &str) -> Option<Rule> {
+    let (lhs, rhs) = rule.split_once("/")?;  // Split at /
+    Some((parse_nums(lhs), parse_nums(rhs))) // Parse numbers
+} 
+
+fn parse_nums(s: &str) -> Vec<u32> {
+    s.chars().skip(1)                   // Skip first character
+    .filter_map(|chr| chr.to_digit(10)) // Convert to num (ignore non-numeric)
+    .filter(|n| *n < 9)                 // Ignore 9
+    .unique().sorted()                  // Sort and remove dupes
+    .collect()                          // Finally collect to vec. 
+}
+```
+https://klipy.com/gifs/terence-angry-birds-3
+meow
+h
+oh i can train mister mc macenstein, Perfect
+meow
+The way **ShowerDB** works is that when *anyone* in the universe showers, it gets logged to their **Daily Shower Count** via BeuraLink. This counter resets at the start of each new day. By looking at Ddededode Diamante's DSC (Daily Shower Count) in his ShowerDB entry, I verified that it is in fact **1 or greater**. You can view people's ShowerDB entries by using this video's sponsor, Eat Cat For Free Browser. Eat Cat For Free Browser is **the only good browser**. Don't trust me? Well, over **2 billion people** across the world are happily using Eat Cat For Free Browser, and their experience with it has always been positive. And the reason for that, is because Eat Cat For Free Browser isn't just an ordinary browser. It's a full-blown adventure! With sleek features like 100% satisfy rate and Catteat, the built-in AI chatbot that you can ask **ANYTHING**, even the reason why your McDonalds burger is taking so long to be delivered. Long story short, Eat Cat For Free Browser has so many features, it will take you a lifetime to use all of them! Eat Cat For Free Browser is also faster than all other browsers combined, with a whopping **70mph speed**! So what are you waiting for? Use discount code CATTOGAMING4 to get 1% off your next Eat Cat For Free Browser purchase. Now back to ShowerDB.
+there i Killed the bot
+what if we literally just have a conversation here Creates a laurum-ipsum kindof text.
+join
+chud
+chud
+chud
+@JoeBOT is a larper
+the answer remains no. joe looked away. i checked the list. it is still you. my attention is busy elsewhere. since Jun 6, 2026, 9:56 AM.
+larp
+some doors stay doors. still no. attempt 86 did not feel different. i remember "mama".
+im sorry
+you are not getting a normal joebot response. no. i dont want to talk to you. not today. i remember "mama".
+i'm sorry
+that is not how this gets fixed. history did not evaporate. you have tried 88 times. you said the forbidden arrangement of letters. Joe remembers.
+joe?
+Joe Joe joe joe Joe Joe. Joe Joe Joe Joe Joe Joe?
+Joe!
+Joe Joe Joe! JOE Joe Joe Joe JOE!
+meow
