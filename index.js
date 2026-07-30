@@ -60,6 +60,7 @@ let slashCommands = []
 
 function loadCommand(file, enabled = false) {
     try {
+        console.log(`loading command ${path.basename(file)}`);
         /** @type {CommandDefinition} */
         const command = require(file);
         delete require.cache[file]; // do not let commands get cached! they could change at any moment
@@ -76,7 +77,6 @@ function loadCommand(file, enabled = false) {
             }
             return command.name;
         }
-        console.log(`loading command ${command.name}`);
         dbs.commands[command.name] = {
             description: command.sDesc,
             category: command.category,
@@ -88,7 +88,7 @@ function loadCommand(file, enabled = false) {
         }
         return command.name;
     } catch (err) {
-        console.warn(err);
+        console.warn('\t' + err.message.split('\n')[0]);
         return null
     }
 }
@@ -122,7 +122,7 @@ fs.watch(commandsPath, (type, filename) => {
     }
 
 });
-console.log('\n')
+console.log('\nsynching slash commands')
 syncSlash(imports.client, slashCommands, { debug: true })
 console.log('\n')
 
