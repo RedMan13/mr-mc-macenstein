@@ -22,6 +22,35 @@ globalThis.imports = {
     db: require('./statics/database-manager.js'),
     getAllArgs: require('./statics/arguments-parser'),
     parseArgs: require('./statics/argument-parser.js'),
+    /**
+     * @param {import('discord.js').TextBasedChannel} channel 
+     * @param {(message: import('discord.js').Message) => boolean} stop 
+     */
+    async scrapeChannel(channel, stop = () => {}) {
+        const res = [];
+        let messages;
+        let count = 0;
+        let start = Date.now();
+        while (!messages || messages.length >= 100) {
+            const since = Date.now() - start;
+            // fifty thousand messages is probably plenty, especially since by here we are going to overuse our stay
+            // but, if discord will let us, we may aswell keep going just in case
+            if (count >= 50 && since < 1000) break;
+            if (since >= 1000) start = Date.now();
+
+            const args = { limit: 100 };
+            if (messages && messages.length > 0)
+                args.before = res.at(-1).id;
+
+            messages = (await channel.messages.fetch(args));
+            res.push(...messages.values());
+            if (messages.some(stop)) break;
+
+            count++;
+        }
+        
+        return res;
+    },
     client: new Client({ 
         intents: [
             GatewayIntentBits.Guilds, 
@@ -41,7 +70,8 @@ globalThis.dbs = { // databases
     commandConfig: config.commands,
     startedAt: Date.now(),
     major: false,
-    lost: true
+    lost: true,
+    needsAppended: []
 }
 
 let slashCommands = []
@@ -95,11 +125,14 @@ function loadCommand(file, enabled = false) {
 console.log('\n')
 const commandsPath = path.resolve(__dirname, 'commands');
 fs.readdir(commandsPath, async (err, files) => { // read commands folder into a list of commands
-    console.log(err ? err : 'reading commands with no error')
+    console.log(err ? err : 'reading commands')
     files.forEach(async file => {
         const filePath = path.resolve(commandsPath, file);
         loadCommand(filePath);
     });
+    console.log('\n')
+    syncSlash(imports.client, slashCommands, { debug: true })
+    console.log('\n')
 });
 fs.watch(commandsPath, (type, filename) => {
     const file = path.resolve(commandsPath, filename);
@@ -122,13 +155,9 @@ fs.watch(commandsPath, (type, filename) => {
     }
 
 });
-console.log('\nsynching slash commands')
-syncSlash(imports.client, slashCommands, { debug: true })
-console.log('\n')
 
 const eventsPath = path.resolve(__dirname, 'events');
 const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
-
 for (const file of eventFiles) { // add events via files
     console.log(`applying event ${file}`)
     const filePath = path.resolve(eventsPath, file);
@@ -139,6 +168,10 @@ for (const file of eventFiles) { // add events via files
             if (!dbs.major) return;
             event.execute(...args);
         }
+    if (event.name === 'connected') {
+        dbs.needsAppended.push([event, onRun]);
+        continue;
+    }
     if (event.once) {
         imports.client.once(event.name, onRun)
     } else {
