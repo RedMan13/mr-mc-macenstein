@@ -51,7 +51,14 @@ module.exports = {
             global.set('restarted', false);
         }
 
-        const rating = rate(client.readyTimestamp);
-        dbs.channels.watchDog.send(`mc;rate ${JSON.stringify({ id: dbs.id, rating })}`);
+
+        const shard = client.ws.shards.at(0);
+        for (const [event, onRun] of dbs.needsAppended) {
+            if (event.name !== 'connected') continue;
+            onRun(); // oh look! this *is* that very ready event that would be listened for
+            if (!event.once)
+                shard.on('resumed', onRun);
+        }
+        dbs.needsAppended = [];
     },
 };
