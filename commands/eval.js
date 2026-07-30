@@ -32,6 +32,8 @@ module.exports = {
         } catch (err) {
             output = err.stack;
         }
+        output = output.replaceAll('```', '`\\`\\`');
+        output = output.replaceAll(imports.client.token, imports.client._censoredToken);
         if (output.length > 1989) output = output.slice(0, 1985) + '...';
         message.reply('```ansi\n' + output + '```');
     },
