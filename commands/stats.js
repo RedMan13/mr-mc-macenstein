@@ -2,6 +2,7 @@ const { EmbedBuilder } = require('discord.js');
 const os = require('os');
 const rate = require('../statics/self-rating.js');
 const path = require('path');
+const getBatteryInfo = require('../statics/analyze-battery.js');
 
 function makeVerbose(rawSeconds) {
     const seconds = Math.floor(rawSeconds % 60);
@@ -47,6 +48,7 @@ module.exports = {
      */
     execute: async (message) => {
         const rating = rate(message.createdTimestamp, true);
+        const battery = await getBatteryInfo();
         message.reply({
             embeds: [
                 new EmbedBuilder()
@@ -69,6 +71,8 @@ module.exports = {
                     }[process.platform])
                     .addFields([
                         { name: 'Watch dog presence', value: dbs.lost ? 'Missing' : 'Live' },
+                        { name: 'Battery', value: (battery.hasBattery ? battery.percentage + '%' : 'None') +
+                            (battery.charging ? ' (Plugged)' : ' (Unplugged)') },
                         { name: 'Ping', value: String(rating.ping) },
                         { name: 'Max parallel', value: String(rating.cores) },
                         { name: 'CPU Usages', value: String(rating.usages.map(v => `${v.user.toFixed(0)}%`).join(', ')) },

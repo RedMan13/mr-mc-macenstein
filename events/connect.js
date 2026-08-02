@@ -45,6 +45,8 @@ module.exports = {
             if (repeated > 1) problems += `(x${repeated})`;
         }
 
+        if (problems.length <= 0) return;
+
         let page = '';
         for (const line of problems) {
             if (page.length + line.length +1 > 2000) {
