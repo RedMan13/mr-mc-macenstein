@@ -33,7 +33,7 @@ const spawn = () => {
         }
         if (msg.kill) spawned[msg.name].kill();
         if (msg.stop) allowStop = true;
-        if (msg.pull) child.exec('git pull', (err, stdout, stderr) => {
+        if (msg.pull) child.exec('git pull', { cwd: __dirname }, (err, stdout, stderr) => {
             stdout += stderr;
             if (stdout.includes('Already up to date.')) return bot.send({ noChanges: true });
             const lines = stdout.split(/\r?\n\r?/g);
