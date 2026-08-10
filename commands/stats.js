@@ -79,8 +79,8 @@ module.exports = {
                         { name: 'Free memory', value: makeMega(rating.freeMem) },
                         { name: 'Rating', value: `${['N/A', 'Terrible', 'Meh', 'Perfect'][Math.floor(rating.available)]} (${rating.available}) (${rating.ratings.map(v => `${v[0]}: ${v[1]}`).join(', ')})` },
                         { name: 'Commands', value: rating.commands
-                            .sort((a,b) => dbs.commands[a].enabled - dbs.commands[b].enabled)
-                            .map(v => dbs.commands[v].enabled ? `**${v}**` : `--${v}--`)
+                            .sort((a,b) => dbs.commands[b].enabled - dbs.commands[a].enabled)
+                            .map(v => dbs.commands[v].enabled ? `**${v}**` : `~~${v}~~`)
                             .join(',') }
                     ])
                     .setFooter({ text: 'Bot id: ' + dbs.id + '; Alias: ' + dbs.alias })
