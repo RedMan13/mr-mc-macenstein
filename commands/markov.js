@@ -1,23 +1,22 @@
 const fs = require('fs');
 const path = require('path');
 const Markov = require('../statics/markovinator.js');
-const text = fs.readFileSync(path.resolve(__dirname, '../assets/samples.txt'), 'utf8');
 const markov = new Markov(null, '\n');
-markov.feed(dbs.trainingData, '');
+markov.feed(dbs.trainingData, / |(?<=\n)/g);
 
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
-    name: 'ipsum',
+    name: 'markov',
     category: 'dumb fun',
-    sDesc: 'Creates a laurum-ipsum kindof text.',
-    lDesc: 'Uses the messages in <#1490146686776119497> to generate nonsense placeholder text.',
+    sDesc: 'Jeremies markov but objectively worse.',
+    lDesc: 'Uses the messages in <#1490146686776119497> to generate nonsense.',
     work: 1,
     args: [
         {
             type: 'any',
-            name: 'char',
+            name: 'word',
             required: false,
-            desc: 'Sets what character the generator should start with.'
+            desc: 'Sets what word the generator should start with.'
         }
     ],
     /**
@@ -25,7 +24,7 @@ module.exports = {
      */
     execute: async (message) => {
         message.reply({
-            content: markov.generate(message.arguments.char),
+            content: markov.generate(message.arguments.word, ' '),
             allowedMentions: {
                 parse: [],
                 roles: [],

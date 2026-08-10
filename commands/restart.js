@@ -5,8 +5,16 @@ module.exports = {
     sDesc: 'restarts the bot',
     lDesc: 'Restarts the entire discord bot.',
     work: 0,
-    args: [],
+    args: [
+        {
+            type: 'any',
+            name: 'id',
+            desc: 'The bot id to control',
+            required: false
+        }
+    ],
     execute: async (message) => {
+        if (message.arguments.id && dbs.id !== message.arguments.id) return;
         if (message.author.id !== "860531746294726736") {
             message.reply(`you are not authorized to use this`);
             return;

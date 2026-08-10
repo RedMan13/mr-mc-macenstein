@@ -80,6 +80,7 @@ module.exports = {
                         { name: 'Rating', value: `${['N/A', 'Terrible', 'Meh', 'Perfect'][Math.floor(rating.available)]} (${rating.available}) (${rating.ratings.map(v => `${v[0]}: ${v[1]}`).join(', ')})` },
                         { name: 'Commands', value: rating.commands.join(',') }
                     ])
+                    .setFooter({ text: 'Bot id: ' + dbs.id })
             ]
         })
     },

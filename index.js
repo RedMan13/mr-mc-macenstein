@@ -12,7 +12,10 @@ const config = require('./statics/config.json');
 const syncSlash = require('@frostzzone/discord-sync-commands');
 const util = require('util');
 
-process.on('uncaughtException', err => console.warn(err));
+process.on('uncaughtException', err => {
+    if (err.code === 'ENOTFOUND') throw err;
+    console.warn(err)
+});
 process.send({ spawn: path.resolve(__dirname, './media-status.js'), name: 'media-status-manager' });
 
 globalThis.imports = {
@@ -71,7 +74,8 @@ globalThis.dbs = { // databases
     startedAt: Date.now(),
     major: false,
     lost: true,
-    needsAppended: []
+    needsAppended: [],
+    trainingData: fs.readFileSync(path.resolve(__dirname, './assets/samples.txt'), 'utf8')
 }
 
 let slashCommands = []
