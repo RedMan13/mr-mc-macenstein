@@ -4,7 +4,7 @@ module.exports = {
     category: 'operator',
     sDesc: 'restarts the bot',
     lDesc: 'Restarts the entire discord bot.',
-    work: 0,
+    work: 'all',
     args: [
         {
             type: 'any',

@@ -25,7 +25,7 @@ for text commands, the format is as follows
 | `string` | `category` | The category to put this command in. if the category doesnt exist then this command is never revealed in help |
 | `string` | `sDesc` | A short description for the command, normally used just after the command name in help |
 | `string` | `lDesc` | A complete description for the command, used when getting help for a specific command |
-| `number\|'pc'` | `work` | The kind of place that ths command will work, numbers indicate performance ratings, strings indicate device requirements. |
+| `'all'\|'any'\|string` | `work` | The kind of place that ths command will work. All means all hosts will always respond, any means this command isnt targeted, and any other string is to match for an alias, such as `phone` or `pc`. |
 | `CLIArguments\|Argument[]` | `args?` | The arguments for this command, included in specific command help. See `Argument Format` for formating. |
 | `(message: Message) => void` | `execute` | The actual command, gets run when the command is ran. `message.arguments: Object` and `message.args: string` are injected into the message object. `message.args` contains the un-processed argument string (content minus command and prefix), `message.arguments` contains the arguments that were parsed according to the rules outlined in the `args` property of this command |
 

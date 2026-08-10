@@ -12,7 +12,7 @@ module.exports = {
     category: 'dumb fun',
     sDesc: 'Creates a laurum-ipsum kindof text.',
     lDesc: 'Uses the messages in <#1490146686776119497> to generate nonsense placeholder text.',
-    work: 1,
+    work: 'any',
     args: [
         {
             type: 'any',

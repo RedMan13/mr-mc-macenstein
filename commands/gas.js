@@ -17,7 +17,7 @@ module.exports = {
     category: 'dumb fun',
     sDesc: 'Markov chain of myself!',
     lDesc: 'Uses the messages i have sent to create new messages that i have never sent.',
-    work: 1,
+    work: 'any',
     args: [
         {
             type: 'any',

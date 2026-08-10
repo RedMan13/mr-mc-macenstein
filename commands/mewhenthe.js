@@ -7,7 +7,7 @@ module.exports = {
     category: 'dumb fun',
     sDesc: 'hehehe me when the color',
     lDesc: 'Generates a random color with the text "Me when the"',
-    work: 1,
+    work: 'any',
     args: [
         {
             type: 'string',

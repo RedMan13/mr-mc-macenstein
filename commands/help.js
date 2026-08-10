@@ -8,7 +8,7 @@ module.exports = {
     category: 'hidden',
     sDesc: 'Gets help',
     lDesc: 'Sends the entire help list yippee',
-    work: 1,
+    work: 'any',
     args: [
         {
             type: 'string',

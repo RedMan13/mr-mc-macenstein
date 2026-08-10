@@ -8,7 +8,7 @@ module.exports = {
     category: 'hidden',
     sDesc: 'Sends ddededodediamantes secret',
     lDesc: 'Sends ddededodediamantes fursona',
-    work: 1,
+    work: 'any',
     args: [],
     /**
      * @param {import('discord.js').Message} message

@@ -8,7 +8,7 @@ module.exports = {
     category: 'dumb fun',
     sDesc: 'Pings electricfuzzball',
     lDesc: 'Pings <@1203782668928421949> 6 or 7 times randomly',
-    work: 1,
+    work: 'any',
     // hoping this works lel
     args: [
         {

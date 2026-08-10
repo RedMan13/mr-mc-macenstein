@@ -4,7 +4,7 @@ module.exports = {
     category: 'general',
     sDesc: 'Makes a suggestion',
     lDesc: 'Suggest features/changes for this bot!',
-    work: 1,
+    work: 'any',
     args: [
         {
             type: 'string',

@@ -8,7 +8,7 @@ module.exports = {
     category: '',
     sDesc: 'Runs a partical simulation',
     lDesc: 'Takes any image, turns it into only four colors, then runs those colors as a particle simulation',
-    work: 3,
+    work: 'any',
     args: [],
     execute: async (message) => {
         const rootMsg = await message.reply(`Loading target image...`);

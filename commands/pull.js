@@ -4,7 +4,7 @@ module.exports = {
     category: 'operator',
     sDesc: 'pulls from github',
     lDesc: 'pulls from github, restarting the bot if necessary',
-    work: 0,
+    work: 'all',
     args: [
         {
             type: 'any',

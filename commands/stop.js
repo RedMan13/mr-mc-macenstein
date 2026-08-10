@@ -4,7 +4,7 @@ module.exports = {
     category: 'operator',
     sDesc: 'stops the bot',
     lDesc: 'Makes the bot shut down entirely from discord',
-    work: 0,
+    work: 'all',
     args: [
         {
             type: 'any',

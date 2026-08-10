@@ -4,7 +4,7 @@ module.exports = {
     category: 'operator',
     sDesc: 'Makes the particular host stop being major',
     lDesc: 'Causes this particular host to temporarily shut up and let anyone else handle its place',
-    work: 0,
+    work: 'all',
     args: [
         {
             type: 'any',

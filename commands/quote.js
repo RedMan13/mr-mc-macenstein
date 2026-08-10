@@ -6,7 +6,7 @@ module.exports = {
     category: 'dumb fun',
     sDesc: 'Quotes some text',
     lDesc: 'Takes in any message you reply to and makes it into a quote card',
-    work: 2,
+    work: 'any',
     args: [],
     /**
      * @param {import('discord.js').Message} message

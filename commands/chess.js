@@ -231,7 +231,7 @@ module.exports = {
     category: 'dumb fun',
     sDesc: 'Plays chess.',
     lDesc: 'Starts a game of chess.',
-    work: 1,
+    work: 'any',
     args: [
         {
             name: 'against',

@@ -6,7 +6,7 @@ module.exports = {
     category: 'hidden',
     sDesc: 'Rates the hosts performance.',
     lDesc: 'Reports an assortment of information about how all current hosts are performing',
-    work: 0,
+    work: 'all',
     args: [],
     execute: async (message) => {
         const rating = rate(message.createdTimestamp);

@@ -41,7 +41,7 @@ module.exports = {
     category: 'operator',
     sDesc: 'lists the current statistics',
     lDesc: 'lists out various nuggets, like how long the bot has been running.',
-    work: 0,
+    work: 'all',
     args: [],
     /**
      * @param {import('discord.js').Message} message

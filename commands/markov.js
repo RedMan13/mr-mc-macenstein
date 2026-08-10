@@ -16,7 +16,7 @@ module.exports = {
     category: 'dumb fun',
     sDesc: 'Jeremies markov but objectively worse.',
     lDesc: 'Uses the messages in <#1490146686776119497> to generate nonsense.',
-    work: 1,
+    work: 'any',
     args: [
         {
             type: 'any',

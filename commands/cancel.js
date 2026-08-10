@@ -4,7 +4,7 @@ module.exports = {
     category: 'operator',
     sDesc: 'Cancels stream effects',
     lDesc: 'Cancels all currently running stream effects',
-    work: 1,
+    work: 'any',
     args: [],
     /**
      * @param {import('discord.js').Message} message

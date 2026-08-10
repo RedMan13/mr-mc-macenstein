@@ -4,7 +4,7 @@ const { createQuoteCard, createQuoteMessage } = require('../statics/quote-genera
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     slashCmd: true,
-    work: 2,
+    work: 'any',
     comData: {
         type: ApplicationCommandType.Message,
         name: 'Quote',

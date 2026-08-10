@@ -4,7 +4,7 @@ module.exports = {
     category: 'operator',
     sDesc: 'just testing',
     lDesc: 'your mom LMAO',
-    work: 1,
+    work: 'any',
     args: [
         {
             type: 'any',
