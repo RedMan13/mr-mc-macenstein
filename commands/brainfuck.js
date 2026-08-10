@@ -17,6 +17,7 @@ function lexInput(string) {
         case ']':
             layer--;
             const target = out.findLastIndex(lex => lex.layer === layer);
+            if (!out[target]) break;
             out[target].target = i;
             out.push({ op: 'loop', target });
             break;
