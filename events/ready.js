@@ -12,6 +12,7 @@ module.exports = {
     async execute(client) {
         console.log(`Ready! Logged in as ${client.user.tag}`);
         dbs.id = uuid();
+        dbs.alias = process.arch !== 'x64' ? 'phone' : 'pc';
         dbs.channels = Object.fromEntries(await Promise.all(Object.entries(dbs.config.channels)
             .map(async ([name, id]) => [name, await client.channels.fetch(id).catch(console.warn)])));
         dbs.channelsLoaded = true;

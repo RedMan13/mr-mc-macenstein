@@ -14,7 +14,7 @@ module.exports = {
         }
     ],
     execute: async (message) => {
-        if (message.arguments.id && dbs.id !== message.arguments.id) return;
+        if (dbs.id !== message.arguments.id && dbs.alias !== message.arguments.id) return;
         if (message.author.id !== "860531746294726736") {
             message.reply(`you are not authorized to use this`);
             return;

@@ -9,6 +9,8 @@ module.exports = {
     execute: async (message) => {
         if (message.channel.id !== dbs.config.channels.dataFeed) return;
         fs.appendFile(samples, '\n' + message.cleanContent);
+        for (const name in dbs.onNewData)
+            dbs.onNewData[name](message.cleanContent);
         message.react('🧠');
     },
 };

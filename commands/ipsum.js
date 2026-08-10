@@ -4,6 +4,7 @@ const Markov = require('../statics/markovinator.js');
 const text = fs.readFileSync(path.resolve(__dirname, '../assets/samples.txt'), 'utf8');
 const markov = new Markov(null, '\n');
 markov.feed(dbs.trainingData, '');
+dbs.onNewData['ipsum'] = data => markov.feed(data);
 
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
@@ -25,7 +26,7 @@ module.exports = {
      */
     execute: async (message) => {
         message.reply({
-            content: markov.generate(message.arguments.char),
+            content: markov.generate(message.arguments.char).slice(0, 2000),
             allowedMentions: {
                 parse: [],
                 roles: [],

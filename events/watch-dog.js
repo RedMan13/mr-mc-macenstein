@@ -18,11 +18,10 @@ module.exports = {
             const jsonEnd = message.content.lastIndexOf('}');
             if (jsonStart <= -1) return;
             const meta = JSON.parse(message.content.slice(jsonStart, jsonEnd +1));
-            if (!rated.some(v => v.id === meta.id)) rated.push(meta);
-            else {
-                const idx = rated.findIndex(v => v.id === meta.id);
-                rated.splice(idx, 1, meta);
-            }
+            const idx = rated.findIndex(v => v.id === meta.id);
+            if (idx < 0) rated.push(meta);
+            // if the meta we have is a lie, perpetuate it
+            else if (!rated[idx].lie) rated.splice(idx, 1, meta);
             clearTimeout(handleRated);
             handleRated = setTimeout(() => {
                 if (!rated.some(v => v.id === dbs.id)) rated.push({ id: dbs.id, rating: rate(message.createdTimestamp) });

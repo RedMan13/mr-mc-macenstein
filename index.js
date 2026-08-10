@@ -34,7 +34,7 @@ globalThis.imports = {
         let messages;
         let count = 0;
         let start = Date.now();
-        while (!messages || messages.length >= 100) {
+        while (!messages || messages.size >= 100) {
             const since = Date.now() - start;
             // fifty thousand messages is probably plenty, especially since by here we are going to overuse our stay
             // but, if discord will let us, we may aswell keep going just in case
@@ -42,7 +42,7 @@ globalThis.imports = {
             if (since >= 1000) start = Date.now();
 
             const args = { limit: 100 };
-            if (messages && messages.length > 0)
+            if (messages && messages.size > 0)
                 args.before = res.at(-1).id;
 
             messages = (await channel.messages.fetch(args));
@@ -75,7 +75,8 @@ globalThis.dbs = { // databases
     major: false,
     lost: true,
     needsAppended: [],
-    trainingData: fs.readFileSync(path.resolve(__dirname, './assets/samples.txt'), 'utf8')
+    trainingData: fs.readFileSync(path.resolve(__dirname, './assets/samples.txt'), 'utf8'),
+    onNewData: {}
 }
 
 let slashCommands = []

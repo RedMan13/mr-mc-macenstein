@@ -1,9 +1,10 @@
 class Markov {
     divider = '';
     finisher = '';
-    chances = {};
+    chances = Object.create(null);
     chars = [];
     totalChances = 0;
+    
     decider = char => (Math.random() * (char.total +1));
 
     constructor(decider, finisher) {
@@ -13,7 +14,7 @@ class Markov {
     feed(text, divider = this.divider) {
         this.divider = divider;
         const data = text.split(divider); 
-        const pureChances = {};
+        const pureChances = Object.create(null);
 
         data.forEach((char, i) => {
             if (!char) return;
@@ -38,7 +39,6 @@ class Markov {
             this.chances[source].chars = Object.entries(this.chances[source].chars);
         }
 
-        this.totalChances = 0;
         for (const char in pureChances) {
             this.totalChances += pureChances[char];
             pureChances[char] = this.totalChances;
@@ -53,21 +53,33 @@ class Markov {
             if (char && !char.endsWith(this.finisher)) return char;
         } while (true)
     }
-    findNext(chunk) {
-        if (!this.chances[chunk]) chunk = this.makeStarter();
+    findNext(chunk) { 
         const pick = this.decider(this.chances[chunk]);
         if (pick < 0 || pick > this.chances[chunk].total) return '';
         return this.chances[chunk].chars.find(v => pick <= v[1])?.[0] ?? '';
     }
     generate(starter = this.makeStarter(), divider = this.divider) {
+        starter = starter.toLowerCase();
+        let failedToFind = false;
+        // try to resolve what this starter might be
+        // if we cant then just make shit up, it isnt that important that we make something logical
+        if (!this.chances[starter]) {
+            starter = this.chars.find(v => v[0].includes(starter))?.[0];
+            if (!starter) {
+                starter = this.makeStarter();
+                failedToFind = true;
+            }
+        }
         let char = starter;
         let acc = char;
-        while (!char.endsWith(this.finisher)) {
-            if (char.includes('\n')) debugger;
+        let count = 0;
+        while (!char.endsWith(this.finisher) && count < 1000) {
             char = this.findNext(char);
             if (!char) break;
             acc += divider + char;
+            count++;
         }
+        if (failedToFind) acc += '\n-# The provided starting chunk could not be found!';
 
         return acc;
     }
