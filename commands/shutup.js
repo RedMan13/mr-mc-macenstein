@@ -20,7 +20,7 @@ module.exports = {
             return;
         }
         console.log('shutting it')
-        message.reply('https://klipy.com/gifs/cry-16222');
+        message.reply('https://cdn.discordapp.com/attachments/1038238583686967428/1536486266319798372/giphy-downsized.gif?ex=6a7b93d8&is=6a7a4258&hm=f6c13038bc3b2d2eb8fbf4e358820ad57bb639c81a5dddde20fc0447f5137293&');
         dbs.channels.watchDog.send(`${JSON.stringify({ id: dbs.id, lie: true, rating: { available: 0 } })}`);
     },
 };
