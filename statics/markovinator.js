@@ -19,7 +19,7 @@ class Markov {
         data.forEach((char, i) => {
             if (!char) return;
             char = char.toLowerCase();
-            this.chances[char] ??= { chars: {}, total: 0 };
+            this.chances[char] ??= { chars: Object.create(null), total: 0 };
             pureChances[char] ??= 0;
             pureChances[char]++;
             if (data[i +1]) {
@@ -30,20 +30,11 @@ class Markov {
             }
         });
 
-        for (const source in this.chances) {
-            let acc = 0;
-            for (const char in this.chances[source].chars) {
-                acc += this.chances[source].chars[char];
-                this.chances[source].chars[char] = acc;
-            }
-            this.chances[source].chars = Object.entries(this.chances[source].chars);
-        }
-
         for (const char in pureChances) {
             this.totalChances += pureChances[char];
             pureChances[char] = this.totalChances;
         } 
-        this.chars = Object.entries(pureChances);
+        this.chars = this.chars.concat(Object.entries(pureChances));
     }
 
     makeStarter() {
@@ -55,10 +46,16 @@ class Markov {
     }
     findNext(chunk) { 
         const pick = this.decider(this.chances[chunk]);
-        if (pick < 0 || pick > this.chances[chunk].total) return '';
-        return this.chances[chunk].chars.find(v => pick <= v[1])?.[0] ?? '';
+        if (pick < 0 || pick > this.chances[chunk].total) return '\n';
+
+        let level = 0;
+        for (const char in this.chances[chunk].chars) {
+            level += this.chances[chunk].chars[char];
+            if (pick < level) return char;
+        }
+        return '\n';
     }
-    generate(starter = this.makeStarter(), divider = this.divider) {
+    generate(starter = this.makeStarter(), minimum = 20, divider = this.divider) {
         starter = starter.toLowerCase();
         let failedToFind = false;
         // try to resolve what this starter might be
@@ -73,9 +70,9 @@ class Markov {
         let char = starter;
         let acc = char;
         let count = 0;
-        while (!char.endsWith(this.finisher) && count < 1000) {
+        while ((!char.endsWith(this.finisher) && count < 1000) || count < minimum) {
             char = this.findNext(char);
-            if (!char) break;
+            if (!this.chances[char]) break;
             acc += divider + char;
             count++;
         }

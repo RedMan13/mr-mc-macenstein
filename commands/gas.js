@@ -5,10 +5,9 @@ const Markov = require('../statics/markovinator.js');
 const markov = new Markov(null, '\n');
 const text = fs.readFileSync(path.resolve(__dirname, '../assets/gsa.txt'), 'utf8');
 // chunks are divided by one of
-// a space
 // a new line (without removing the newline)
 // a none-spoken character followed by a spoken character (without removing either)
-// a spoken character followed by a none-spoken character (without removing either)
+// a spoken character (including space) followed by a none-spoken character (without removing either)
 markov.feed(text, /(?<=\n)|(?<=[a-z0-9])(?=[^a-z0-9])|(?<=[^a-z0-9 ])(?=[a-z0-9])/gi);
 
 /** @type {import('../index.js').CommandDefinition} */
@@ -55,7 +54,7 @@ module.exports = {
             return;
         }
         message.reply({
-            content: markov.generate(message.arguments.word, '').slice(0, 2000),
+            content: markov.generate(message.arguments.word, 10, '').slice(0, 2000),
             allowedMentions: {
                 parse: [],
                 roles: [],

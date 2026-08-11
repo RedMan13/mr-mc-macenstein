@@ -26,7 +26,7 @@ module.exports = {
      */
     execute: async (message) => {
         message.reply({
-            content: markov.generate(message.arguments.char).slice(0, 2000),
+            content: markov.generate(message.arguments.char, 0).slice(0, 2000),
             allowedMentions: {
                 parse: [],
                 roles: [],
