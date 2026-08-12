@@ -44,13 +44,14 @@ class Markov {
             if (char && !char.endsWith(this.finisher)) return char;
         } while (true)
     }
-    findNext(chunk) { 
+    findNext(chunk, canEnd) { 
         const pick = this.decider(this.chances[chunk]);
         if (pick < 0 || pick > this.chances[chunk].total) return '\n';
 
         let level = 0;
         for (const char in this.chances[chunk].chars) {
             level += this.chances[chunk].chars[char];
+            if (!canEnd && char.endsWith(this.finisher)) continue;
             if (pick < level) return char;
         }
         return '\n';
@@ -70,8 +71,8 @@ class Markov {
         let char = starter;
         let acc = char;
         let count = 0;
-        while ((!char.endsWith(this.finisher) && count < 1000) || count < minimum) {
-            char = this.findNext(char);
+        while ((!char.endsWith(this.finisher) && count < 1000)) {
+            char = this.findNext(char, count >= minimum);
             if (!this.chances[char]) break;
             acc += divider + char;
             count++;

@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const Markov = require('../statics/markovinator.js');
-const text = fs.readFileSync(path.resolve(__dirname, '../assets/samples.txt'), 'utf8');
+const { EmbedBuilder } = require('discord.js');
 const markov = new Markov(null, '\n');
 markov.feed(dbs.trainingData, '');
 dbs.onNewData['ipsum'] = data => markov.feed(data);
@@ -18,13 +18,36 @@ module.exports = {
             type: 'any',
             name: 'char',
             required: false,
-            desc: 'Sets what character the generator should start with.'
+            desc: 'Sets what char the generator should start with. Setting to `has-said` will pull up statistics info for the following char, if it has been said.'
         }
     ],
     /**
      * @param {import('discord.js').Message} message
      */
     execute: async (message) => {
+        if (message.arguments.char === 'has-said') {
+            let word = message.args.split(' ').at(-1).toLowerCase();
+            if (!markov.chances[word]) word = markov.chars.find(a => a[0].endsWith(word));
+            if (!markov.chances[word]) return message.reply('Never said that!');
+            const data = markov.chances[word];
+            const chances = Object.entries(data.chars)
+                .sort((a,b) => b[1] - a[1])
+                .map(a => [a[0], (a[1] / data.total) * 100])
+                .map(a => `${a[0].replace('\n', '{end}')} (${a[1].toFixed(1)}%)`)
+                .map(v => v.replaceAll('-', '\\-').replaceAll('\\', '\\\\').replaceAll('`', '\\`').replaceAll('*', '\\*'))
+                .join('') 
+                .slice(0, 1024);
+            const uses = markov.chars.find(v => v[0] === word)[1];
+            message.reply({
+                embeds: [new EmbedBuilder()
+                    .setTitle(word)
+                    .setDescription(`This word has been used a total of ${uses} times!`)
+                    .addFields([
+                        { name: 'Followed by', value: chances }
+                    ])]
+            })
+            return;
+        }
         message.reply({
             content: markov.generate(message.arguments.char, 0).slice(0, 2000),
             allowedMentions: {
