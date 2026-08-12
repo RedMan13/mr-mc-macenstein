@@ -32,7 +32,7 @@ module.exports = {
         if (message.arguments.word === 'has-said') {
             let word = message.args.split(' ').at(-1).toLowerCase();
             if (!markov.chances[word]) word = markov.chars.find(a => a[0].endsWith(word))?.[0];
-            if (!markov.chances[word]) return message.reply('Never said that!');
+            if (!markov.chances[word] || !word) return message.reply('Never said that!');
             const data = markov.chances[word];
             const chances = Object.entries(data.chars)
                 .sort((a,b) => b[1] - a[1])
