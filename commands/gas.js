@@ -7,8 +7,10 @@ const text = fs.readFileSync(path.resolve(__dirname, '../assets/gsa.txt'), 'utf8
 // chunks are divided by one of
 // a new line (without removing the newline)
 // a none-spoken character followed by a spoken character (without removing either)
+// the following is `|(?<=[^a-z0-9 ])(?=[a-z0-9])|(?<=[^a-z0-9])(?= )` and was removed to make the bot more literate
 // a spoken character (including space) followed by a none-spoken character (without removing either)
-markov.feed(text, /(?<=\n)|(?<=[a-z0-9])(?=[^a-z0-9])|(?<=[^a-z0-9 ])(?=[a-z0-9])/gi);
+// a none-spoken character followed by a space (without removing either)
+markov.feed(text, /(?<=\n)|(?<=[a-z0-9])(?=[^a-z0-9])/gi);
 
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
@@ -30,8 +32,7 @@ module.exports = {
      */
     execute: async (message) => {
         if (message.arguments.word === 'has-said') {
-            let word = message.args.split(' ').at(-1).toLowerCase();
-            if (!markov.chances[word]) word = markov.chars.find(a => a[0].endsWith(word));
+            let word = markov.findWord(message.args.split(' ').at(-1));
             if (!markov.chances[word] || !word) return message.reply('Never said that!');
             const data = markov.chances[word];
             const chances = Object.entries(data.chars)
@@ -41,7 +42,7 @@ module.exports = {
                 .map(v => v.replaceAll('-', '\\-').replaceAll('\\', '\\\\').replaceAll('`', '\\`').replaceAll('*', '\\*'))
                 .join('') 
                 .slice(0, 1024);
-            const uses = markov.chars.find(v => v[0] === word)[1];
+            const uses = markov.chars[word];
             message.reply({
                 embeds: [new EmbedBuilder()
                     .setTitle(word)

@@ -14,14 +14,13 @@ class Markov {
     feed(text, divider = this.divider) {
         this.divider = divider;
         const data = text.split(divider); 
-        const pureChances = Object.create(null);
 
         data.forEach((char, i) => {
             if (!char) return;
             char = char.toLowerCase();
             this.chances[char] ??= { chars: Object.create(null), total: 0 };
-            pureChances[char] ??= 0;
-            pureChances[char]++;
+            this.chars[char] ??= 0;
+            this.chars[char]++;
             if (data[i +1]) {
                 const next = data[i +1].toLowerCase();
                 this.chances[char].chars[next] ??= 0;
@@ -29,19 +28,33 @@ class Markov {
                 this.chances[char].total++;
             }
         });
-
-        for (const char in pureChances) {
-            this.totalChances += pureChances[char];
-            pureChances[char] = this.totalChances;
-        } 
-        this.chars = this.chars.concat(Object.entries(pureChances));
+    }
+    findWord(word) {
+        word = word.toLowerCase();
+        if (!this.chances[word]) {
+            let proximity = Infinity;
+            let best;
+            for (const char in this.chars) {
+                if (!char.includes(word)) continue;
+                if ((char.length - word.length) > proximity) continue;
+                proximity = char.length - word.length;
+                best = char;
+            }
+            if (!best) return;
+            word = best;
+        }
+        return word;
     }
 
     makeStarter() {
         do {
             const pick = Math.floor(Math.random() * this.totalChances);
-            const char = this.chars.find(v => pick <= v[1])?.[0];
-            if (char && !char.endsWith(this.finisher)) return char;
+            let level = 0;
+            for (const char in this.chars) {
+                level += this.chars[char];
+                if (!char || char.endsWith(this.finisher)) continue;
+                if (pick < level) return char;
+            }
         } while (true)
     }
     findNext(chunk, canEnd) { 
@@ -56,18 +69,13 @@ class Markov {
         }
         return '\n';
     }
-    generate(starter = this.makeStarter(), minimum = 20, divider = this.divider) {
-        starter = starter.toLowerCase();
+    generate(starter, minimum = 20, divider = this.divider) {
         let failedToFind = false;
-        // try to resolve what this starter might be
-        // if we cant then just make shit up, it isnt that important that we make something logical
-        if (!this.chances[starter]) {
-            starter = this.chars.find(v => v[0].includes(starter))?.[0];
-            if (!starter) {
-                starter = this.makeStarter();
-                failedToFind = true;
-            }
+        if (starter) {
+            starter = this.findWord(starter);
+            if (!starter) failedToFind = true;
         }
+        if (!starter) starter = this.makeStarter();
         let char = starter;
         let acc = char;
         let count = 0;
