@@ -32,6 +32,6 @@ module.exports = {
         const usedToCheck = usedWords.filter(v => v.startsWith(letter));
         const totalToCheck = words.filter(v => v.startsWith(letter));
         const percent = ((usedToCheck.length / totalToCheck.length) * 100).toFixed(1) + '%';
-        return message.reply('`' + letter + '` has ' + (totalToCheck.length - usedToCheck.length) + ' usese left, and is ' + percent + ' used.');
+        return message.reply('`' + letter + '` has ' + (totalToCheck.length - usedToCheck.length) + ' uses left, and is ' + percent + ' used.');
     },
 };
