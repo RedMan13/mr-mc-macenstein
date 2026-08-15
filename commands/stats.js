@@ -72,7 +72,7 @@ module.exports = {
                     .addFields([
                         { name: 'Watch dog presence', value: dbs.lost ? 'Missing' : 'Live' },
                         { name: 'Battery', value: (battery.hasBattery ? battery.percentage + '%' : 'None') +
-                            (battery.charging ? ' (Plugged)' : ' (Unplugged)') },
+                            (battery.charging ? ' (Plugged)' : ' (Unplugged)') + (battery.isDying ? ' Dies as' : 'Charged at') + ' <t:' + battery.diesAt + ':R>' },
                         { name: 'Ping', value: String(rating.ping) },
                         { name: 'Max parallel', value: String(rating.cores) },
                         { name: 'CPU Usages', value: String(rating.usages.map(v => `${v.user.toFixed(0)}%`).join(', ')) },

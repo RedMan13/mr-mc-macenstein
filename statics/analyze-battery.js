@@ -16,7 +16,9 @@ module.exports = async function getBatteryInfo() {
             return {
                 hasBattery: info.present,
                 charging: info.plugged !== 'UNPLUGGED',
-                percentage: info.percentage
+                percentage: info.percentage,
+                diesAt: Math.floor((((info.charge_counter / Math.abs(info.current)) * 60 * 60 * 1000) + Date.now()) / 1000),
+                isDying: info.status === 'DISCHARGING'
             }
         }
     case 'linux':
