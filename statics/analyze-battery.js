@@ -28,10 +28,17 @@ module.exports = async function getBatteryInfo() {
             const res = { hasBattery: true };
             for (const [_, key, value] of data.matchAll(/^(.+)=(.*)$/gm)) {
                 switch (key) {
+                case 'POWER_SUPPLY_ENERGY_NOW': res.wattHoursLeft = Number(value) / 1000_000; break;
+                case 'POWER_SUPPLY_POWER_NOW': res.watts = Number(value) / 1000_000; break;
                 case 'POWER_SUPPLY_CAPACITY': res.percentage = Number(value); break;
                 case 'POWER_SUPPLY_STATUS': res.charging = value.toLowerCase() !== 'discharging'; break;
                 }
             }
+
+            res.isDying = !res.charging;
+            if (!res.isDying)
+                res.diesAt = Math.floor((((res.wattHoursLeft / res.watts) * 60 * 60 * 1000) + Date.now()) / 1000);
+            else res.diesAt = 0;
             return res;
         }
         return { hasBattery: false };
@@ -48,7 +55,7 @@ module.exports = async function getBatteryInfo() {
             switch (key) {
             case 'hw.acpi.battery.units': res.hasBattery = value !== '0'; break;
             case 'hw.acpi.battery.life': res.percentage = Number(value); break;
-            case 'hw.acpi.acline': res.charging = value !== '1';
+            case 'hw.acpi.acline': res.charging = value !== '1'; break;
             }
         }
         return res;
