@@ -9,6 +9,7 @@ module.exports = {
         const rating = rate(imports.client.readyTimestamp);
         dbs.channels.watchDog.send(`mc;rate ${JSON.stringify({ id: dbs.id, rating })}`);
 
+	await dbs.database.channel(dbs.channels.wordChain.id).loaded;
         const handledUsers = {}
         /** @type {import('discord.js').Message[]} */
         const messages = (await imports.scrapeChannel(dbs.channels.wordChain, message => message.reactions.resolve('1164828602609717248')?.me))
