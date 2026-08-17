@@ -8,6 +8,7 @@ class Database {
     #resolveLoaded = null;
     #taboutTimeout = null;
     #saveInterval = null;
+    wasEmpty = true;
     loaded = null;
     constructor(dir) {
         this.loaded = new Promise(resolve => this.#resolveLoaded = resolve);
@@ -19,6 +20,8 @@ class Database {
     }
     async save(forced) {
         if (!this.#needsWrite && !forced) return;
+        // never save if the database is empty and was empty
+        if (!Object.keys(this.#data).length && this.wasEmpty) return;
         this.#taboutTimeout = setTimeout(this.close.bind(this), 60000);
         clearTimeout(this.#taboutTimeout);
         console.log(`saving ${path.basename(this.#path)}...`);
@@ -33,6 +36,7 @@ class Database {
         if (isReal) console.log(`Reading database ${path.basename(this.#path)}`);
         const data = await fs.readFile(this.#path, 'utf8').catch(() => '{}');
         this.#data = Object.assign(JSON.parse(data), this.#data);
+        this.wasEmpty = data === '{}';
         this.#resolveLoaded(true);
         this.loaded = true;
         this.#saveInterval = setInterval(this.save.bind(this), 1000);
