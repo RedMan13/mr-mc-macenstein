@@ -18,7 +18,7 @@ module.exports = async function getBatteryInfo() {
                 charging: info.plugged !== 'UNPLUGGED',
                 percentage: info.percentage,
                 diesAt: info.current < 0
-                    ? Math.floor(((((info.charge_counter * (100 / info.percentage) - info.charge_counter) / -info.current) * 60 * 60 * 1000) + Date.now()) / 1000)
+                    ? Math.floor((((((info.charge_counter * (100 / info.percentage)) - info.charge_counter) / -info.current) * 60 * 60 * 1000) + Date.now()) / 1000)
                     : Math.floor((((info.charge_counter / info.current) * 60 * 60 * 1000) + Date.now()) / 1000),
                 isDying: info.current < 0
             }
