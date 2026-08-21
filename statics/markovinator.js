@@ -17,6 +17,7 @@ class Markov {
 
         data.forEach((char, i) => {
             if (!char) return;
+            this.totalChances++
             char = char.toLowerCase();
             this.chances[char] ??= { chars: Object.create(null), total: 0 };
             this.chars[char] ??= 0;
