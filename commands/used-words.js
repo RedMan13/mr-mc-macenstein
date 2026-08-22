@@ -1,7 +1,7 @@
 const { EmbedBuilder } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
-const words = fs.readFileSync(path.resolve(__dirname, '../assets/words.txt'), 'utf8').split(',');
+const { words, topCounts, unsafeMessageChars, safeReplacer } = require('../events/word-chain');
 
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
@@ -28,10 +28,11 @@ module.exports = {
             const percent = ((usedWords.length / words.length) * 100).toFixed(1) + '%';
             return message.reply(percent + ' of all available words used');
         }
-        const letter = message.arguments.letter[0].replaceAll(/[^0-9a-z\-']+/gi, '-');
-        const usedToCheck = usedWords.filter(v => v.startsWith(letter));
-        const totalToCheck = words.filter(v => v.startsWith(letter));
-        const percent = ((usedToCheck.length / totalToCheck.length) * 100).toFixed(1) + '%';
-        return message.reply('`' + letter + '` has ' + (totalToCheck.length - usedToCheck.length) + ' uses left, and is ' + percent + ' used.');
+        const letter = message.arguments.letter[0].replaceAll(unsafeMessageChars, safeReplacer).toLowerCase();
+        const usedToCheck = messageChannel.get(letter) ?? 0;
+        const totalToCheck = topCounts[letter];
+        const references = words.filter(word => word.at(-1) === letter);
+        const percent = ((usedToCheck / totalToCheck) * 100).toFixed(1) + '%';
+        return message.reply(`\`${letter}\` has ${(totalToCheck - usedToCheck)} uses left, and is ${percent} used.\n${references.length} words end in \`${letter}\`.`);
     },
 };

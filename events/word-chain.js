@@ -1,7 +1,11 @@
 const { EmbedBuilder } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
-const words = fs.readFileSync(path.resolve(__dirname, '../assets/words.txt'), 'utf8');
+const wordsPath = path.resolve(__dirname, '../assets/words.txt');
+const words = fs.readFileSync(wordsPath, 'utf8');
+const topCounts = words.split(',')
+    .map(word => word[0])
+    .reduce((c,v) => (v in c ? c[v]++ : (c[v] = 1), c), {});
 
 /**
  * @param {import('discord.js').Message} message
@@ -18,11 +22,17 @@ function fail(message, reason) {
 function checkMessage(message) {
     const messageChannel = dbs.database.channel(dbs.channels.wordChain.id);
     const filtered = message.content.replaceAll(unsafeMessageChars, safeReplacer).toLowerCase();
+    const letter = filtered[0];
     const used = messageChannel.get('words') ?? '';
+
+    // if this word is the last word, and leads to the same letter it just ended, then we cant allow it.
+    if (filtered.at(-1) === filtered[0] && messageChannel.get(filtered.at(-1)) >= topCounts[filtered.at(-1)] -1)
+        return `\`${filtered.at(-1)}\` cant be used that way! it would end the universe!!`;
+    if (messageChannel.get(filtered.at(-1)) >= topCounts[filtered.at(-1)]) return `\`${filtered.at(-1)}\` has been all used up!`;
 
     if (messageChannel.get('lastUser') === message.author.id) return `You are not allowed to submit back to back!`;
 
-    if (used.length && used.at(-1) !== filtered[0]) return `\`${filtered}\` does not start with \`${used.at(-1)}\`!`;
+    if (used.length && used.at(-1) !== letter) return `\`${filtered}\` does not start with \`${used.at(-1)}\`!`;
 
     const locator = new RegExp(`(?:^|,)${filtered}(?:$|,)`);
     if (locator.test(used)) return `\`${filtered}\` has already been used!`;
@@ -30,6 +40,9 @@ function checkMessage(message) {
 
     messageChannel.set('words', used + ',' + filtered);
     messageChannel.set('lastUser', message.author.id);
+    if (!messageChannel.has(letter))
+        messageChannel.set(letter, 0);
+    messageChannel.add(letter);
 
     return false;
 }
@@ -41,6 +54,11 @@ module.exports = {
     once: false,
     global: true,
     checkMessage,
+    wordsPath,
+    unsafeMessageChars,
+    safeReplacer,
+    topCounts,
+    words: words.split(','),
     /**
      * @param {import('discord.js').Message} message
      */

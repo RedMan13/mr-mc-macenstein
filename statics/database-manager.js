@@ -49,6 +49,8 @@ class Database {
         delete this.databases[dir];
     }
 
+    add(key) { this.#data[key]++; this.#needsWrite = true; }
+    sub(key) { this.#data[key]--; this.#needsWrite = true; }
     has(key) { return key in this.#data; }
     get(key) { return this.#data[key]; }
     set(key, value) { this.#data[key] = value; this.#needsWrite = true; }
