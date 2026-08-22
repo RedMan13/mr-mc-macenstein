@@ -20,14 +20,23 @@ function fail(message, reason) {
  * @returns {false|string} False only when the input message is valid
  */
 function checkMessage(message) {
+    if (message.author.id === imports.client.user.id) return false;
     const messageChannel = dbs.database.channel(dbs.channels.wordChain.id);
     const filtered = message.content.replaceAll(unsafeMessageChars, safeReplacer).toLowerCase();
     const letter = filtered[0];
     const used = messageChannel.get('words') ?? '';
 
-    // if this word is the last word, and leads to the same letter it just ended, then we cant allow it.
-    if (filtered.at(-1) === filtered[0] && messageChannel.get(filtered.at(-1)) >= topCounts[filtered.at(-1)] -1)
-        return `\`${filtered.at(-1)}\` cant be used that way! it would end the universe!!`;
+    // if this word is the last word, and leads to the same letter it just ended, then we need to edit reality
+    if (filtered.at(-1) === filtered[0] && messageChannel.get(filtered.at(-1)) >= topCounts[filtered.at(-1)] -1) {
+        const availableLetters = Object.entries(topCounts)
+            .filter(([letter, count]) => messageChannel.get(letter) < count)
+            .map(([letter]) => letter);
+        const letter = availableLetters[Math.floor(Math.random() * availableLetters.length)];
+        const end = words.indexOf(letter + ',');
+        const start = words.lastIndexOf(',', end);
+        dbs.channels.wordChain.send(words.slice(start, end));
+        dbs.channels.wordErrors.send('Oops! that cant be right!');
+    }
     if (messageChannel.get(filtered.at(-1)) >= topCounts[filtered.at(-1)]) return `\`${filtered.at(-1)}\` has been all used up!`;
 
     if (messageChannel.get('lastUser') === message.author.id) return `You are not allowed to submit back to back!`;
