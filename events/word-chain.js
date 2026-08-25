@@ -55,7 +55,7 @@ function checkMessage(message) {
 
     return false;
 }
-const unsafeMessageChars = /[^0-9a-z\-']+/gi;
+const unsafeMessageChars = /[^a-z\-']+/gi;
 const safeReplacer = '-';
 
 module.exports = {
