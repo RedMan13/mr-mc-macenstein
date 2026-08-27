@@ -3,9 +3,20 @@ const fs = require('fs');
 const path = require('path');
 const wordsPath = path.resolve(__dirname, '../assets/words.txt');
 const words = fs.readFileSync(wordsPath, 'utf8');
-const topCounts = words.split(',')
-    .map(word => word[0])
-    .reduce((c,v) => (v in c ? c[v]++ : (c[v] = 1), c), {});
+const topCounts = {};
+const messageChannel = dbs.database.channel(dbs.config.channels.wordChain);
+(async () => {
+    if (await messageChannel.loaded) {
+        const usedWords = (messageChannel.get('words') ?? '').split(',');
+        words.split(',')
+            .forEach(word => {
+                if (messageChannel.get(usedWords.at(-1)) < 0) return;
+                topCounts[word[0]] ??= 0;
+                topCounts[word[0]]++;
+            });
+        console.log(topCounts)
+    }
+})();
 
 /**
  * @param {import('discord.js').Message} message
@@ -37,7 +48,7 @@ function checkMessage(message) {
         dbs.channels.wordChain.send(words.slice(start, end));
         dbs.channels.wordErrors.send('Oops! that cant be right!');
     }
-    if (messageChannel.get(filtered.at(-1)) >= topCounts[filtered.at(-1)]) return `\`${filtered.at(-1)}\` has been all used up!`;
+    if (messageChannel.get(filtered.at(-1)) < 0) return `\`${filtered.at(-1)}\` has been all used up!`;
 
     if (messageChannel.get('lastUser') === message.author.id) return `You are not allowed to submit back to back!`;
 
@@ -52,6 +63,8 @@ function checkMessage(message) {
     if (!messageChannel.has(letter))
         messageChannel.set(letter, 0);
     messageChannel.add(letter);
+    if (messageChannel.get(letter) >= topCounts[letter])
+        messageChannel.set(letter, -1);
 
     return false;
 }

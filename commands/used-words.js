@@ -31,7 +31,10 @@ module.exports = {
         const letter = message.arguments.letter[0].replaceAll(unsafeMessageChars, safeReplacer).toLowerCase();
         const usedToCheck = messageChannel.get(letter) ?? 0;
         const totalToCheck = topCounts[letter];
-        const references = words.filter(word => word.at(-1) === letter);
+        const references = words
+            .filter(word => word.at(-1) === letter)
+            .filter(word => (messageChannel.get(word[0]) ?? 0) >= 0)
+            .filter(word => !usedWords.includes(word));
         const percent = ((usedToCheck / totalToCheck) * 100).toFixed(1) + '%';
         return message.reply(`\`${letter}\` has ${(totalToCheck - usedToCheck)} uses left, and is ${percent} used.\n${references.length} words end in \`${letter}\`.`);
     },
