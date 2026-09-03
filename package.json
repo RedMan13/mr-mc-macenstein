@@ -22,8 +22,11 @@
         "image-raub": "^5.2.0",
         "opencl-raub": "^2.0.1",
         "os-utils": "0.0.14",
-        "sharp": "^0.35.3",
+        "sharp": "^0.35.4",
         "skia-canvas": "^3.0.8",
         "uuid": "^14.0.1"
+    },
+    "allowScripts": {
+        "@google/genai@1.52.0": true
     }
 }
