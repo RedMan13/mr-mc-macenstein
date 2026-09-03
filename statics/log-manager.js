@@ -13,20 +13,16 @@ function pruneLogs() {
     for (const file of logs) {
         if (!file.endsWith('.log')) continue;
         const { name } = path.parse(file);
-        const dated = new Date(name);
+        const dated = new Date(name.split('T')[0]);
         if (dated.toString() === 'Invalid Date') continue
-        const corseDate = new Date('00/00/00 00:00:00');
-        corseDate.setFullYear(dated.getFullYear());
-        corseDate.setMonth(dated.getMonth());
-        corseDate.setDate(dated.getDate());
-        if (date !== corseDate.valueOf() || file === logs.at(-1)) {
+        if (date !== dated.valueOf() || file === logs.at(-1)) {
             for (let i = 0; i < filesInDay.length; i++) {
                 if (i < 4) continue; 
                 fs.rm(path.resolve(logDir, filesInDay[i]), () => {});
             }
             filesInDay = [];
         }
-        date = corseDate.valueOf();
+        date = dated.valueOf();
         filesInDay.unshift(file);
         if ((Date.now() - dated) < expires) continue;
         fs.rm(path.resolve(logDir, file), () => {});

@@ -10,7 +10,6 @@ require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const process = require('process');
 const config = require('./statics/config.json');
 const syncSlash = require('@frostzzone/discord-sync-commands');
-const util = require('util');
 
 process.on('uncaughtException', err => {
     if (err.code === 'ENOTFOUND') throw err;

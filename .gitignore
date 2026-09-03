@@ -20,6 +20,7 @@ databases/global.json
 
 assets/predictions.json
 assets/samples.txt
+assets/midis.txt
 
 errors.log
 nohup.out

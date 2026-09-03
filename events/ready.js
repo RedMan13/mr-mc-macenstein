@@ -1,6 +1,11 @@
 const util = require('util');
 const rate = require('../statics/self-rating');
 const { v7: uuid } = require('uuid');
+const path = require('path');
+const MIDI = require('midi-file');
+const textSamples = path.resolve(__dirname, '../assets/samples.txt');
+const midiSamples = path.resolve(__dirname, '../assets/midis.txt');
+const fs = require('fs/promises');
 
 module.exports = {
     name: 'clientReady',
@@ -61,5 +66,29 @@ module.exports = {
                 shard.on('resumed', onRun);
         }
         dbs.needsAppended = [];
+
+
+        fs.stat(textSamples)
+            .catch(async () => {
+                const messages = (await imports.scrapeChannel(dbs.channels.textFeed))
+                    .map(message => message.cleanContent)
+                    .join('\n');
+                fs.writeFile(textSamples, messages);
+            })
+        fs.stat(midiSamples)
+            .catch(async () => {
+                const promises = (await imports.scrapeChannel(dbs.channels.midiFeed))
+                    .filter(message => message.attachments.size > 0)
+                    .flatMap(message => message.attachments.toJSON())
+                    .filter(file => file.contentType === 'audio/sp-midi')
+                    .map(file => fetch(file.url).then(req => req.bytes()).catch(() => {}));
+                const samples = (await Promise.all(promises))
+                    .filter(data => data.length)
+                    .map(data => MIDI.parseMidi(data))
+                    .map(midi => JSON.stringify(midi))
+                    .join('\n') + '\n';
+                
+                fs.writeFile(midiSamples, samples);
+            })
     },
 };
