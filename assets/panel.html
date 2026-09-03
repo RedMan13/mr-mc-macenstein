@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Pane l</title>
+    <style>
+        body { font-family: sans-serif; }
+        .process {
+            display: grid;
+            gap: 2px;
+            grid-template-columns: max-content 1fr max-content max-content 24px 24px 24px;
+            grid-template-rows: 24px max-content;
+        }
+        .process span { margin-right: 6px; }
+        .button {
+            cursor: pointer;
+            border-radius: 2px;
+        }
+        .button:hover { background-color: lightgray; }
+        .log-body {
+            grid-column: 1 / 7;
+            max-height: calc(100vh - 82px);
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: inset 0px 0px 4px grey;
+            border-radius: 10px;
+            padding: 5px;
+            margin: 0;
+            overflow-x: hidden;
+            overflow-y: scroll;
+            text-wrap: wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .add-process {
+            height: 24px;
+            width: 100%;
+            padding-bottom: 8px;
+            border-bottom: 1px solid grey;
+            display: flex;
+            gap: 2px;
+        }
+        .add-process input { margin-right: 4px; }
+        .arguments { width: 100%; }
+    </style>
+</head>
+<body>
+    <div class="add-process">
+        <input type="text" placeholder="name" id="name">
+        <input type="text" placeholder="file [args]" class="arguments" id="file-args">
+        <label for="restarts">Restarts</label>
+        <input type="checkbox" id="restarts">
+        <img class="button" src="/icons/execute.svg" id="execute">
+    </div>
+    <div id="process-list"></div>
+    <script>
+        const name = document.getElementById('name');
+        const fileArgs = document.getElementById('file-args');
+        const restarts = document.getElementById('restarts');
+        const execute = document.getElementById('execute');
+        execute.onclick = async () => {
+            if (!name.value) return;
+            if (!fileArgs.value) return;
+            
+            const args = fileArgs.value.split(' ');
+            const newProc = {
+                spawn: args.shift(),
+                args: args,
+                options: { restarts: restarts.checked }
+            }
+
+            const proc = await fetch(`/spawned/${name.value}`, { method: 'PUT', body: JSON.stringify(newProc) })
+                .then(req => req.json());
+            makeProcessWidget(proc);
+        }
+
+        const processList = document.getElementById('process-list');
+
+        function makeMega(bytes) {
+            const kilo = bytes / 1000;
+            const mega = bytes / 1000_000;
+            const giga = bytes / 1000_000_000;
+            const tera = bytes / 1000_000_000_000;
+
+            if (tera >= 1) return tera.toFixed(2) + 'TB';
+            if (giga >= 1) return giga.toFixed(2) + 'GB';
+            if (mega >= 1) return mega.toFixed(2) + 'MB';
+            if (kilo >= 1) return kilo.toFixed(2) + 'KB';
+            return bytes + 'B';
+        }
+        function makeProcessWidget(proc, showLogs) {
+            const oldProcess = document.getElementById(proc.name);
+            if (oldProcess) return updateProcessWidget(proc);
+
+            const process = document.createElement('div');
+            process.id = proc.name;
+            process.classList.add('process');
+
+            const label = document.createElement('span');
+            label.innerText = proc.name + '  ';
+            process.appendChild(label);
+
+            const executable = document.createElement('span');
+            executable.innerText = proc.spawn;
+            process.appendChild(executable);
+
+            const usage = document.createElement('span');
+            usage.id = 'cpu-usage';
+            usage.innerText = proc.usage.toFixed(2) + '%  ';
+            process.appendChild(usage);
+
+            const memory = document.createElement('span');
+            memory.id = 'memory-usage';
+            memory.innerText = makeMega(proc.memory);
+            process.appendChild(memory);
+
+            const restart = new Image();
+            restart.classList.add('button');
+            restart.src = '/icons/restart.svg';
+            restart.onclick = () => fetch(`/spawned/${proc.name}`, {
+                method: 'PUT',
+                body: JSON.stringify({ spawn: proc.args[0], ...proc })
+            });
+            process.appendChild(restart);
+
+            const stop = new Image();
+            stop.classList.add('button');
+            stop.src = '/icons/stop.svg';
+            stop.onclick = () => fetch(`/spawned/${proc.name}`, { method: 'DELETE' });
+            process.appendChild(stop);
+
+            /** @type {WebSocket} */
+            let socket;
+            const viewLogs = new Image();
+            viewLogs.classList.add('button');
+            viewLogs.src = showLogs
+                ? '/icons/collapse.svg'
+                : '/icons/expand.svg';
+            viewLogs.onclick = async () => {
+                if (logBody.hidden) {
+                    const loading = document.createElement('progress');
+                    logBody.appendChild(loading);
+                    const req = new XMLHttpRequest();
+                    req.onprogress = ev => {
+                        loading.max = ev.total;
+                        loading.value = ev.loaded;
+                    }
+                    req.ontimeout = req.onabort = req.onerror = () => {
+                        loading.remove();
+                        logBody.innerText = 'Failed :(';
+                    }
+                    req.onload = () => {
+                        loading.remove();
+                        logBody.innerText = req.responseText;
+                        socket = new WebSocket(`/logs/${proc.name}`);
+                        socket.onmessage = msg => logBody.innerText += msg.data;
+                    }
+                    req.open('GET', `/logs/${proc.name}`);
+                    req.send();
+                }
+                if (!logBody.hidden)
+                    socket.close();
+
+                logBody.hidden = !logBody.hidden;
+                viewLogs.src = logBody.hidden
+                    ? '/icons/expand.svg'
+                    : '/icons/collapse.svg';
+            }
+            process.appendChild(viewLogs);
+
+            const logBody = document.createElement('pre');
+            logBody.classList.add('log-body');
+            logBody.hidden = !showLogs;
+            process.appendChild(logBody);
+            
+            processList.appendChild(process);
+        }
+        function updateProcessWidget(proc) {
+            const usage = document.querySelector(`#${proc.name} #cpu-usage`);
+            usage.innerText = proc.usage.toFixed(2) + '%';
+
+            const memory = document.querySelector(`#${proc.name} #memory-usage`);
+            memory.innerText = makeMega(proc.memory);
+        }
+
+        async function getProcesses() {
+            const oldElements = document.getElementsByClassName('process');
+
+            const procs = await fetch('/spawned').then(req => req.json());
+
+            for (const el of oldElements) 
+                if (!procs.some(proc => proc.name === el.id))
+                    el.remove();
+            procs.forEach(proc => makeProcessWidget(proc));
+            setTimeout(getProcesses, 2000);
+        }
+        getProcesses();
+    </script>
+</body>
+</html>

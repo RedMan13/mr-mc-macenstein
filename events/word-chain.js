@@ -14,7 +14,6 @@ const messageChannel = dbs.database.channel(dbs.config.channels.wordChain);
                 topCounts[word[0]] ??= 0;
                 topCounts[word[0]]++;
             });
-        console.log(topCounts)
     }
 })();
 
