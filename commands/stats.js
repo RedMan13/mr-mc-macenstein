@@ -49,8 +49,8 @@ module.exports = {
     execute: async (message) => {
         const rating = rate(message.createdTimestamp, true);
         const battery = await getBatteryInfo();
-        message.reply({
-            embeds: [
+        const start = Date.now();
+        const embeds = [
                 new EmbedBuilder()
                     .setTitle('Uptime statistics')
                     .addFields([
@@ -73,7 +73,7 @@ module.exports = {
                         { name: 'Watch dog presence', value: dbs.lost ? 'Missing' : 'Live' },
                         { name: 'Battery', value: (battery.hasBattery ? battery.percentage + '%' : 'None') +
                             (battery.charging ? ' (Plugged)' : ' (Unplugged)') + (battery.diesAt ? (battery.isDying ? ' Dies' : ' Charged') + ' <t:' + battery.diesAt + ':R>' : '') },
-                        { name: 'Ping', value: String(rating.ping) },
+                        { name: 'Message Ping', value: String(rating.ping) },
                         { name: 'Max parallel', value: String(rating.cores) },
                         { name: 'CPU Usages', value: String(rating.usages.map(v => `${v.user.toFixed(0)}%`).join(', ')) },
                         { name: 'Free memory', value: makeMega(rating.freeMem) },
@@ -84,7 +84,9 @@ module.exports = {
                             .join(',') }
                     ])
                     .setFooter({ text: 'Bot id: ' + dbs.id + '; Alias: ' + dbs.alias })
-            ]
-        })
+        ]
+        const sent = await message.reply({ embeds })
+        embeds[1].addFields({ name: 'Ping', value: String(Date.now() - start) });
+        sent.edit({ embeds })
     },
 };

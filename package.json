@@ -24,12 +24,12 @@
         "os-utils": "0.0.14",
         "sharp": "^0.35.4",
         "skia-canvas": "^3.0.8",
-        "uuid": "^14.0.1"
+        "uuid": "^14.0.1",
         "pidusage": "^4.0.1",
         "sharp": "^0.35.3",
         "skia-canvas": "^3.0.8",
         "uuid": "^14.0.1",
-        "websocket-express": "^4.1.0",
+        "websocket-express": "^4.1.0"
     },
     "allowScripts": {
         "@google/genai@1.52.0": true
