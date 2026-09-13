@@ -11,7 +11,7 @@ module.exports = {
             name: 'length',
             desc: 'The length of the progress bar',
             min: 1,
-            max: 999,
+            max: 100,
             required: true
         },
         {
