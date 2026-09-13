@@ -19,7 +19,7 @@ module.exports = {
             max: Infinity,
             min: 0,
             name: 'time',
-            desc: 'What the maximum time to wait between movements of the bar should be',
+            desc: 'What the maximum number of seconds to wait between movements of the bar should be',
             required: false
         },
         {
