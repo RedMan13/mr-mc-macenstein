@@ -4,6 +4,7 @@ const interval = ((5 * 60) * 60) * 1000;
 const rated = [];
 let handleRated = null;
 let time = null;
+let autoPing = null;
 module.exports = {
     name: 'messageCreate',
     once: false,
@@ -13,6 +14,7 @@ module.exports = {
      */
     execute: async (message) => {
         if (message.channelId !== dbs.config.channels.watchDog) return;
+        if (autoPing) clearTimeout(autoPing);
         if (message.author.id === imports.client.user.id) {
             const jsonStart = message.content.indexOf('{');
             const jsonEnd = message.content.lastIndexOf('}');
@@ -41,9 +43,8 @@ module.exports = {
                 if (dbs.major) console.log('This bot is handling events.');
                 else console.log('This bot will nolonger handle events.');
                 console.log('The following commands are enabled: ', Object.entries(dbs.commands).filter(([n, command]) => command.enabled).map(n => n[0]));
-                if (dbs.lost) // if no gabe, just try our best. this isnt really good because all hosts will send `mc;rate`, but this should be good enough
-                    setTimeout(() => dbs.channels.watchDog.send('mc;rate'), interval);
             }, 3000);
+            autoPing = setTimeout(() => dbs.channels.watchDog.send(`${JSON.stringify({ id: dbs.id, rating })}`), interval);
         }
         if (message.author.id !== dbs.config.users.gabriel) return;
         if (time) clearTimeout(time);
