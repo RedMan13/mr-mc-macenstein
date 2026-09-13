@@ -44,7 +44,7 @@ module.exports = {
                     setTimeout(() => dbs.channels.watchDog.send('mc;rate'), interval);
             }, 3000);
         }
-        if (message.author.id !== '1455453433565020306') return; // ddededodediamantes gabriel
+        if (message.author.id !== dbs.config.users.gabriel) return;
         if (time) clearTimeout(time);
         if (dbs.lost) {
             dbs.lost = false;

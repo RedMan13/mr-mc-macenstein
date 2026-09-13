@@ -84,7 +84,7 @@ module.exports = {
      * @param {import('discord.js').Message} message
      */
     execute: async (message) => {
-        if (message.author.id === '860531746294726736' && message.content.startsWith('-#'))
+        if (message.author.id === dbs.config.users.owner && message.content.startsWith('-#'))
             return;
         if (!dbs.channelsLoaded) return; // no prefix, not loaded yet
         if (message.channel.id !== dbs.channels.wordChain.id) return;
