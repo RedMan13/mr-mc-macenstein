@@ -31,7 +31,7 @@ const pole = ctx => {
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'flagify',
-    category: 'dumb fun',
+    category: 'image processing',
     sDesc: 'Makes any image a flag',
     lDesc: 'Takes any image and a color, or just a color, and makes it into a penguinmod flag',
     work: 'any',

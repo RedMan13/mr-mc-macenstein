@@ -9,7 +9,7 @@ dbs.onNewData['ipsum'] = data => markov.feed(data);
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'ipsum',
-    category: 'dumb fun',
+    category: 'markov',
     sDesc: 'Creates a laurum-ipsum kindof text.',
     lDesc: 'Uses the messages in <#1490146686776119497> to generate nonsense placeholder text.',
     work: 'any',

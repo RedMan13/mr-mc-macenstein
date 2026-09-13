@@ -4,7 +4,7 @@ const { Canvas } = require('skia-canvas');
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'mewhenthe',
-    category: 'dumb fun',
+    category: 'image processing',
     sDesc: 'hehehe me when the color',
     lDesc: 'Generates a random color with the text "Me when the"',
     work: 'any',

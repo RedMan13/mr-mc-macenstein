@@ -119,7 +119,7 @@ async function convert(id, message, file, pixels) {
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'emojify',
-    category: 'dumb fun',
+    category: 'image processing',
     sDesc: 'Converts an image to emojis',
     lDesc: 'Converts any one image into a set of discord emojis',
     work: 'pc',

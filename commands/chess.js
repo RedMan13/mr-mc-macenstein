@@ -228,7 +228,7 @@ class Chess {
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'chess',
-    category: 'dumb fun',
+    category: 'games',
     sDesc: 'Plays chess.',
     lDesc: 'Starts a game of chess.',
     work: 'any',

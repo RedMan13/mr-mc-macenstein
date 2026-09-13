@@ -3,7 +3,7 @@ const { actions, outcomes, rareEvents } = require('../assets/predictions.json');
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'prediction',
-    category: 'dumb fun',
+    category: 'general',
     sDesc: 'predict the future',
     lDesc: 'Generates a random prophecy about someone.',
     work: 'any',

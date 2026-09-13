@@ -1,7 +1,7 @@
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'disable-santa',
-    category: 'operator',
+    category: 'settings',
     sDesc: 'enables santa clause',
     lDesc: 'enables santa clause, can only be used by <@860531746294726736>',
     work: 'any',

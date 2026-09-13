@@ -5,7 +5,7 @@ const toWait = 2 * 60 * 1000;
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'electricfuzzping',
-    category: 'dumb fun',
+    category: 'general',
     sDesc: 'Pings electricfuzzball',
     lDesc: 'Pings <@1203782668928421949> 6 or 7 times randomly',
     work: 'any',

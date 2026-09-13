@@ -1,7 +1,7 @@
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'progress-bar',
-    category: 'dumb fun',
+    category: 'general',
     sDesc: 'makes a fake progress bar',
     lDesc: 'sets up and displays an entirely fake progress bar for your entertainment',
     work: 'any',

@@ -15,7 +15,7 @@ markov.feed(text, /(?<=\n)|(?<=[a-z0-9])(?=[^a-z0-9])/gi);
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'gas',
-    category: 'dumb fun',
+    category: 'markov',
     sDesc: 'Markov chain of myself!',
     lDesc: 'Uses the messages i have sent to create new messages that i have never sent.',
     work: 'any',

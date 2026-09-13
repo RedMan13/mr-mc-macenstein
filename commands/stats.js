@@ -38,7 +38,7 @@ function makeMega(bytes) {
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'stats',
-    category: 'operator',
+    category: 'info',
     sDesc: 'lists the current statistics',
     lDesc: 'lists out various nuggets, like how long the bot has been running.',
     work: 'all',

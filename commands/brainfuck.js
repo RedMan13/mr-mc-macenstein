@@ -28,7 +28,7 @@ function lexInput(string) {
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'brainfuck',
-    category: 'dumb fun',
+    category: 'languages',
     sDesc: 'Runs any brainfuck code',
     lDesc: 'Simply runs brainfuck code. Can optionally include data to be given as input, added to the end of this command',
     work: 'any',

@@ -15,7 +15,7 @@ dbs.onNewData['markov'] = data => markov.feed(data);
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'markov',
-    category: 'dumb fun',
+    category: 'markov',
     sDesc: 'Jeremies markov but technically better.',
     lDesc: 'Uses the messages in <#1490146686776119497> to generate nonsense.',
     work: 'any',

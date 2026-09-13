@@ -3,7 +3,7 @@ const { createQuoteCard } = require('../statics/quote-generator.js');
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'quote',
-    category: 'dumb fun',
+    category: 'image processing',
     sDesc: 'Quotes some text',
     lDesc: 'Takes in any message you reply to and makes it into a quote card',
     work: 'any',
