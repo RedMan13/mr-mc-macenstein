@@ -1,6 +1,7 @@
 /** @type {import('../index.js').CommandDefinition} */ 
 module.exports = { 
     name: 'shutup',
+    aliases: ['stop-speaking', 'quite'],
     category: 'operator',
     sDesc: 'Makes the particular host stop being major',
     lDesc: 'Causes this particular host to temporarily shut up and let anyone else handle its place',

@@ -6,6 +6,7 @@ const { words, topCounts, unsafeMessageChars, safeReplacer } = require('../event
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'words-used',
+    aliases: ['used-words'],
     category: 'info',
     sDesc: 'Reports info about the percentage of usage in word chains.',
     lDesc: 'Reports info like how many words are left, the percentage of used words, based on which letter you provided as the starter.',

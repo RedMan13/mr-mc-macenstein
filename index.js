@@ -120,6 +120,8 @@ function loadCommand(file, enabled = false) {
             useCLI: !Array.isArray(command.args),
             file
         }
+        if (Array.isArray(command.aliases))
+            command.aliases.forEach(name => dbs.commands[name] = { aliasFor: command.name })
         return command.name;
     } catch (err) {
         console.warn('\t' + err.message.split('\n')[0]);

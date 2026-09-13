@@ -3,6 +3,7 @@ const { AttachmentBuilder } = require('discord.js');
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'pfp',
+    aliases: ['avatar', 'profile-picture'],
     category: 'general',
     sDesc: 'Gets a users PFP',
     lDesc: 'Gets the Profile Picture of whoever you mention',

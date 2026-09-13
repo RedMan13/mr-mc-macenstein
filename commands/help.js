@@ -30,6 +30,8 @@ module.exports = {
         }
 
         if (commands.includes(message.arguments.command)) {
+            if ('aliasFor' in dbs.commands[message.arguments.command])
+                message.arguments.command = dbs.commands[message.arguments.command].aliasFor;
             const commandData = dbs.commands[message.arguments.command].command;
             const usesCLI = dbs.commands[message.arguments.command].useCLI;
             embed.title = commandData.name;

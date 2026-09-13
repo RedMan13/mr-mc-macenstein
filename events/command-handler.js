@@ -6,7 +6,9 @@ module.exports = {
         if (!dbs.commandConfig.prefix) return;
         if (message.content.startsWith(dbs.commandConfig.prefix)) {
             const args = message.content.split(' ');
-            const command = args.shift().slice(dbs.config.commands.prefix.length);
+            let command = args.shift().slice(dbs.config.commands.prefix.length);
+            if ('aliasFor' in dbs.commands[command])
+                command = dbs.commands[command].aliasFor;
             if (!dbs.commands[command]) return message.react('<:no:1164832595478069299>');
             if (!dbs.commands[command].enabled && dbs.commands[command].work !== 'all') return;
             const commandData = dbs.commands[command].command;

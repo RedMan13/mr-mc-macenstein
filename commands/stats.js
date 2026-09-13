@@ -38,6 +38,7 @@ function makeMega(bytes) {
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'stats',
+    aliases: ['ping'],
     category: 'info',
     sDesc: 'lists the current statistics',
     lDesc: 'lists out various nuggets, like how long the bot has been running.',
@@ -79,6 +80,7 @@ module.exports = {
                         { name: 'Free memory', value: makeMega(rating.freeMem) },
                         { name: 'Rating', value: `${['N/A', 'Terrible', 'Meh', 'Perfect'][Math.floor(rating.available)]} (${rating.available}) (${rating.ratings.map(v => `${v[0]}: ${v[1]}`).join(', ')})` },
                         { name: 'Commands', value: rating.commands
+                            .filter(name => !('aliasFor' in dbs.commands[name]))
                             .sort((a,b) => dbs.commands[b].enabled - dbs.commands[a].enabled)
                             .map(v => dbs.commands[v].enabled ? `**${v}**` : `~~${v}~~`)
                             .join(',') }
