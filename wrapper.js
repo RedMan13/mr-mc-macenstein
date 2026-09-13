@@ -5,15 +5,19 @@ const { getFile, releaseFiles } = require('./statics/log-manager');
 const path = require('path');
 const usage = require('pidusage');
 const fs = require('fs/promises');
+let electron;
+try {
+    electron = require('electron');
+} catch (err) { console.warn('No electron!'); }
 
 /** @type {{ [key: name]: child.ChildProcessWithoutNullStreams }} */
 const spawned = {};
 const spawnProc = (name, spawn, args, options) => { args ??= []; options ??= {};
     if (spawned[name]) spawned[name].kill();
-    let allowStop = false;
     const sister = /\.[mc]?js$/i.test(spawn) 
         ? child.fork(spawn, Object.assign(options, { stdio: 'pipe' }))
         : child.spawn(spawn, args, Object.assign(options, { stdio: 'pipe' }));
+    sister.allowStop = false;
     const log = getFile(name);
     sister.stdout.pipe(log);
     sister.stderr.pipe(log);
@@ -25,7 +29,7 @@ const spawnProc = (name, spawn, args, options) => { args ??= []; options ??= {};
     sister.on('message', msg => {
         if (msg.spawn) spawnProc(msg.name, msg.spawn, msg.args, msg.options);
         if (msg.kill) spawned[msg.name].kill();
-        if (msg.stop) allowStop = true;
+        if (msg.stop) sister.allowStop = true;
         if (msg.pull) child.exec('git pull', { cwd: __dirname }, (err, stdout, stderr) => {
             stdout += stderr;
             if (stdout.includes('Already up to date.')) return sister.send({ noChanges: true });
@@ -45,9 +49,9 @@ const spawnProc = (name, spawn, args, options) => { args ??= []; options ??= {};
         log.close();
         releaseFiles(name);
         if (!options.restarts) return delete spawned[name];
-        if (allowStop && name === 'mister-mc-macenstein') process.exit();
-        if (allowStop) return;
-        spawnProc(name, spawn, args);
+        if (sister.allowStop && name === 'mister-mc-macenstein') process.exit();
+        if (sister.allowStop) return;
+        spawnProc(name, spawn, args, options);
     });
 
     return sister;
@@ -56,6 +60,26 @@ spawnProc('mister-mc-macenstein', require.resolve('./index.js'), null, { cwd: __
 
 const app = new WebSocketExpress();
 app.use(bodyParser.json({ type: () => true }));
+app.get('/executables', async (req, res) => {
+    const allFiles = await fs.readdir(__dirname, { recursive: true, withFileTypes: true });
+    const executables = process.platform === 'win32'
+        ? process.env.PATHEXT.replaceAll(';', '|').replaceAll('.', '\\.')
+        : '\\.appimage|\\.sh|\\/[^.]+';
+    const filter = new RegExp(`(?:\\.[mc]?js|${executables})$`, 'i');
+    const filtered = allFiles
+        .filter(dirent => dirent.isFile())
+        .map(dirent => path.relative(__dirname, path.resolve(dirent.parentPath, dirent.name)))
+        .filter(name => filter.test(name));
+    
+    res.send({
+        allFiles: filtered,
+        defaults: [
+            { name: 'media-status-manager', spawn: './media-status.js', options: {} },
+            { name: 'mister-mc-macentstein', spawn: './index.js', options: { restarts: true } },
+            { name: 'overlay-manager', spawn: electron, args: ['./electron/index.js'], options: { restarts: true } }
+        ]
+    })
+});
 app.get('/spawned', async (req, res) => {
     const report = [];
     for (const [name, sister] of Object.entries(spawned)) {

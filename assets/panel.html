@@ -41,6 +41,21 @@
         }
         .add-process input { margin-right: 4px; }
         .arguments { width: 100%; }
+
+        .text-suggestions {
+            position-area: bottom;
+            margin-top: 4px;
+            max-height: 6rem;
+            box-sizing: border-box;
+            border-radius: 2px;
+            border: 1px solid grey;
+        }
+        .text-suggestions button {
+            border: 0;
+            box-sizing: border-box;
+            width: 100%;
+            text-align: left;
+        }
     </style>
 </head>
 <body>
@@ -52,6 +67,7 @@
         <img class="button" src="/icons/execute.svg" id="execute">
     </div>
     <div id="process-list"></div>
+    <div popover="manual" id="text-suggestions" class="text-suggestions"></div>
     <script>
         const name = document.getElementById('name');
         const fileArgs = document.getElementById('file-args');
@@ -194,6 +210,80 @@
             setTimeout(getProcesses, 2000);
         }
         getProcesses();
+
+
+        let suggestionsChangeListener;
+        let suggestionsTarget;
+        const textSuggestions = document.getElementById('text-suggestions');
+        /**
+         * @param {HTMLInputElement} at
+         * @param {{ word: string, selected: () => void }[]} keywords
+         */
+        function setupSuggestions(at, keywords) {
+            suggestionsTarget = at;
+            const rect = at.getBoundingClientRect();
+            textSuggestions.style.width = `${rect.width}px`;
+
+            function showSuggestionsFor(starter) {
+                textSuggestions.innerHTML = '';
+                let top;
+                let counted = 0;
+                for (const { word, selected } of keywords) {
+                    if (!word.startsWith(starter)) continue;
+                    if (!top) top = word;
+                    if (counted > 100) break;
+                    const button = document.createElement('button');
+                    button.setAttribute('safe', true);
+                    button.innerText = word;
+                    button.onclick = () => {
+                        textSuggestions.hidePopover();
+                        selected();
+                    }
+                    textSuggestions.appendChild(button);
+                    counted++;
+                }
+                at.placeholder = top;
+            }
+            showSuggestionsFor(at.value);
+            suggestionsChangeListener = () => showSuggestionsFor(at.value)
+            at.addEventListener('input', suggestionsChangeListener);
+            document.onkeypress = e => {
+                if (e.key !== 'Enter') return;
+                const top = keywords.find(suggestion => suggestion.word.startsWith(at.value));
+                if (!top) return;
+                top.selected();
+            }
+
+            textSuggestions.showPopover({ source: at });
+        }
+        function destroySuggestions() {
+            textSuggestions.hidePopover();
+            if (!suggestionsTarget) return;
+            suggestionsTarget.removeEventListener('input', suggestionsChangeListener);
+            suggestionsTarget.placeholder = '';
+        }
+        name.onblur = 
+        fileArgs.onblur = e => {
+            if (e.relatedTarget && e.relatedTarget.getAttribute('safe') === 'true') return;
+            destroySuggestions();
+        };
+
+        fetch('/executables').then(req => req.json())
+            .then(res => {
+                const nameSuggestions = res.defaults.map(app => ({
+                    word: app.name,
+                    selected() {
+                        name.value = app.name;
+                        fileArgs.value = app.args?.length 
+                            ? `${app.spawn} ${app.args.join(' ')}`
+                            : app.spawn;
+                        restarts.checked = app.options.restarts;
+                    }
+                }));
+                const fileSuggestions = res.allFiles.map(file => ({ word: file, selected() { fileArgs.value = file } }))
+                name.onfocus = e => setupSuggestions(e.target, nameSuggestions);
+                fileArgs.onfocus = e => setupSuggestions(e.target, fileSuggestions);
+            })
     </script>
 </body>
 </html>

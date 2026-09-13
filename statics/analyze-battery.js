@@ -38,7 +38,7 @@ module.exports = async function getBatteryInfo() {
             }
 
             res.isDying = !res.charging;
-            if (!res.isDying)
+            if (res.isDying)
                 res.diesAt = Math.floor((((res.wattHoursLeft / res.watts) * 60 * 60 * 1000) + Date.now()) / 1000);
             else res.diesAt = 0;
             return res;
