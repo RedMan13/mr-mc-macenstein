@@ -40,15 +40,14 @@ client.on('ready', async () => {
         const player = await new Promise((g,b) => bus.getInterface(name, '/org/mpris/MediaPlayer2', 'org.mpris.MediaPlayer2.Player', (e,i) => e ? b(e) : g(i)));
         // const tracks = await new Promise(g => bus.getInterface(name, '/org/mpris/MediaPlayer2', 'org.mpris.MediaPlayer2.TrackList', (e,i) => g(i)));
         // const playlist = await new Promise(g => bus.getInterface(name, '/org/mpris/MediaPlayer2', 'org.mpris.MediaPlayer2.Playlists', (e,i) => g(i)));
-        const ident = await new Promise((g,b) => basic.getProperty('Identity', (e,i) => e ? b(e) : g(i)));
+        const ident = await new Promise((g,b) => basic.getProperty('Identity', (e,i) => e ? b(e) : g(i))).catch(() => {});
+        if (!ident) return; // ignore if identity fails, since at that point theres nothing of value we can get
         let rate;
         let start;
         let end;
         let artist;
         let title;
         let status;
-        let lastSong = '';
-        let lastIcon = '';
         let link;
         let artUrl;
         let pauseStart;
@@ -100,16 +99,17 @@ client.on('ready', async () => {
                 details: status === 'Paused' ? `Idling on ${title}` : `Listening to ${title}`,
                 state: `Song by ${artist}`
             };
+            console.log('painted', activity, 'from', raw);
             if (link) activity.details_url = link;
             client.user.setActivity(activity)
                 .catch(err => console.warn(err, activity, raw));
         }
 
         paintOut({
-            Rate: await new Promise((g,b) => player.getProperty('Rate', (e,i) => e ? b(e) : g(i))),
-            Position: await new Promise((g,b) => player.getProperty('Position', (e,i) => e ? b(e) : g(i))),
-            Metadata: await new Promise((g,b) => player.getProperty('Metadata', (e,i) => e ? b(e) : g(i))),
-            PlaybackStatus: await new Promise((g,b) => player.getProperty('PlaybackStatus', (e,i) => e ? b(e) : g(i)))
+            Rate: await new Promise((g,b) => player.getProperty('Rate', (e,i) => e ? b(e) : g(i))).catch(e => Promise.reject(new Error('Failed to get Rate', { cause: e }))),
+            Position: await new Promise((g,b) => player.getProperty('Position', (e,i) => e ? b(e) : g(i))).catch(e => Promise.reject(new Error('Failed to get Position', { cause: e }))),
+            Metadata: await new Promise((g,b) => player.getProperty('Metadata', (e,i) => e ? b(e) : g(i))).catch(e => Promise.reject(new Error('Failed to get Metadata', { cause: e }))),
+            PlaybackStatus: await new Promise((g,b) => player.getProperty('PlaybackStatus', (e,i) => e ? b(e) : g(i))).catch(e => Promise.reject(new Error('Failed to get PlaybackStatus', { cause: e })))
         });
         properties.on('PropertiesChanged', wrap);
     }

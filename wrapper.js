@@ -74,7 +74,7 @@ app.get('/executables', async (req, res) => {
     res.send({
         allFiles: filtered,
         defaults: [
-            { name: 'media-status-manager', spawn: './media-status.js', options: {} },
+            { name: 'media-status-manager', spawn: './media-status.js', options: { restarts: true } },
             { name: 'mister-mc-macentstein', spawn: './index.js', options: { restarts: true } },
             { name: 'overlay-manager', spawn: electron, args: ['./electron/index.js'], options: { restarts: true } }
         ]
@@ -115,6 +115,7 @@ app.delete('/spawned/:name', (req, res) => {
         res.send();
         return;
     }
+    spawned[req.params.name].allowStop = true;
     spawned[req.params.name].kill();
 });
 app.get('/logs/:name', async (req, res) => {
