@@ -19,6 +19,7 @@ module.exports = {
             message.reply(`you are not authorized to use this`);
             return;
         }
+        await message.reply(`Stopped bot ${dbs.id}`);
         process.send({ stop: true });
         stop();
     },
