@@ -20,7 +20,7 @@ function renderMessage(message) {
         container.addMediaGalleryComponents(messageAttachmentsGallery);
     }
 
-    container.addTextDisplayComponents({ content: `-# <R:${Math.floor((message.editedTimestamp ?? message.createdTimestamp) / 1000)}:t>` });
+    container.addTextDisplayComponents({ content: `-# <t:${Math.floor((message.editedTimestamp ?? message.createdTimestamp) / 1000)}:R>` });
 
     // if (message.embeds.length > 0) {
     //     for (const embed of message.embeds) {
@@ -85,7 +85,7 @@ module.exports = {
         const messages = await channel.messages.fetch({ limit: message.arguments.limit || 10 });
         await message.reply({
             flags: 'IsComponentsV2',
-            components: messages.map(renderMessage),
+            components: messages.map(renderMessage).reverse(),
             allowedMentions: {
                 repliedUser: true,
                 roles: [],
