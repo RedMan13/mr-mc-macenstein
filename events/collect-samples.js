@@ -14,7 +14,6 @@ module.exports = {
     execute: async (message) => {
         switch (message.channel.id) {
         case dbs.config.channels.textFeed:
-            if (message.channel.id !== dbs.config.channels.dataFeed) return;
             fs.appendFile(textSamples, '\n' + message.cleanContent);
             for (const name in dbs.onNewData)
                 dbs.onNewData[name](message.cleanContent);

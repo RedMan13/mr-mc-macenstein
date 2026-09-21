@@ -79,6 +79,8 @@ module.exports = {
             message.reply(`you are not authorized to use this`);
             return;
         }
+        if (!(message.arguments.channel in dbs.channels) && !/^[0-9]+$/.test(message.arguments.channel))
+            return message.reply(`${message.arguments.channel} doesnt exist! Only ${Object.keys(dbs.channels).map(v => `\`${v}\``).join(', ')} are real.`)
         /** @type {import('discord.js').TextBasedChannel} */
         const channel = dbs.channels[message.arguments.channel] ??
             await imports.client.channels.fetch(message.arguments.channel);
