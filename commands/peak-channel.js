@@ -58,7 +58,7 @@ module.exports = {
     category: 'operator',
     sDesc: 'Responds with messages from channels',
     lDesc: 'Responds with all visible messages in any channel anywhere the bot can see.',
-    work: 'any',
+    work: 'all',
     args: [
         {
             type: 'any',

@@ -15,7 +15,9 @@ process.on('uncaughtException', err => {
     if (err.code === 'ENOTFOUND') throw err;
     console.warn(err)
 });
-process.send({ spawn: path.resolve(__dirname, './media-status.js'), name: 'media-status-manager', options: { restarts: true } });
+
+if (fs.existsSync(path.resolve(__dirname, './node_modules/dbus/build')))
+   process.send({ spawn: path.resolve(__dirname, './media-status.js'), name: 'media-status-manager', options: { restarts: true } });
 
 globalThis.imports = {
     exec,
