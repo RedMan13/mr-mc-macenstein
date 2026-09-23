@@ -33,7 +33,7 @@ const createOverlayWindow = async () => {
 
     win.on('load', () => win.setIgnoreMouseEvents(true));
     await win.loadFile(path.join(__dirname, './player.html'));
-    win.on("close", () => {});
+    win.on("close", () => console.log('nooooooo'));
 
     window = win;
 };

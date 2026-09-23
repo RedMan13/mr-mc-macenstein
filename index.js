@@ -106,8 +106,8 @@ function loadCommand(file, enabled = false) {
             dbs.commands[command.comData.name] = {
                 description: command.comData.description,
                 command,
+                work: command.work === 'all' ? 'any' : command.work,
                 enabled,
-                work: Math.max(command.work, 1), // cant have globally executing slash commands
                 isSlash: true,
                 file
             }

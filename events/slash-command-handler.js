@@ -12,7 +12,7 @@ module.exports = {
             return;
         }
         const command = dbs.commands[interaction.commandName];
-        if (!dbs.commands[command]?.enabled) return;
+        if (!command?.enabled) return;
         command.command.execute(interaction);
     }
 };
