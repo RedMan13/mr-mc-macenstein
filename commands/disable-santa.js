@@ -10,7 +10,7 @@ module.exports = {
      * @param {import('discord.js').Message} message
      */
     execute: async (message) => {
-        if (message.author.id !== dbs.config.users.owner && message.author.id !== dbs.config.users.jeremygamer) {
+        if (!message.member.permissions.had('Administrator')) {
             message.reply(`you are not authorized to use this`);
             return;
         }

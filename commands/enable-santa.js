@@ -21,13 +21,13 @@ module.exports = {
      * @param {import('discord.js').Message} message
      */
     execute: async (message) => {
-        if (message.author.id !== dbs.config.users.owner && message.author.id !== dbs.config.users.jeremygamer) {
+        if (!message.member.permissions.had('Administrator')) {
             message.reply(`you are not authorized to use this`);
             return;
         }
         const wishChannel = message.arguments.wishes ?? message.channel;
-        wishChannel.send(`Second Santa is enabled here now.
-📃 reactions mean santa replied.e
+        wishChannel.send(`Santa is enabled here now.
+📃 reactions mean santa replied.
 🧏‍♂️ reactions means santa is thinking.
 👋 reactions means that a human will be handling your wish.`);
         message.reply('Done!');

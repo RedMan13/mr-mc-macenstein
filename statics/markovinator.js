@@ -2,10 +2,10 @@ class Markov {
     divider = '';
     finisher = '';
     chances = Object.create(null);
-    chars = [];
+    chars = {};
     totalChances = 0;
     
-    decider = char => (Math.random() * (char.total +1));
+    decider = char => (Math.random() * char.total);
 
     constructor(decider, finisher) {
         if (decider) this.decider = decider;

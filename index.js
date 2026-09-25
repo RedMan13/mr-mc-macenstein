@@ -9,7 +9,6 @@ const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const process = require('process');
 const config = require('./statics/config.json');
-const syncSlash = require('@frostzzone/discord-sync-commands');
 const embedBuilder = require('./statics/discord-embeds.js');
 
 const jsHandle = require.extensions['.js'];
@@ -96,8 +95,6 @@ globalThis.dbs = { // databases
     onNewData: {}
 }
 
-let slashCommands = []
-
 /**
  * @typedef {Object} CommandDefinition
  * @prop {boolean} slashCmd
@@ -117,8 +114,6 @@ function loadCommand(file, enabled = false) {
         const command = require(file);
         delete require.cache[file]; // do not let commands get cached! they could change at any moment
         if (command.slashCmd) {
-            console.log(`pushed ${command.comData.name} to slash command sync list`);
-            slashCommands.push(command.comData);
             dbs.commands[command.comData.name] = {
                 description: command.comData.description,
                 command,
@@ -155,9 +150,6 @@ fs.readdir(commandsPath, { recursive: true, withFileTypes: true }, async (err, f
         const filePath = path.resolve(commandsPath, file.parentPath, file.name);
         loadCommand(filePath);
     });
-    console.log('\n')
-    syncSlash(imports.client, slashCommands, { debug: true })
-    console.log('\n')
 });
 fs.watch(commandsPath, { recursive: true }, (type, filename) => {
     const file = path.resolve(commandsPath, filename);

@@ -47,7 +47,10 @@ const spawnProc = (name, spawn, args, options) => { args ??= []; options ??= {};
     sister.on('exit', code => {
         releaseFiles(name); 
         if (!options.restarts) return delete spawned[name];
-        if (sister.allowStop && name === 'mister-mc-macenstein') process.exit();
+        if (sister.allowStop && name === 'mister-mc-macenstein') {
+            for (const sister of spawned) sister.kill();
+            process.exit();
+        }
         if (sister.allowStop) return;
         spawnProc(name, spawn, args, options);
     });

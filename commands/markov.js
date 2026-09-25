@@ -33,7 +33,21 @@ module.exports = {
     execute: async (message) => {
         if (message.arguments.word === 'has-said') {
             let word = markov.findWord(message.args.split(' ').at(-1));
-            if (!markov.chances[word]) word = markov.chars.find(a => a[0]?.endsWith?.(word))?.[0];
+            if (!word) {
+                const chances = Object.entries(markov.chars)
+                    .sort((a,b) => b[1] - a[1])
+                    .map(a => [a[0], (a[1] / markov.totalChances) * 100])
+                    .map(a => `${a[0].replace('\n', '{end}')} (${a[1].toFixed(1)}%)`)
+                    .map(v => v.replaceAll('-', '\\-').replaceAll('\\', '\\\\').replaceAll('`', '\\`').replaceAll('*', '\\*'))
+                    .join('') 
+                    .slice(0, 2000);
+                message.reply({
+                    embeds: [new EmbedBuilder()
+                        .setTitle('All words')
+                        .setDescription(chances)]
+                })
+                return;
+            }
             if (!markov.chances[word] || !word) return message.reply('Never said that!');
             const data = markov.chances[word];
             const chances = Object.entries(data.chars)
