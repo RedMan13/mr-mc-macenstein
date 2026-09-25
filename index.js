@@ -10,6 +10,22 @@ require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const process = require('process');
 const config = require('./statics/config.json');
 const syncSlash = require('@frostzzone/discord-sync-commands');
+const embedBuilder = require('./statics/discord-embeds.js');
+
+const jsHandle = require.extensions['.js'];
+require.extensions['.js'] = (module, filename) => {
+    if (!filename.includes('commands') && !filename.includes('events')) return jsHandle(module, filename);
+    const text = embedBuilder(fs.readFileSync(filename, 'utf8'));
+    try {
+        module._compile(text, filename);
+    } catch (err) {
+        const line = parseInt(err.stack.split('\n')[0].split(':').at(-1));
+        const lines = text.split('\n');
+        const focus = lines.slice(line -1, line +2);
+        focus.splice(2, 0, '> ' + err.message);
+        console.error(focus.join('\n'))
+    }
+}
 
 process.on('uncaughtException', err => {
     if (err.code === 'ENOTFOUND') throw err;
@@ -132,17 +148,18 @@ function loadCommand(file, enabled = false) {
 }
 console.log('\n')
 const commandsPath = path.resolve(__dirname, 'commands');
-fs.readdir(commandsPath, async (err, files) => { // read commands folder into a list of commands
+fs.readdir(commandsPath, { recursive: true, withFileTypes: true }, async (err, files) => { // read commands folder into a list of commands
     console.log(err ? err : 'reading commands')
     files.forEach(async file => {
-        const filePath = path.resolve(commandsPath, file);
+        if (!file.isFile()) return;
+        const filePath = path.resolve(commandsPath, file.parentPath, file.name);
         loadCommand(filePath);
     });
     console.log('\n')
     syncSlash(imports.client, slashCommands, { debug: true })
     console.log('\n')
 });
-fs.watch(commandsPath, (type, filename) => {
+fs.watch(commandsPath, { recursive: true }, (type, filename) => {
     const file = path.resolve(commandsPath, filename);
     const exists = fs.existsSync(file);
     for (const commandName in dbs.commands) {

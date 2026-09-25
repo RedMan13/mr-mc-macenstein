@@ -20,18 +20,26 @@ const messageChannel = dbs.database.channel(dbs.config.channels.wordChain);
 /**
  * @param {import('discord.js').Message} message
  */
-function fail(message, reason) {
+async function fail(message, reason) {
+    const settings = dbs.database.server(message.channel.guild.id);
+    const userSettings = dbs.database.user(message.author.id);
+
     if (!dbs.major) return;
-    dbs.channels.wordErrors.send(`${message.author} ${reason}`);
+    const mention = !userSettings.has('wordchains-ping') || userSettings.get('wordchains-ping')
+        ? message.author
+        : message.author.username + ':'
+    const wordErrors = await imports.client.channels.fetch(settings.get('word-errors-channel'));
+    wordErrors.send(`${mention} ${reason}`);
     message.delete();
 }
 /**
  * @param {import('discord.js').Message} message 
  * @returns {false|string} False only when the input message is valid
  */
-function checkMessage(message) {
+async function checkMessage(message) {
     if (message.author.id === imports.client.user.id) return false;
-    const messageChannel = dbs.database.channel(dbs.channels.wordChain.id);
+    const settings = dbs.database.server(message.channel.guild.id);
+    const messageChannel = dbs.database.channel(settings.get('wordchains-channel'));
     const filtered = message.content.replaceAll(unsafeMessageChars, safeReplacer).toLowerCase();
     const letter = filtered[0];
     const used = messageChannel.get('words') ?? '';
@@ -44,8 +52,11 @@ function checkMessage(message) {
         const letter = availableLetters[Math.floor(Math.random() * availableLetters.length)];
         const end = words.indexOf(letter + ',');
         const start = words.lastIndexOf(',', end);
-        dbs.channels.wordChain.send(words.slice(start, end));
-        dbs.channels.wordErrors.send('Oops! that cant be right!');
+        const wordChains = await imports.client.channels.fetch(settings.get('wordchains-channel'));
+        const wordErrors = await imports.client.channels.fetch(settings.get('word-errors-channel'));
+        
+        wordChains.send(words.slice(start, end));
+        wordErrors.send('Oops! that cant be right!');
     }
     if (messageChannel.get(filtered.at(-1)) < 0) return `\`${filtered.at(-1)}\` has been all used up!`;
 
@@ -84,12 +95,17 @@ module.exports = {
      * @param {import('discord.js').Message} message
      */
     execute: async (message) => {
+        const settings = dbs.database.server(message.channel.guild.id);
+
+        if (!settings.get('wordchains-enabled')) return;
+        if (!settings.get('wordchains-channel')) return;
+        if (!settings.get('word-errors-channel')) return;
         if (message.author.id === dbs.config.users.owner && message.content.startsWith('-#'))
             return;
         if (!dbs.channelsLoaded) return; // no prefix, not loaded yet
-        if (message.channel.id !== dbs.channels.wordChain.id) return;
+        if (message.channel.id !== settings.get('wordchains-channel')) return;
 
-        const checked = checkMessage(message);
+        const checked = await checkMessage(message);
         if (checked) return fail(message, checked);
 
         message.react('<:yes:1164828602609717248>');
