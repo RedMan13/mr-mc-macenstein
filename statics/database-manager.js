@@ -9,10 +9,13 @@ const KeyWord = new mongoose.Schema({
     content: String
 });
 
+let resolveReady = null;
+let readyPromise = new Promise(resolve => resolveReady = resolve);
 const server = mongoose.createConnection(process.env.mongoLink);
 server.on('connected', () => {
     Database = MongoDatabase;
     console.log('  Mongo ready!');
+    resolveReady();
 });
 function failAndRety() {
     console.log('  Whoops!');
@@ -124,6 +127,7 @@ class MongoDatabase extends RootDatabase {
         await KeyWords.bulkWrite(changes);
     }
     async _setupSaving() {
+        await readyPromise;
         const keys = await KeyWords.aggregate([{ $match: { file: this._name } }]);
         for (const entry of keys) {
             this._data[entry.key] = JSON.parse(entry.content);
