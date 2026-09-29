@@ -235,14 +235,8 @@ module.exports = {
     args: [
         {
             name: 'against',
-            desc: 'When starting: Who (user) to play chess with. When replying to a game: which piece to move',
-            type: 'any',
-            required: false
-        },
-        {
-            name: 'move',
-            desc: 'Where to move a piece to.',
-            type: 'any',
+            desc: 'Who to play chess with.',
+            type: 'user',
             required: false
         }
     ],

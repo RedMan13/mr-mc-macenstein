@@ -1,5 +1,5 @@
 const Canvas = require('skia-canvas');
-const Tokenizer = require('./tokenizer');
+const { Tokenizer } = require('builder');
 
 /** @typedef {'preserve-word'|'break-longest'|'break-anywhere'} BreakRule */
 /** @typedef {{

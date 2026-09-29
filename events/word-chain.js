@@ -84,7 +84,7 @@ const safeReplacer = '-';
 module.exports = {
     name: 'messageCreate',
     once: false,
-    global: true,
+    global: false,
     checkMessage,
     wordsPath,
     unsafeMessageChars,

@@ -50,12 +50,12 @@ function renderServerSettings(settings, page = 'commands', userOnly, userSetting
                     <button id={`configure.word-chains.disable..${page}`} style={!hasWordchains ? ButtonStyle.Primary : ButtonStyle.Secondary}>Disabled</button>
                 </row>,
                 <row>
-                    <channel-select id={`configure.word-chains-channel..${page}`} max="1" placeholder="Word Chains Channel" types={[ChannelType.GuildText, ChannelType.PrivateThread, ChannelType.PublicThread]}>
+                    <channel-select id={`configure.word-chains-channel...${page}`} max="1" placeholder="Word Chains Channel" types={[ChannelType.GuildText, ChannelType.PrivateThread, ChannelType.PublicThread]}>
                         {wordchainsChannel && <channel id={wordchainsChannel}/>}
                     </channel-select>
                 </row>,
                 <row>
-                    <channel-select id={`configure.word-errors-channel..${page}`} max="1" placeholder="Word Errors Channel (i.e. a thread)" types={[ChannelType.GuildText, ChannelType.PrivateThread, ChannelType.PublicThread]}>
+                    <channel-select id={`configure.word-errors-channel...${page}`} max="1" placeholder="Word Errors Channel (i.e. a thread)" types={[ChannelType.GuildText, ChannelType.PrivateThread, ChannelType.PublicThread]}>
                         {wordErrorsChannel && <channel id={wordErrorsChannel}/>}
                     </channel-select>
                 </row>
@@ -76,7 +76,7 @@ function renderServerSettings(settings, page = 'commands', userOnly, userSetting
                 </row>,
                 <text>### {usesBlacklist ? ' Denied ' : ' Allowed '} Channels</text>,
                 <row> 
-                    <channel-select id={`configure.command-channels..${page}`} max="25" min="0" types={[ChannelType.GuildText, ChannelType.GuildVoice, ChannelType.PublicThread, ChannelType.PrivateThread, ChannelType.GuildForum, ChannelType.GuildMedia]}>
+                    <channel-select id={`configure.command-channels...${page}`} max="25" min="0" types={[ChannelType.GuildText, ChannelType.GuildVoice, ChannelType.PublicThread, ChannelType.PrivateThread, ChannelType.GuildForum, ChannelType.GuildMedia]}>
                         {channelsList && channelsList.map(channel => (<channel id={channel}/>))}
                     </channel-select>
                 </row>,

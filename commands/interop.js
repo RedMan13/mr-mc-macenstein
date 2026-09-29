@@ -52,6 +52,7 @@ module.exports = {
                 name: 'command',
                 description: 'The command to run.',
                 type: ApplicationCommandOptionType.String,
+                autocomplete: true,
                 required: true
             },
             {
@@ -71,7 +72,16 @@ module.exports = {
     /**
      * @param {import('discord.js').ChatInputCommandInteraction} interaction
      */
-    execute: async (interaction) => {
+    execute: async (interaction, type) => {
+        if (type === 'autocomplete') {
+            const value = interaction.options.get('command').value;
+            const completes = Object.keys(dbs.commands)
+                .filter(command => command.startsWith(value))
+                .slice(0,25)
+                .map(command => ({ name: command, value: command }));
+            interaction.respond(completes);
+            return;
+        }
         const command = dbs.commands[interaction.options.get('command').value];
         if (!command?.enabled) return interaction.reply({ content: 'Command doesnt exist!!', ephumeral: true });
         await interaction.deferReply();

@@ -5,6 +5,7 @@ const rated = [];
 let handleRated = null;
 let time = null;
 let autoPing = null;
+let wasMajor = false;
 module.exports = {
     name: 'messageCreate',
     once: false,
@@ -40,6 +41,9 @@ module.exports = {
                     const correctPlatform = dbs.commands[command].work === 'any' || dbs.commands[command].work === dbs.alias;
                     dbs.commands[command].enabled = (!bestId || bestId === dbs.id) && correctPlatform;
                 }
+                if (!wasMajor && dbs.major)
+                    dbs.database.clearAll();
+                wasMajor = dbs.major;
                 if (dbs.major) console.log('This bot is handling events.');
                 else console.log('This bot will nolonger handle events.');
                 console.log('The following commands are enabled: ', Object.entries(dbs.commands).filter(([n, command]) => command.enabled).map(n => n[0]));
