@@ -10,7 +10,10 @@ const KeyWord = new mongoose.Schema({
 });
 
 const server = mongoose.createConnection(process.env.mongoLink);
-server.on('connected', () => Database = MongoDatabase);
+server.on('connected', () => {
+    Database = MongoDatabase;
+    console.log('  Mongo ready!');
+});
 function failAndRety() {
     console.log('  Whoops!');
     // dont try changing databases? not sure about that but if its already set to mongo then its most likely true that we will later get mongo back
