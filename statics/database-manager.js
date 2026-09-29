@@ -105,10 +105,14 @@ class MongoDatabase extends RootDatabase {
     _hashes = {};
     async _saveInternal() {
         const changes = [];
-        for (const key in this._data) {
+        for (const key in this._hashes) {
+            if (!(key in this._data)) {
+                changes.push({ deleteOne: { filter: { file: this._name, key } } });
+                continue;
+            }
             const content = JSON.stringify(this._data[key]);
             const newHash = crypto.hash('SHA256', content);
-            if (this._hashes[key] === content) continue;
+            if (this._hashes[key] === newHash) continue;
 
             this._hashes[key] = newHash;
             changes.push({
