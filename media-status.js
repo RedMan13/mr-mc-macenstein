@@ -1,7 +1,6 @@
 const DBus = require('dbus');
 const { Client } = require('@xhayper/discord-rpc');
 const MprisSpecs = require('./assets/mpris-specifications.json');
-const path = require('path');
 
 // small media player scrapper that then also intends to setup things like discord status
 const client = new Client({ clientId: '993334503290454030' });
@@ -96,8 +95,8 @@ client.on('ready', async () => {
                 status_display_type: 2,
                 largeImageKey: artUrl,
                 name: ident,
-                details: status === 'Paused' ? `Idling on ${title}` : `Listening to ${title}`,
-                state: `Song by ${artist}`
+                details: status === 'Paused' ? `Idling on${title ? ' ' + title : '... Something?'}` : `Listening to${title ? ' ' + title : '... Something?'}`,
+                state: `Song by${artist ? ' ' + artist : '... Someone.'}`
             };
             console.log('painted', activity, 'from', raw);
             if (link) activity.details_url = link;

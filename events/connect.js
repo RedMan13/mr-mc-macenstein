@@ -26,22 +26,10 @@ module.exports = {
             /** @type {import('discord.js').Message[]} */
             const messages = (await imports.scrapeChannel(wordChain, message => message.reactions.resolve('1164828602609717248')?.me))
                 .reverse();
-            let used = messageChannel.get('words');
-            let caughtLatest = false;
             for (const message of messages) {
                 /** @type {import('discord.js').MessageReaction} */
                 const reaction = message.reactions.resolve('1164828602609717248');
-                if (reaction?.me) {
-                    if (caughtLatest) continue;
-                    caughtLatest = true;
-                    const filtered = message.content.replaceAll(unsafeMessageChars, safeReplacer).toLowerCase();
-                    const locator = new RegExp(`(?:^|,)${filtered}(?:$|,)`);
-                    if (locator.test(used)) continue;
-                    used += ',' + filtered;
-                    messageChannel.set('words', used);
-                    messageChannel.set('lastUser', message.author.id);
-                    continue;
-                }
+                if (reaction?.me) continue;
 
                 const checked = await checkMessage(message);
                 if (!checked) {
