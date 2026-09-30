@@ -11,14 +11,11 @@ module.exports = {
         dbs.channels.watchDog.send(`mc;rate ${JSON.stringify({ id: dbs.id, rating })}`);
 
         for (const [guildId] of imports.client.guilds.cache) {
-            await dbs.database.server(guildId).loaded;
-            const settings = dbs.database.server(guildId);
+            const settings = await dbs.database.server(guildId);
             if (!settings.get('wordchains-enabled')) continue;
             if (!settings.get('wordchains-channel')) continue;
             if (!settings.get('word-errors-channel')) continue;
 
-            await dbs.database.channel(settings.get('wordchains-channel')).loaded;
-            const messageChannel = dbs.database.channel(settings.get('wordchains-channel'));
             const wordChain = await imports.client.channels.fetch(settings.get('wordchains-channel'));
             const wordErrors = await imports.client.channels.fetch(settings.get('word-errors-channel'));
             const handledUsers = {}
@@ -46,7 +43,7 @@ module.exports = {
             const users = Object.fromEntries(await Promise.all(Object.keys(handledUsers)
                 .map(async userId => {
                     await dbs.database.user(userId).loaded;
-                    return [userId, dbs.database.user(userId)]
+                    return [userId, await dbs.database.user(userId)]
                 })))
 
             const problems = [];

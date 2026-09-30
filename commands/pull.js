@@ -25,7 +25,7 @@ module.exports = {
             if (msg.updated) await message.reply('Finished! updated ' + msg.updated.length + ' files. ');
             if (msg.restartNeeded) {
                 await message.channel.send('Restarting bot...');
-                const global = dbs.database.global();
+                const global = dbs.database.global(true);
                 global.set('restarted', true);
                 global.set('restartMessage', message.id);
                 global.set('restartChannel', message.channel.id);

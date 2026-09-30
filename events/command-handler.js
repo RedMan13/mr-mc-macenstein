@@ -12,7 +12,7 @@ module.exports = {
                 command = dbs.commands[command].aliasFor;
             if (!dbs.commands[command].enabled && dbs.commands[command].work !== 'all') return;
 
-            const settings = dbs.database.server(message.channel.guild.id);
+            const settings = await dbs.database.server(message.channel.guild.id);
             if (settings.has('channels-list')) {
                 const usesBlacklist = !settings.has('blacklist-channels') || settings.get('blacklist-channels');
                 const list = settings.get('channels-list');

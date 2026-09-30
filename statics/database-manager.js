@@ -105,7 +105,7 @@ class MongoDatabase extends RootDatabase {
     _hashes = {};
     async _saveInternal() {
         const changes = [];
-        for (const key in this._hashes) {
+        for (const key in Object.assign({}, this._data, this._hashes)) {
             if (!(key in this._data)) {
                 changes.push({ deleteOne: { filter: { file: this._name, key } } });
                 continue;
@@ -147,24 +147,28 @@ let Database = MongoDatabase;
 class DatabaseManager {
     /** @type {{ [key: string]: RootDatabase }} */
     static databases = {};
-    static user(id) {
+    static user(id, immediate) {
         const dir = `user/${id}.json`;
         if (!(dir in this.databases)) this.databases[dir] = new Database(dir);
+        if (!immediate) return Promise.resolve(this.databases[dir].loaded).then(() => this.databases[dir]);
         return this.databases[dir];
     }
-    static channel(id) {
+    static channel(id, immediate) {
         const dir = `channel/${id}.json`;
         if (!(dir in this.databases)) this.databases[dir] = new Database(dir);
+        if (!immediate) return Promise.resolve(this.databases[dir].loaded).then(() => this.databases[dir]);
         return this.databases[dir];
     }
-    static server(id) {
+    static server(id, immediate) {
         const dir = `server/${id}.json`;
         if (!(dir in this.databases)) this.databases[dir] = new Database(dir);
+        if (!immediate) return Promise.resolve(this.databases[dir].loaded).then(() => this.databases[dir]);
         return this.databases[dir];
     }
-    static global() {
+    static global(immediate) {
         const dir = `global.json`;
         if (!(dir in this.databases)) this.databases[dir] = new Database(dir);
+        if (!immediate) return Promise.resolve(this.databases[dir].loaded).then(() => this.databases[dir]);
         return this.databases[dir];
     }
     static clearAll() {

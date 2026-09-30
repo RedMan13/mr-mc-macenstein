@@ -14,7 +14,7 @@ module.exports = {
             message.reply(`you are not authorized to use this`);
             return;
         }
-        const database = dbs.database.channel(message.channel.id);
+        const database = dbs.database.channel(message.channel.id, true);
         database.set('santaIsHere', false);
         message.reply('Done!');
     },

@@ -136,9 +136,9 @@ module.exports = {
     ],
     /** @param {import('discord.js').MessageComponentInteraction} message */
     execute: async (message, setting, boolean, command, page) => {
-        const userSettings = dbs.database.user(message.member?.id ?? message.author.id);
+        const userSettings = await dbs.database.user(message.member?.id ?? message.author.id);
         const userOnly = !message.member.permissions.has('Administrator');
-        const settings = dbs.database.server(message.channel.guild.id);
+        const settings = await dbs.database.server(message.channel.guild.id);
 
         switch (setting) {
         case 'change-page': page = message.values[0]; break;

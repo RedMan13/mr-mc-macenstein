@@ -2,8 +2,8 @@ const { EmbedBuilder } = require('discord.js');
 
 const maxMemory = 10;
 async function respondSanta(message, naughty = '', ...reason) {
-    const messageChannel = dbs.database.channel(message.channel.id);
-    const userWishes = dbs.database.user(message.author.id);
+    const messageChannel = await dbs.database.channel(message.channel.id);
+    const userWishes = await dbs.database.user(message.author.id);
     if (!userWishes.has('history')) userWishes.set('history', []);
     userWishes.get('history').push({ naughty, wish: message.content, reason: reason.join('; ') });
     if (userWishes.get('history').length > maxMemory)
@@ -36,9 +36,9 @@ module.exports = {
      */
     execute: async (message) => {
         if (!dbs.channelsLoaded) return; // no prefix, not loaded yet
-        const messageChannel = dbs.database.channel(message.channel.id);
-        const logsChannel = dbs.database.channel(dbs.config.channels.saintlets);
-        const userWishes = dbs.database.user(message.author.id);
+        const messageChannel = await dbs.database.channel(message.channel.id);
+        const logsChannel = await dbs.database.channel(dbs.config.channels.saintlets);
+        const userWishes = await dbs.database.user(message.author.id);
         if (message.channel.id === dbs.config.channels.saintlets && logsChannel.get('wishes')?.[message.reference?.messageId]) {
             const wish = logsChannel.get('wishes')[message.reference.messageId];
             delete logsChannel.get('wishes')[message.reference.messageId];

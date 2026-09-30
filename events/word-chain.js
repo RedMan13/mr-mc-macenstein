@@ -3,26 +3,20 @@ const fs = require('fs');
 const path = require('path');
 const wordsPath = path.resolve(__dirname, '../assets/words.txt');
 const words = fs.readFileSync(wordsPath, 'utf8');
-const topCounts = {};
-const messageChannel = dbs.database.channel(dbs.config.channels.wordChain);
-(async () => {
-    if (await messageChannel.loaded) {
-        const usedWords = (messageChannel.get('words') ?? '').split(',');
-        words.split(',')
-            .forEach(word => {
-                if (messageChannel.get(usedWords.at(-1)) < 0) return;
-                topCounts[word[0]] ??= 0;
-                topCounts[word[0]]++;
-            });
-    }
-})();
+const topCounts = words
+    .split(',')
+    .reduce((counts, word) => {
+        counts[word[0]] ??= 0;
+        counts[word[0]]++;
+        return counts;
+    }, {});
 
 /**
  * @param {import('discord.js').Message} message
  */
 async function fail(message, reason) {
-    const settings = dbs.database.server(message.channel.guild.id);
-    const userSettings = dbs.database.user(message.author.id);
+    const settings = await dbs.database.server(message.channel.guild.id);
+    const userSettings = await dbs.database.user(message.author.id);
 
     if (!dbs.major) return;
     const mention = !userSettings.has('wordchains-ping') || userSettings.get('wordchains-ping')
@@ -38,8 +32,8 @@ async function fail(message, reason) {
  */
 async function checkMessage(message) {
     if (message.author.id === imports.client.user.id) return false;
-    const settings = dbs.database.server(message.channel.guild.id);
-    const messageChannel = dbs.database.channel(settings.get('wordchains-channel'));
+    const settings = await dbs.database.server(message.channel.guild.id);
+    const messageChannel = await dbs.database.channel(settings.get('wordchains-channel'));
     const filtered = message.content.replaceAll(unsafeMessageChars, safeReplacer).toLowerCase();
     const letter = filtered[0];
     const used = messageChannel.get('words') ?? '';
@@ -95,7 +89,7 @@ module.exports = {
      * @param {import('discord.js').Message} message
      */
     execute: async (message) => {
-        const settings = dbs.database.server(message.channel.guild.id);
+        const settings = await dbs.database.server(message.channel.guild.id);
 
         if (!settings.get('wordchains-enabled')) return;
         if (!settings.get('wordchains-channel')) return;

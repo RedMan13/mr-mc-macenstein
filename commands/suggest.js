@@ -20,7 +20,7 @@ module.exports = {
      */
     execute: async (message) => {
         const sent = await dbs.channels.suggestions.send(`Suggestion: ${message.arguments.suggestion}`);
-        const data = dbs.database.channel(dbs.channels.suggestions.id);
+        const data = await dbs.database.channel(dbs.channels.suggestions.id);
         const suggested = data.get('suggested') ?? {};
         suggested[sent.id] = {
             author: message.author.id,

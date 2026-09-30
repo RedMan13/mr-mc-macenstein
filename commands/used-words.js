@@ -23,7 +23,7 @@ module.exports = {
      * @param {import('discord.js').Message} message
      */
     execute: async (message) => {
-        const messageChannel = dbs.database.channel(dbs.channels.wordChain.id);
+        const messageChannel = await dbs.database.channel(dbs.channels.wordChain.id);
         const usedWords = messageChannel.get('words').split(',');
         if (!message.arguments.letter) {
             const percent = ((usedWords.length / words.length) * 100).toFixed(1) + '%';

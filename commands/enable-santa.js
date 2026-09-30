@@ -31,7 +31,7 @@ module.exports = {
 🧏‍♂️ reactions means santa is thinking.
 👋 reactions means that a human will be handling your wish.`);
         message.reply('Done!');
-        const database = dbs.database.channel(wishChannel.id);
+        const database = dbs.database.channel(wishChannel.id, true);
         database.set('santaIsHere', true);
         if (!message.arguments.webhook) return;
         const url = message.arguments.webhook.split('/');

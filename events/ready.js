@@ -41,8 +41,7 @@ module.exports = {
             });
         } catch (err) { console.warn(err.message) }
 
-        const global = dbs.database.global();
-        await global.loaded;
+        const global = await dbs.database.global();
         if (global.get('restarted')) {
             if (global.has('restartChannel')) {
                 /** @type {import('discord.js').TextChannel} */
