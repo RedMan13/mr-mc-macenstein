@@ -4,6 +4,8 @@ class Markov {
     chances = Object.create(null);
     chars = {};
     totalChances = 0;
+    /** @type {{ exception: boolean, match: RegExp }[]} */
+    censorRules = [];
     
     decider = char => (Math.random() * char.total);
 
@@ -11,13 +13,15 @@ class Markov {
         if (decider) this.decider = decider;
         this.finisher = finisher;
     }
+
     feed(text, divider = this.divider) {
         this.divider = divider;
         const data = text.split(divider); 
 
         data.forEach((char, i) => {
             if (!char) return;
-            this.totalChances++
+            if (this.isCensored(char)) return;
+            this.totalChances++;
             char = char.toLowerCase();
             this.chances[char] ??= { chars: Object.create(null), total: 0 };
             this.chars[char] ??= 0;
@@ -48,7 +52,9 @@ class Markov {
     }
 
     makeStarter() {
+        let attempts = 100;
         do {
+            if (attempts <= 0) return;
             const pick = Math.floor(Math.random() * this.totalChances);
             let level = 0;
             for (const char in this.chars) {
@@ -56,7 +62,16 @@ class Markov {
                 if (!char || char.endsWith(this.finisher)) continue;
                 if (pick < level) return char;
             }
+            attempts--;
         } while (true)
+    }
+    isCensored(chunk) {
+        let matched = false;
+        for (let i = 0; i < this.censorRules.length; i++) {
+            matched = this.censorRules[i].match.test(chunk);
+            if (this.censorRules[i].exception && matched) return false;
+        }
+        return matched;
     }
     findNext(chunk, canEnd) { 
         const pick = this.decider(this.chances[chunk]);
@@ -72,13 +87,15 @@ class Markov {
     }
     generate(starter, minimum = 20, divider = this.divider) {
         let failedToFind = false;
+        let acc = '';
         if (starter) {
+            acc = starter;
+            starter = starter.split(this.divider).at(-1);
             starter = this.findWord(starter);
             if (!starter) failedToFind = true;
         }
-        if (!starter) starter = this.makeStarter();
+        if (!starter) acc = starter = this.makeStarter();
         let char = starter;
-        let acc = char;
         let count = 0;
         while ((!char.endsWith(this.finisher) && count < 1000)) {
             char = this.findNext(char, count >= minimum);

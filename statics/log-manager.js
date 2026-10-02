@@ -28,12 +28,11 @@ function pruneLogs() {
         fs.rm(path.resolve(logDir, file), () => {});
     }
 }
-pruneLogs() // but what if we restart before this ever runs
-setInterval(pruneLogs, 24 * 60 * 60 * 1000); // every day
 
 const open = {};
 
 function getFile(identity) {
+    pruneLogs();
     const now = new Date().toISOString();
     const identDir = path.resolve(logDir, identity);
     fs.mkdirSync(identDir, { recursive: true });

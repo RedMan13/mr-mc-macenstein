@@ -28,7 +28,7 @@ module.exports = {
         let output;
         try {
             const res = await new AsyncFunction('message', 'require', message.arguments.code)(message, require);
-            output = util.inspect(res, { showHidden: true, colors: true });
+            output = util.inspect(res, { showHidden: true, colors: true, depth: 0 });
         } catch (err) {
             output = err.stack;
         }
