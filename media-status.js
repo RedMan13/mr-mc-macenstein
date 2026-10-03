@@ -46,6 +46,7 @@ client.on('ready', async () => {
         const ident = await new Promise((g,b) => basic.getProperty('Identity', (e,i) => e ? b(e) : g(i))).catch(() => {});
         if (!ident) return console.log('Access failure when hooking', name); // ignore if identity fails, since at that point theres nothing of value we can get
         let rate;
+        let length;
         let start;
         let end;
         let artist;
@@ -67,6 +68,10 @@ client.on('ready', async () => {
                 }
                 status = raw.PlaybackStatus;
                 if (status === 'Paused') pauseStart = Date.now();
+                if (status === 'Stopped') {
+                    start = Date.now();
+                    end = Date.now() + length;
+                }
             }
             if ('Rate' in raw) {
                 // rate zero is often used for "paused"
@@ -75,7 +80,8 @@ client.on('ready', async () => {
             }
             if ('Metadata' in raw) {
                 if (!('Position' in raw)) raw.Position = await new Promise((g,b) => player.getProperty('Position', (e,i) => e ? b(e) : g(i)));
-                end = (((raw.Metadata['mpris:length'] / 1000) * rate) - ((raw.Position / 1000) / rate)) + Date.now();
+                length = ((raw.Metadata['mpris:length'] / 1000) * rate);
+                end = (length - ((raw.Position / 1000) / rate)) + Date.now();
                 artist = raw.Metadata['xesam:artist']?.join?.(', ') ?? '';
                 title = raw.Metadata['xesam:title'] ?? '';
                 if ('mpris:artUrl' in raw.Metadata) {
