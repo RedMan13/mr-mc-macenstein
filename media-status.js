@@ -23,7 +23,10 @@ client.on('ready', async () => {
     /** @type {Intropect} */
     bus.introspect = function(serviceName, objectPath, callback) {
         trueIntrospect.call(this, serviceName, objectPath, (err, obj) => {
-            if (err?.message === 'No introspectable') { return callback(null, MprisSpecs); }
+            if (err?.message === 'No introspectable') {
+                console.log('Could not introspect', serviceName, 'Falling back to internal constants.');
+                return callback(null, MprisSpecs);
+            }
             callback(err, obj);
         })
     }
@@ -34,13 +37,14 @@ client.on('ready', async () => {
     let majorActivity = null;
     const listenings = [];
     async function hookPlayer(name) {
+        console.log('Hooking', name);
         const properties = await new Promise((g,b) => bus.getInterface(name, '/org/mpris/MediaPlayer2', 'org.freedesktop.DBus.Properties', (e,i) => e ? b(e) : g(i)));
         const basic = await new Promise((g,b) => bus.getInterface(name, '/org/mpris/MediaPlayer2', 'org.mpris.MediaPlayer2', (e,i) => e ? b(e) : g(i)));
         const player = await new Promise((g,b) => bus.getInterface(name, '/org/mpris/MediaPlayer2', 'org.mpris.MediaPlayer2.Player', (e,i) => e ? b(e) : g(i)));
         // const tracks = await new Promise(g => bus.getInterface(name, '/org/mpris/MediaPlayer2', 'org.mpris.MediaPlayer2.TrackList', (e,i) => g(i)));
         // const playlist = await new Promise(g => bus.getInterface(name, '/org/mpris/MediaPlayer2', 'org.mpris.MediaPlayer2.Playlists', (e,i) => g(i)));
         const ident = await new Promise((g,b) => basic.getProperty('Identity', (e,i) => e ? b(e) : g(i))).catch(() => {});
-        if (!ident) return; // ignore if identity fails, since at that point theres nothing of value we can get
+        if (!ident) return console.log('Access failure when hooking', name); // ignore if identity fails, since at that point theres nothing of value we can get
         let rate;
         let start;
         let end;
@@ -116,6 +120,7 @@ client.on('ready', async () => {
     internals.on('NameOwnerChanged', (name, oldValue, newValue) => {
         if (!name.startsWith('org.mpris.MediaPlayer2')) return;
         if (!newValue) {
+            console.log(name, 'Has stopped emitting');
             const idx = listenings.indexOf(name);
             if (idx <= -1) return;
             listenings.splice(idx, 1);

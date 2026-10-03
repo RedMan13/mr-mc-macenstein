@@ -63,9 +63,11 @@ module.exports = {
         const page = await browser.newPage();
         await page.setViewport({ width: 480, height: 360, deviceScaleFactor: 1 });
         await page.goto(`https://www.bing.com/search?q=${encodeURI(searchSpecific)}`);
-        await page.locator('h2 a').click();
-        await new Promise(resolve => page.once('load', resolve));
-        console.log('Search landed on', page.url());
+        await Promise.all([
+            page.waitForNavigation(),
+            page.click('li h2 a'),
+        ]);
+        console.log('Landed at', page.url());
         const parsed = new JSDOM(await page.content());
         await page.close();
 

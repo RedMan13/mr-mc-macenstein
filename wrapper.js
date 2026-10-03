@@ -19,6 +19,7 @@ const spawnProc = (name, spawn, args, options) => { args ??= []; options ??= {};
         : child.spawn(spawn, args, Object.assign(options, { stdio: 'pipe' }));
     sister.allowStop = false;
     const log = getFile(name);
+    log.write(`file: ${spawn}, arguments: ${args}, options: ${JSON.stringify(options)}\n`);
     sister.stdout.pipe(log);
     sister.stderr.pipe(log);
     // sister.stdout.pipe(process.stdout);
@@ -45,8 +46,9 @@ const spawnProc = (name, spawn, args, options) => { args ??= []; options ??= {};
         });
     })
     sister.on('exit', code => {
+        log.write(`\nClosed with ${code}`);
         releaseFiles(name); 
-        if (!options.restarts) return delete spawned[name];
+        delete spawned[name];
         if (sister.allowStop && name === 'mister-mc-macenstein') {
             for (const sister of Object.values(spawned)) sister.kill();
             process.exit();
