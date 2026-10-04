@@ -49,9 +49,10 @@ const spawnProc = (name, spawn, args, options) => { args ??= []; options ??= {};
         });
     })
     sister.on('exit', code => {
-        log.write(`\nClosed with ${code}`);
-        releaseFiles(name); 
+        if (!(name in spawned)) return;
         delete spawned[name];
+        log.write(`\n Closed because ${code}`);
+        releaseFiles(name); 
         if (sister.allowStop && name === 'mister-mc-macenstein') {
             for (const sister of Object.values(spawned)) sister.kill();
             process.exit();
