@@ -13,7 +13,10 @@ try {
 /** @type {{ [key: name]: child.ChildProcessWithoutNullStreams }} */
 const spawned = {};
 const spawnProc = (name, spawn, args, options) => { args ??= []; options ??= {};
-    if (spawned[name]) spawned[name].kill();
+    if (spawned[name]) {
+        spawned[name].allowStop = true;
+        spawned[name].kill();
+    }
     const sister = /\.[mc]?js$/i.test(spawn) 
         ? child.fork(spawn, Object.assign(options, { stdio: 'pipe' }))
         : child.spawn(spawn, args, Object.assign(options, { stdio: 'pipe' }));
@@ -118,7 +121,6 @@ app.delete('/spawned/:name', (req, res) => {
         res.send();
         return;
     }
-    spawned[req.params.name].allowStop = true;
     spawned[req.params.name].kill();
 });
 app.get('/logs/:name', async (req, res) => {

@@ -60,16 +60,14 @@ module.exports = {
         searchSpecific[searchSpecific.length -1] = ` "${lastChunk}"`;
         searchSpecific = searchSpecific.join('');
         console.log('Looking up `', searchSpecific, '`');
+        const searches = await JSDOM.fromURL(`https://www.bing.com/search?q=${encodeURI(searchSpecific)}`);
         const page = await browser.newPage();
         await page.setViewport({ width: 480, height: 360, deviceScaleFactor: 1 });
-        await page.goto(`https://www.bing.com/search?q=${encodeURI(searchSpecific)}`);
-        await Promise.all([
-            page.waitForNavigation(),
-            page.click('li h2 a'),
-        ]);
+        await page.goto(searches.window.document.querySelector('a[href]:not([href*=bing], [href*="#"], [href*=microsoft])').href);
+        page.on('framenavigated', frame => console.log('framenavigated', frame.url()));
         console.log('Landed at', page.url());
         const parsed = new JSDOM(await page.content());
-        await page.close();
+        setTimeout(() => page.close(), 4000);
 
         const markov = new Markov(null, '\n');
         markov.censorRules = (await message.guild.autoModerationRules.fetch())
