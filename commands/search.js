@@ -53,51 +53,51 @@ module.exports = {
      * @param {import('discord.js').Message} message
      */
     execute: async (message) => {
+        return message.reply('no!');
         browser ??= await puppeteer.launch();
+        browser.on('disconnected', () => browser = null);
 
-        let searchSpecific = message.arguments.search.split(delimiter);
-        const lastChunk = searchSpecific.at(-1).trim()
-        searchSpecific[searchSpecific.length -1] = ` "${lastChunk}"`;
-        searchSpecific = searchSpecific.join('');
-        console.log('Looking up `', searchSpecific, '`');
-        const searches = await JSDOM.fromURL(`https://www.bing.com/search?q=${encodeURI(searchSpecific)}`);
+        const lastChunk = message.arguments.search.split(delimiter).at(-1).trim()
+        console.log('Looking up `', message.arguments.search, '`');
+        const searches = await JSDOM.fromURL(`https://www.bing.com/search?q=${encodeURI(message.arguments.search)}`);
         const page = await browser.newPage();
         await page.setViewport({ width: 480, height: 360, deviceScaleFactor: 1 });
-        await page.goto(searches.window.document.querySelector('a[href]:not([href*=bing], [href*="#"], [href*=microsoft])').href);
-        page.on('framenavigated', frame => console.log('framenavigated', frame.url()));
-        console.log('Landed at', page.url());
-        const parsed = new JSDOM(await page.content());
-        setTimeout(() => page.close(), 4000);
+        await page.goto(searches.window.document.querySelector('h2 a').href);
+        page.on('domcontentloaded', async () => {
+            console.log('Landed at', page.url());
+            const parsed = new JSDOM(await page.content());
+            await page.close();
 
-        const markov = new Markov(null, '\n');
-        markov.censorRules = (await message.guild.autoModerationRules.fetch())
-            .map(autorule => [
-                autorule.triggerMetadata.keywordFilter
-                    .map(word => ({ exception: false, match: new RegExp(escape(word), 'i') })),
-                autorule.triggerMetadata.allowList
-                    .map(word => ({ exception: true, match: new RegExp(escape(word), 'i') })),
-                autorule.triggerMetadata.regexPatterns
-                    .map(regex => ({ exception: false, match: new RegExp(regex.replace(/\(\?[a-z]+\)/ig, ''), 'imgs')}))
-            ]).flat(3);
-        let text = '';
-        const possibleTextEls = parsed.window.document.querySelectorAll('*:not(script,style)');
-        possibleTextEls.forEach(el => {
-            el.childNodes.forEach(child => {
-                if (child.nodeType !== 3 && child.nodeType !== 4) return;
-                text += ' ' + child.textContent;
-            });
-        })
-        markov.feed(text, delimiter);
+            const markov = new Markov(null, '\n');
+            markov.censorRules = (await message.guild.autoModerationRules.fetch())
+                .map(autorule => [
+                    autorule.triggerMetadata.keywordFilter
+                        .map(word => ({ exception: false, match: new RegExp(escape(word), 'i') })),
+                    autorule.triggerMetadata.allowList
+                        .map(word => ({ exception: true, match: new RegExp(escape(word), 'i') })),
+                    autorule.triggerMetadata.regexPatterns
+                        .map(regex => ({ exception: false, match: new RegExp(regex.replace(/\(\?[a-z]+\)/ig, ''), 'imgs')}))
+                ]).flat(3);
+            let text = '';
+            const possibleTextEls = parsed.window.document.querySelectorAll('*:not(script,style)');
+            possibleTextEls.forEach(el => {
+                el.childNodes.forEach(child => {
+                    if (child.nodeType !== 3 && child.nodeType !== 4) return;
+                    text += ' ' + child.textContent;
+                });
+            })
+            markov.feed(text, delimiter);
 
-        message.reply({
-            content: markov.generate(lastChunk, 3, '').slice(0, 2000),
-            flags: [MessageFlags.SuppressEmbeds],
-            allowedMentions: {
-                parse: [],
-                roles: [],
-                users: [],
-                repliedUser: true
-            }
-        })
+            message.reply({
+                content: markov.generate(lastChunk, 3, '').slice(0, 2000),
+                flags: [MessageFlags.SuppressEmbeds],
+                allowedMentions: {
+                    parse: [],
+                    roles: [],
+                    users: [],
+                    repliedUser: true
+                }
+            })
+        });
     },
 };
