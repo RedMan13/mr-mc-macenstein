@@ -39,6 +39,7 @@ function parseTokens(tokens, text) {
             const elements = parseTokens(batch.at(-2), text);
             const mid = batch.find(tok => tok.name === 'close');
             let inside = 0;
+            let lineStart = true;
             if (mid)
             for (let i = mid.end; i < end.start; i++) {
                 const el = elements.find(tok => i >= tok.start && i < tok.end);
@@ -71,7 +72,10 @@ function parseTokens(tokens, text) {
                     js[js.length -1] += text[i];
                     continue;
                 }
-                children[children.length -1] += text[i];
+                if (!lineStart || !/\s/.test(text[i])) {
+                    lineStart = text[i] === '\n';
+                    children[children.length -1] += text[i];
+                }
             }
         }
 

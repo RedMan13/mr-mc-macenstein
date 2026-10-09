@@ -183,22 +183,23 @@ module.exports = {
             const req = await fetch(message.attachments.at(0).proxyURL);
             const image = sharp(Buffer.from(await req.bytes()));
             const meta = await image.metadata();
-            const tilesHigh = Math.round(meta.height / height);
-            const tilesWide = Math.round(meta.width / width);
+            const tilesHigh = Math.ceil(meta.height / height);
+            const tilesWide = Math.ceil(meta.width / width);
             const pixelsWide = tilesWide * width;
             const pixelsHigh = tilesHigh * height;
             image.resize(pixelsWide, pixelsHigh);
             console.log('Extracting', tilesWide * tilesHigh, 'tiles from image for pixels');
             message.reply('Extracting mapping pixels...');
             const promises = [];
-            for (let y = 0; y < pixelsWide; y += height)
-                for (let x = 0; x < pixelsHigh; x += width)
+            for (let y = 0; y < pixelsHigh; y += height)
+                for (let x = 0; x < pixelsWide; x += width)
                     promises.push(image
                         .extract({ left: x, top: y, width, height })
                         .ensureAlpha()
                         .raw()
                         .toBuffer()
-                        .then(buf => (process.stdout.write('Resolved image ' + x + ':' + y + '        \r'), new Uint8ClampedArray(buf.toJSON().data))));
+                        .then(buf => (process.stdout.write('Resolved image ' + x + ':' + y + '        \r'), new Uint8ClampedArray(buf.toJSON().data)))
+                        .catch(err => Promise.reject(new Error(JSON.stringify({ x,y, width, height, pixelsWide, pixelsHigh }), { cause: err }))));
             usedPixels = await Promise.all(promises);
         }
         message.arguments.scale = Math.max(Math.min(Number(message.arguments.scale), 16), 0);

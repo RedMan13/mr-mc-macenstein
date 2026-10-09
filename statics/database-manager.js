@@ -67,8 +67,8 @@ class RootDatabase {
         delete DatabaseManager.databases[this._name];
     }
     close() {
-        this.save(true);
         this.clear();
+        return this.save(true);
     }
 
     add(key) { this._data[key]++; this._needsWrite = true; }

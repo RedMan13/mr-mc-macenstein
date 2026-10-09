@@ -7,6 +7,7 @@ module.exports = {
     once: false,
     global: true,
     async execute() {
+        dbs.database.clearAll();
         const rating = rate(imports.client.readyTimestamp);
         dbs.channels.watchDog.send(`mc;rate ${JSON.stringify({ id: dbs.id, rating })}`);
 

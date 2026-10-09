@@ -20,14 +20,10 @@ process.on('message', ([segments, pixels]) => {
                         Math.abs(segments[idx][i +1] - pixels[emojiIdx][i +1]) +
                         Math.abs(segments[idx][i +2] - pixels[emojiIdx][i +2]) +
                         Math.abs(segments[idx][i +3] - pixels[emojiIdx][i +3]) +
-                        Math.abs(segments[idx][i +3] - pixels[emojiIdx][i +3]) +
-                        Math.abs(segments[idx][i +3] - pixels[emojiIdx][i +3]) +
 
                         Math.abs(segments[idx][i +4] - pixels[emojiIdx][i +4]) +
                         Math.abs(segments[idx][i +5] - pixels[emojiIdx][i +5]) +
                         Math.abs(segments[idx][i +6] - pixels[emojiIdx][i +6]) +
-                        Math.abs(segments[idx][i +7] - pixels[emojiIdx][i +7]) +
-                        Math.abs(segments[idx][i +7] - pixels[emojiIdx][i +7]) +
                         Math.abs(segments[idx][i +7] - pixels[emojiIdx][i +7]);
                 }
             }
