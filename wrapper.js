@@ -51,7 +51,7 @@ const spawnProc = (name, spawn, args, options) => { args ??= []; options ??= {};
     sister.on('exit', code => {
         if (!(name in spawned)) return;
         delete spawned[name];
-        log.write(`\n Closed because ${code}`);
+        // log.write(`\n Closed because ${code}`);
         releaseFiles(name); 
         if (sister.allowStop && name === 'mister-mc-macenstein') {
             for (const sister of Object.values(spawned)) sister.kill();
