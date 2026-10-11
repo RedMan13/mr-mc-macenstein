@@ -33,7 +33,6 @@ class RootDatabase {
     _data = {};
     _needsWrite = false;
     _resolveLoaded = null;
-    _taboutTimeout = null;
     _saveInterval = null;
     wasEmpty = true;
     loaded = null;
@@ -41,10 +40,8 @@ class RootDatabase {
         this.loaded = new Promise(resolve => this._resolveLoaded = resolve);
         this._name = name;
         this._setupSaving();
-        this.save();
     }
     async save(forced) {
-        this._taboutTimeout = setTimeout(this.close.bind(this), 60000);
         if (!this._needsWrite && !forced) return;
         // never save if the database is empty and was empty
         if (Object.keys(this._data).length <= 0 && this.wasEmpty) return;
@@ -62,7 +59,6 @@ class RootDatabase {
     }
     clear() {
         clearInterval(this._saveInterval);
-        clearTimeout(this._taboutTimeout);
         this.loaded = false;
         delete DatabaseManager.databases[this._name];
     }

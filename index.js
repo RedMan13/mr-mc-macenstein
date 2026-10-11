@@ -11,6 +11,8 @@ const process = require('process');
 const config = require('./statics/config.json');
 const embedBuilder = require('./statics/discord-embeds.js');
 
+process.send ??= () => {};
+
 const jsHandle = require.extensions['.js'];
 require.extensions['.js'] = (module, filename) => {
     if (!filename.includes('commands') && !filename.includes('events')) return jsHandle(module, filename);

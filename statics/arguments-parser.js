@@ -87,7 +87,7 @@ module.exports = async (message, args, slash) => {
         case 'member':
             let member = argContent
             member = member.match(/(?:<@!?)?([0-9]+)>?/i);
-            member = await message.guild.members.fetch(member[1]).catch(err => console.warn(err));
+            member = await message.guild.members.fetch(member?.[1]).catch(err => console.warn(err));
             if (!member) return `The argument "${name}" has to be a real member`;
             result[name] = member;
             break;
