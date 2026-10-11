@@ -41,18 +41,18 @@ class RootDatabase {
         this.loaded = new Promise(resolve => this._resolveLoaded = resolve);
         this._name = name;
         this._setupSaving();
-        this._taboutTimeout = setTimeout(this.close.bind(this), 60000);
+        this.save();
     }
     async save(forced) {
+        this._taboutTimeout = setTimeout(this.close.bind(this), 60000);
         if (!this._needsWrite && !forced) return;
         // never save if the database is empty and was empty
         if (Object.keys(this._data).length <= 0 && this.wasEmpty) return;
         clearTimeout(this._taboutTimeout);
-        this._taboutTimeout = setTimeout(this.close.bind(this), 60000);
-        console.log(`saving ${this._name}...`);
+        if (!forced) console.log(`saving ${this._name}...`);
         await this._saveInternal();
         this._needsWrite = false;
-        console.log(`Finished saving ${this._name}`);
+        if (!forced) console.log(`Finished saving ${this._name}`);
     }
     _saveInternal() { console.warn('_saveInternal() needs implemented!') }
     _setupSaving() {
@@ -67,8 +67,8 @@ class RootDatabase {
         delete DatabaseManager.databases[this._name];
     }
     close() {
+        this.save(true);
         this.clear();
-        return this.save(true);
     }
 
     add(key) { this._data[key]++; this._needsWrite = true; }
@@ -167,7 +167,7 @@ class DatabaseManager {
     }
     static global(immediate) {
         const dir = `global.json`;
-        if (!(dir in this.databases)) this.databases[dir] = new Database(dir);
+        if (!(dir in this.databases)) this.databases[dir] = new FileDatabase(dir); // hardwired to a local database
         if (!immediate) return Promise.resolve(this.databases[dir].loaded).then(() => this.databases[dir]);
         return this.databases[dir];
     }
