@@ -11,8 +11,8 @@ module.exports = {
     args: [
         {
             type: 'string',
-            name: 'code',
-            desc: 'The code to run, of course',
+            name: 'components',
+            desc: 'The XML formated components',
             required: true
         }
     ],
