@@ -94,271 +94,231 @@ function parseTokens(tokens, text) {
     return output;
 }
 
-function expectChildText(children) {
-    let out = '`';
+function expectChildText(children, pure) {
+    let out = '"';
     for (const child of children) {
-        if (typeof child === 'string') { out += JSON.stringify(child).slice(1, -1).replaceAll('`', '\\`'); continue; }
-        if (!Array.isArray(child)) throw new TypeError('Children can only be text here!');
-        out += '${';
+        if (typeof child === 'string') { out += JSON.stringify(child).slice(1, -1).replaceAll(',', '\\,'); continue; }
+        if (!Array.isArray(child) || pure) throw new TypeError('Children can only be text here!');
+        out += '" + (';
         for (const part of child) {
-            if (typeof part !== 'string') throw new TypeError('Children can only be text hete!');
+            if (typeof part !== 'string') throw new TypeError('Children can only be text here!');
             out += part;
         }
-        out += '}';
+        out += ') + "';
     }
-    return out + '`';
+    return out + '"';
 }
-function expectChildElements(children) {
-    let out = '[].concat(';
-    for (const child of children) {
+function expectChildElements(children, maximum, pure) {
+    maximum = Math.min(maximum ?? Infinity, children.length);
+    let out = pure ? '[' : '[].concat(';
+    for (let i = 0; i < maximum; i++) {
+        const child = children[i];
         if (typeof child === 'string') continue;
         if (Array.isArray(child)) {
+            if (pure) continue;
             for (const part of child) {
                 if (typeof part === 'string') { out += part; continue; }
-                out += makeJSON(part);
+                out += makeJSON(part, pure);
             }
             out += ').concat(';
             continue;
         }
-        out += makeJSON(child) + ').concat(';
+        out += makeJSON(child, pure) + (pure ? ', ' : ').concat(');
     }
-    return `${out}).filter(Boolean)`;
+    return pure ? `${out.includes(', ') ? out.slice(0, -2) : out}]` : `${out}).filter(Boolean)`;
+}
+function expectString(attributes, names, pure) {
+    const attribute = attributes.find(attr => names.includes(attr[0]))?.[1];
+    if (typeof attribute === 'undefined') return;
+    if (pure) return attribute[0] === '"' ? attribute : `"${attribute.slice(1,-1).replace(/(?<!\\)"/g, '\\"')}"`;
+    return attribute.startsWith('{') ? attribute.slice(1, -1) : attribute;
+}
+function expectNumber(attributes, names, pure) {
+    const attribute = attributes.find(attr => names.includes(attr[0]))?.[1];
+    if (typeof attribute === 'undefined') return;
+    if (pure) return Number(attribute.slice(1,-1));
+    return `Number(${attribute.startsWith('{') ? attribute.slice(1, -1) : attribute})`;
+}
+function expectBoolean(attributes, names, pure) {
+    const attribute = attributes.find(attr => names.includes(attr[0]))?.[1];
+    if (typeof attribute === 'undefined') return false;
+    if (pure || /^['"]/.test(attribute)) return attribute.slice(1, -1).toLowerCase() !== 'false';
+    return attribute.startsWith('{') ? attribute.slice(1, -1) : attribute;
 }
 
-function makeJSON(token) {
+function makeJSON(token, pure) {
     if (typeof token === 'string') return;
-    token.attributes = token.attributes.map(attr => [attr[0], attr[1] && (attr[1][0] === '{' ? attr[1].slice(1, -1) : attr[1])]);
     switch (token.tagname) {
+    case 'components': return `${expectChildElements(token.children, null, pure)}`
     case 'embed': break;
-    case 'modal': {
-        const customId = token.attributes.find(attr => attr[0] === 'id' || attr[0] === 'custom-id' || attr[0] === 'sku-id');
-        if (!customId) throw new SyntaxError('Modals inputs must have custom ids');
-        const label = token.attributes.find(attr => attr[0] === 'title' || attr[0] === 'label');
+    case 'modal': 
         return `{
-            custom_id: ${customId[1]},
-            title: ${label?.[1]},
-            components: ${expectChildElements(token.children)}
-        }`
-    }
-    case 'label': {
-        const label = token.attributes.find(attr => attr[0] === 'title' || attr[0] === 'label');
-        const desc = token.attributes.find(attr => attr[0] === 'description');
+            "custom_id": ${expectString(token.attributes, ['id', 'custom-id'], pure)},
+            "title": ${expectString(token.attributes, ['title', 'label'], pure)},
+            "components": ${expectChildElements(token.children, null, pure)}
+        }`;
+    case 'label': 
         return `{
-            type: 18,
-            label: ${label?.[1]},
-            description: ${desc?.[1]},
-            component: ${expectChildElements(token.children)}.at(0)
-        }`
-    }
+            "type": 18,
+            "label": ${expectString(token.attributes, ['label'], pure)},
+            "description": ${expectString(token.attributes, ['description', 'title'], pure)},
+            "component": ${expectChildElements(token.children, 1, pure)}
+        }`;
     case 'text-input': {
-        const customId = token.attributes.find(attr => attr[0] === 'id' || attr[0] === 'custom-id' || attr[0] === 'sku-id');
-        if (!customId) throw new SyntaxError('Text inputs must have custom ids');
-        const placeholder = token.attributes.find(attr => attr[0] === 'placeholder');
-        const min = token.attributes.find(attr => attr[0] === 'min' || attr[0] === 'min-length');
-        const max = token.attributes.find(attr => attr[0] === 'max' || attr[0] === 'max-length');
-        const required = token.attributes.some(attr => attr[0] === 'required');
+        const paragraph = pure
+            ? expectBoolean(token.attributes, ['paragraph', 'long'], pure) +1
+            : `(${expectBoolean(token.attributes, ['paragraph', 'long'], pure)}) +1`;
         return `{
-            type: 4,
-            custom_id: ${customId[1]},
-            style: ${token.attributes.some(attr => attr[0] === 'paragraph' || attr[0] === 'long') +1},
-            placeholder: ${placeholder?.[1]},
-            value: ${expectChildText(token.children)},
-            min_length: ${min?.[1]},
-            max_length: ${max?.[1]},
-            required: ${required?.[1]}
+            "type": 4,
+            "custom_id": ${expectString(token.attributes, ['id', 'custom-id'], pure)},
+            "style": ${paragraph},
+            "placeholder": ${expectString(token.attributes, ['placeholder'], pure)},
+            "value": ${expectChildText(token.children, pure)},
+            "min_length": ${expectString(token.attributes, ['min', 'min-length'], pure)},
+            "max_length": ${expectString(token.attributes, ['max', 'max-length'], pure)},
+            "required": ${expectBoolean(token.attributes, ['required'], pure)}
         }`;
     }
     case 'file-input':
-    case 'file-upload': {
-        const customId = token.attributes.find(attr => attr[0] === 'id' || attr[0] === 'custom-id' || attr[0] === 'sku-id');
-        if (!customId) throw new SyntaxError('File inputs must have custom ids');
-        const fileTypes = token.attributes.find(attr => attr[0] === 'types');
-        const min = token.attributes.find(attr => attr[0] === 'min' || attr[0] === 'min-values');
-        const max = token.attributes.find(attr => attr[0] === 'max' || attr[0] === 'max-values');
-        const required = token.attributes.some(attr => attr[0] === 'required');
-        if (required && min && min[1] < 1) throw new SyntaxError('The minimum select count must be greater then zero if required!');
+    case 'file-upload': 
         return `{
-            type: 19,
-            file_types: ${fileTypes?.[1]},
-            custom_id: ${customId[1]},
-            min_values: ${min?.[1]},
-            max_values: ${max?.[1]}, 
-            required: ${required}
-        }`
-    }
-    case 'radio-group':
-    case 'radio': {
-        const customId = token.attributes.find(attr => attr[0] === 'id' || attr[0] === 'custom-id' || attr[0] === 'sku-id');
-        if (!customId) throw new SyntaxError('Radios must have custom ids');
-        const required = token.attributes.some(attr => attr[0] === 'required');
-        return `{
-            type: 19,
-            options: ${expectChildElements(token.children)},
-            custom_id: ${customId[1]},
-            required: ${required}
-        }`
-    }
-    case 'checkbox-group': {
-        const customId = token.attributes.find(attr => attr[0] === 'id' || attr[0] === 'custom-id' || attr[0] === 'sku-id');
-        if (!customId) throw new SyntaxError('Checkboxes must have custom ids');
-        const min = token.attributes.find(attr => attr[0] === 'min' || attr[0] === 'min-values');
-        const max = token.attributes.find(attr => attr[0] === 'max' || attr[0] === 'max-values');
-        const required = token.attributes.some(attr => attr[0] === 'required');
-        if (required && min && min[1] < 1) throw new SyntaxError('The minimum select count must be greater then zero if required!');
-        return `{
-            type: 22,
-            options: ${expectChildElements(token.children)},
-            custom_id: ${customId[1]},
-            min_values: ${min?.[1]},
-            max_values: ${max?.[1]}, 
-            required: ${required}
-        }`
-    }
-    case 'checkbox': {
-        const customId = token.attributes.find(attr => attr[0] === 'id' || attr[0] === 'custom-id' || attr[0] === 'sku-id');
-        if (!customId) throw new SyntaxError('Checkboxes must have custom ids');
-        const value = token.attributes.find(attr => attr[0] === 'default' || attr[0] === 'checked' || attr[0] === 'value');
-        return `{
-            type: 23,
-            custom_id: ${customId[1]},
-            default: ${value?.[1] ?? true}
-        }`
-    }
-    case 'container': {
-        const color = token.attributes.find(attr => attr[0] === 'color' || attr[0] === 'accent');
-        return `{
-            type: 17,
-            components: ${expectChildElements(token.children)},
-            accent_color: ${color?.[1]},
-            spoiler: ${token.attributes.some(attr => attr[0] === 'spoiler')}
+            "type": 19,
+            "file_types": ${expectString(token.attributes, ['types'], pure)},
+            "custom_id": ${expectString(token.attributes, ['id', 'custom-id'], pure)},
+            "min_values": ${expectString(token.attributes, ['min', 'min-values'], pure)},
+            "max_values": ${expectString(token.attributes, ['max', 'max-values'], pure)}, 
+            "required": ${expectBoolean(token.attributes, ['required'], pure)}
         }`;
-    }
+    case 'radio-group':
+    case 'radio': 
+        return `{
+            "type": 19,
+            "options": ${expectChildElements(token.children, null, pure)},
+            "custom_id": ${expectString(token.attributes, ['id', 'custom-id'], pure)},
+            "required": ${expectBoolean(token.attributes, ['required'], pure)}
+        }`;
+    case 'checkbox-group': 
+        return `{
+            "type": 22,
+            "options": ${expectChildElements(token.children, null, pure)},
+            "custom_id": ${expectString(token.attributes, ['id', 'custom-id'], pure)},
+            "min_values": ${expectNumber(token.attributes, ['min', 'min-values'], pure)},
+            "max_values": ${expectNumber(token.attributes, ['max', 'max-values'], pure)}, 
+            "required": ${expectBoolean(token.attributes, ['required'], pure)}
+        }`;
+    case 'checkbox': 
+        return `{
+            "type": 23,
+            "custom_id": ${expectString(token.attributes, ['id', 'custom-id'], pure)},
+            "required": ${expectBoolean(token.attributes, ['required'], pure)}
+        }`;
+    case 'container': 
+        return `{
+            "type": 17,
+            "components": ${expectChildElements(token.children, null, pure)},
+            "accent_color": ${expectNumber(token.attributes, ['color', 'accent'], pure)},
+            "spoiler": ${expectBoolean(token.attributes, ['spoiler'], pure)}
+        }`;
     case 'text-display':
     case 'text':
-        return `{ type: 10, content: ${expectChildText(token.children)} }`;
-    case 'seperator':
+        return `{ "type": 10, "content": ${expectChildText(token.children, pure)} }`;
+    case 'seperator': {
+        const large = pure
+            ? expectBoolean(token.attributes, ['large'], pure) +1
+            : `(${expectBoolean(token.attributes, ['large'], pure)}) +1`;
         return `{
-            type: 14,
-            divider: ${token.attributes.some(attr => attr[0] === 'solid')},
-            spacing: ${token.attributes.some(attr => attr[0] === 'large') +1}
+            "type": 14,
+            "divider": ${expectBoolean(token.attributes, ['solid'], pure)},
+            "spacing": ${large}
         }`;
+    }
     case 'media-gallery':
     case 'media':
-        return `{ type: 12, items: ${expectChildElements(token.children)} }`;
+        return `{ "type": 12, "items": ${expectChildElements(token.children, null, pure)} }`;
     case 'audio':
     case 'video':
     case 'image':
-    case 'img': {
-        const url = token.attributes.find(attr => attr[0] === 'src' || attr[0] === 'url' || attr[0] === 'source');
-        if (!url) throw new SyntaxError('Media url is not optional!');
-        const desc = token.attributes.find(attr => attr[0] === 'title' || attr[0] === 'description');
+    case 'img': 
         return `{
-            media: { url: ${url[1]} },
-            description: ${desc?.[1]},
-            spoiler: ${token.attributes.some(attr => attr[0] === 'spoiler')}
+            "media": { "url": ${expectString(token.attributes, ['src', 'url', 'source'], pure)} },
+            "description": ${expectString(token.attributes, ['title', 'description'], pure)},
+            "spoiler": ${expectBoolean(token.attributes, ['spoiler'], pure)}
         }`;
-    }
     case 'section': {
-        return `(() => {
-            const components = ${expectChildElements(token.children)};
-            const accessory = components.pop();
-            return { type: 9, components, accessory }
-        })()`;
+        const children = expectChildElements(token.children, null, pure);
+        const split = children.lastIndexOf('}, {');
+        return pure 
+            ? `{
+                "type": 9,
+                "components": ${children.slice(0, split +1)}],
+                "accessory": [${children.slice(split +3)}
+            }`
+            : `(() => {
+                const components = ${children};
+                const accessory = components.pop();
+                return { type: 9, components, accessory }
+            })()`;
     }
-    case 'thumbnail': {
-        const url = token.attributes.find(attr => attr[0] === 'src' || attr[0] === 'url' || attr[0] === 'source');
-        if (!url) throw new SyntaxError('Media url is not optional!');
-        const desc = token.attributes.find(attr => attr[0] === 'title' || attr[0] === 'description');
+    case 'thumbnail': 
         return `{
-            type: 11,
-            media: { url: ${url[1]} },
-            description: ${desc?.[1]},
-            spoiler: ${token.attributes.some(attr => attr[0] === 'spoiler')}
+            "type": 11,
+            "media": { "url": ${expectString(token.attributes, ['src', 'url', 'source'], pure)} },
+            "description": ${expectString(token.attributes, ['title', 'description'], pure)},
+            "spoiler": ${expectBoolean(token.attributes, ['spoiler'], pure)}
         }`;
-    }
     case 'action-row':
-    case 'row': {
-        return `{ type: 1, components: ${expectChildElements(token.children)} }`;
-    }
+    case 'row': 
+        return `{ "type": 1, "components": ${expectChildElements(token.children, null, pure)} }`;
     case 'button': {
-        const style = token.attributes.find(attr => attr[0] === 'style');
-        if (!style) throw new SyntaxError('Buttons must include a style!');
-        const emoji = token.attributes.find(attr => attr[0] === 'emoji');
-        const customId = token.attributes.find(attr => attr[0] === 'id' || attr[0] === 'custom-id' || attr[0] === 'sku-id');
-        if (customId && style[1] === 'link')
-            throw new SyntaxError('Link buttons can not have custom ids');
-        if (!customId && style[1] !== 'link')
-            throw new SyntaxError('None-link buttons must have custom ids');
-        const url = token.attributes.find(attr => attr[0] === 'url');
-        if (url && style[1] !== 'link')
-            throw new SyntaxError('Only link buttons are allowed to have links')
+        const style = expectString(token.attributes, ['style'], pure);
+        const customId = expectString(token.attributes, ['id', 'custom-id', 'sku-id'], pure);
         return `{
-            type: 2,
-            style: ${style[1]},
-            label: ${expectChildText(token.children)},
-            emoji: ${emoji?.[1]},
-            custom_id: ${style[1] !== 'premium' ? customId?.[1] : undefined},
-            sku_id: ${style[1] === 'premium' ? customId?.[1] : undefined},
-            url: ${url?.[1]},
-            disabled: ${token.attributes.some(attr => attr[0] === 'disabled')}
+            "type": 2,
+            "style": ${style},
+            "label": ${expectChildText(token.children, pure)},
+            "emoji": ${expectString(token.attributes, ['emoji'], pure)},
+            "custom_id": ${style !== 'premium' ? customId : undefined},
+            "sku_id": ${style === 'premium' ? customId : undefined},
+            "url": ${expectString(token.attributes, ['url'], pure)},
+            "disabled": ${expectBoolean(token.attributes, ['disabled'], pure)}
         }`;
     }
-    case 'option': {
-        const customId = token.attributes.find(attr => attr[0] === 'id' || attr[0] === 'value');
-        if (!customId[1]) throw new SyntaxError('Selection options must have values!');
-        const desc = token.attributes.find(attr => attr[0] === 'title' || attr[0] === 'description');
-        const emoji = token.attributes.find(attr => attr[0] === 'emoji');
-        const defaultKey = token.attributes.find(attr => attr[0] === 'default');
-
+    case 'option': 
         return `{
-            label: ${expectChildText(token.children)},
-            value: ${customId[1]},
-            description: ${desc?.[1]},
-            emoji: ${emoji?.[1]},
-            default: ${defaultKey?.[1] || !!defaultKey}
-        }`
-    }
+            "label": ${expectChildText(token.children, pure)},
+            "value": ${expectString(token.attributes, ['id', 'value'], pure)},
+            "description": ${expectString(token.attributes, ['title', 'description'], pure)},
+            "emoji": ${expectString(token.attributes, ['emoji'], pure)},
+            "default": ${expectBoolean(token.attributes, ['default'], pure)}
+        }`;
     case 'channel':
     case 'role':
-    case 'user': {
-        const id = token.attributes.find(attr => attr[0] === 'id' || attr[0] === 'value');
-        return `{ type: ${JSON.stringify(token.tagname)}, id: ${id[1]} }`
-    }
-    case 'user': return { type: 'user', id: token.children.join(' ') }
-    case 'role': return { type: 'role', id: token.children.join(' ') }
-    case 'channel': return { type: 'channel', id: token.children.join(' ') }
+    case 'user': 
+        return `{ "type": ${JSON.stringify(token.tagname)}, "id": ${expectString(token.attributes, ['id', 'value'], pure)} }`;
 
     case 'string-select':
     case 'user-select':
     case 'role-select':
     case 'channel-select':
     case 'mentionable-select':
-        const options = expectChildElements(token.children);
-        const customId = token.attributes.find(attr => attr[0] === 'id' || attr[0] === 'custom-id' || attr[0] === 'sku-id');
-        if (!customId) throw new SyntaxError('Selectors must have custom ids');
-        const channelTypes = token.attributes.find(attr => attr[0] === 'types');
-        const placeholder = token.attributes.find(attr => attr[0] === 'placeholder');
-        const min = token.attributes.find(attr => attr[0] === 'min' || attr[0] === 'min-values');
-        const max = token.attributes.find(attr => attr[0] === 'max' || attr[0] === 'max-values');
-        const required = token.attributes.some(attr => attr[0] === 'required');
-        if (required && min && min[1] < 1) throw new SyntaxError('The minimum select count must be greater then zero if required!');
+        const options = expectChildElements(token.children, null, pure);
         return `{
-            type: ${{ 'string-select': 3, 'user-select': 5, 'role-select': 6, 'mentionable-select': 7, 'channel-select': 8 }[token.tagname]},
-            options: ${token.tagname === 'string-select' ? options : undefined},
-            default_values: ${token.tagname !== 'string-select' ? options : undefined},
-            channel_types: ${channelTypes?.[1]},
-            custom_id: ${customId[1]},
-            placeholder: ${placeholder?.[1]},
-            min_values: ${min?.[1]},
-            max_values: ${max?.[1]}, 
-            required: ${required},
-            disabled: ${token.attributes.some(attr => attr[0] === 'disabled')}
+            "type": ${{ 'string-select': 3, 'user-select': 5, 'role-select': 6, 'mentionable-select': 7, 'channel-select': 8 }[token.tagname]},
+            "options": ${token.tagname === 'string-select' ? options : undefined},
+            "default_values": ${token.tagname !== 'string-select' ? options : undefined},
+            "channel_types": ${expectString(token.attributes, ['type'], pure)},
+            "custom_id": ${expectString(token.attributes, ['id', 'custom-id'], pure)},
+            "placeholder": ${expectString(token.attributes, ['placeholder'], pure)},
+            "min_values": ${expectNumber(token.attributes, ['min', 'min-values'], pure)},
+            "max_values": ${expectNumber(token.attributes, ['max', 'max-values'], pure)}, 
+            "required": ${expectBoolean(token.attributes, ['required'], pure)},
+            "disabled": ${expectBoolean(token.attributes, ['disabled'], pure)}
         }`
     }
 }
 
 global.nostd = true;
-module.exports = function(text) {
+module.exports = function(text, pure = false) {
     const tok = new Tokenizer(text, {
         end: /^(\/>|<\/(?:(?<namespace>[a-z$_][a-z$_0-9-]*):)?(?<tagname>[a-z$_][a-z$_0-9-]*\s*)>)/i,
         _(str) {
@@ -412,7 +372,7 @@ module.exports = function(text) {
 
     let off = 0;
     for (const usage of parseTokens(tokens, text)) {
-        const json = makeJSON(usage);
+        const json = makeJSON(usage, pure);
         text = `${text.slice(0, usage.start + off)}${json}${text.slice(usage.end + off)}`;
         off += json.length - (usage.end - usage.start)
     }
