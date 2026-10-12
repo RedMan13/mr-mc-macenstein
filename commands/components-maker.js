@@ -20,10 +20,10 @@ module.exports = {
      * @param {import('discord.js').Message} message
      */
     execute: async (message) => {
-        if (message.arguments.code.startsWith('```')) message.arguments.code = message.arguments.code.replace(/^```[a-z]*|```$/gi, '');
-        let output;
+        const code = message.arguments.code.replace(/^```[a-z]*|```$/gi, '');
+        let output = code;
         try {
-            const jSON = JSON.parse(output = embedBuilder(`<components>${message.arguments.code}</components>`, true));
+            const jSON = JSON.parse(output = embedBuilder(`<components>${code}</components>`, true));
             output = JSON.stringify(jSON, null, '\t');
             await message.reply({
                 flags: 'IsComponentsV2',
