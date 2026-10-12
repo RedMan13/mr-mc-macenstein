@@ -1,5 +1,21 @@
 const { Tokenizer, CJSHelpers: { jumpArbit } } = require('builder');
 
+function unescapeXML(text) {
+    if (typeof text !== 'string') return text;
+    return text.replace(/&([a-z0-9]+);/gi, (_, name) => {
+        switch (name) {
+        case 'lt': return '<';
+        case 'gt': return '>';
+        case 'amp': return '&';
+        case 'apos': return '\'';
+        case 'quot': return '\\"';
+        default:
+            if (!name[0] === '#') return _;
+            if (name[1] === 'x') return String.fromCodePoint(parseInt(name.slice(2), 16));
+            return String.fromCodePoint(parseInt(name.slice(1)));
+        }
+    })
+}
 function isUppercase(tag) {
     return 'QWERTYUIOPASDFGHJKLZXCVBNM'.includes(tag[0]);
 }
@@ -23,7 +39,7 @@ function isUppercase(tag) {
  * @typedef {[JSXStartToken, ...JSXAttributeToken, JSXAttributeCloseToken, JSXElementToken[], JSXEndToken]} JSXElementToken
  * @param {JSXElementToken[]} tokens 
  */
-function parseTokens(tokens, text) {
+function parseTokens(tokens, text, js) {
     const output = [];
     for (const batch of tokens) {
         const end = batch.at(-1);
@@ -51,15 +67,17 @@ function parseTokens(tokens, text) {
                     i = el.end -1;
                     continue;
                 }
-                if (text[i] === '{') {
-                    if (inside <= 0) children.push(['']);
-                    inside++;
-                    if (inside <= 1) continue;
-                }
-                if (text[i] === '}') {
-                    inside--;
-                    if (inside <= 0) children.push('');
-                    if (inside <= 0) continue;
+                if (js) {
+                    if (text[i] === '{') {
+                        if (inside <= 0) children.push(['']);
+                        inside++;
+                        if (inside <= 1) continue;
+                    }
+                    if (text[i] === '}') {
+                        inside--;
+                        if (inside <= 0) children.push('');
+                        if (inside <= 0) continue;
+                    }
                 }
                 if (inside > 0) {
                     const jmp = jumpArbit(text.slice(i));
@@ -97,7 +115,7 @@ function parseTokens(tokens, text) {
 function expectChildText(children, pure) {
     let out = '"';
     for (const child of children) {
-        if (typeof child === 'string') { out += JSON.stringify(child).slice(1, -1).replaceAll(',', '\\,'); continue; }
+        if (typeof child === 'string') { out += JSON.stringify(unescapeXML(child)).slice(1, -1).replaceAll(',', '\\,'); continue; }
         if (!Array.isArray(child) || pure) throw new TypeError('Children can only be text here!');
         out += '" + (';
         for (const part of child) {
@@ -130,20 +148,20 @@ function expectChildElements(children, maximum, pure) {
 function expectString(attributes, names, pure) {
     const attribute = attributes.find(attr => names.includes(attr[0]))?.[1];
     if (typeof attribute === 'undefined') return;
-    if (pure) return attribute[0] === '"' ? attribute : `"${attribute.slice(1,-1).replace(/(?<!\\)"/g, '\\"')}"`;
-    return attribute.startsWith('{') ? attribute.slice(1, -1) : attribute;
+    if (pure) return unescapeXML(attribute[0] === '"' ? attribute : `"${attribute.slice(1,-1).replace(/(?<!\\)"/g, '\\"')}"`);
+    return attribute.startsWith('{') ? attribute.slice(1, -1) : unescapeXML(attribute);
 }
 function expectNumber(attributes, names, pure) {
     const attribute = attributes.find(attr => names.includes(attr[0]))?.[1];
     if (typeof attribute === 'undefined') return;
-    if (pure) return Number(attribute.slice(1,-1));
-    return `Number(${attribute.startsWith('{') ? attribute.slice(1, -1) : attribute})`;
+    if (pure || /^['"]/.test(attribute)) return Number(unescapeXML(attribute.slice(1,-1)));
+    return `Number(${attribute.startsWith('{') ? attribute.slice(1, -1) : unescapeXML(attribute)})`;
 }
 function expectBoolean(attributes, names, pure) {
     const attribute = attributes.find(attr => names.includes(attr[0]))?.[1];
     if (typeof attribute === 'undefined') return false;
-    if (pure || /^['"]/.test(attribute)) return attribute.slice(1, -1).toLowerCase() !== 'false';
-    return attribute.startsWith('{') ? attribute.slice(1, -1) : attribute;
+    if (pure || /^['"]/.test(attribute)) return unescapeXML(attribute.slice(1, -1)).toLowerCase() !== 'false';
+    return attribute.startsWith('{') ? attribute.slice(1, -1) : unescapeXML(attribute);
 }
 
 function makeJSON(token, pure) {
@@ -235,7 +253,7 @@ function makeJSON(token, pure) {
     case 'media-gallery':
     case 'media':
         return `{ "type": 12, "items": ${expectChildElements(token.children, null, pure)} }`;
-    case 'audio':
+    // case 'audio': // audio isnt a valid media item, for some fucking reason
     case 'video':
     case 'image':
     case 'img': 
@@ -306,7 +324,7 @@ function makeJSON(token, pure) {
             "type": ${{ 'string-select': 3, 'user-select': 5, 'role-select': 6, 'mentionable-select': 7, 'channel-select': 8 }[token.tagname]},
             "options": ${token.tagname === 'string-select' ? options : undefined},
             "default_values": ${token.tagname !== 'string-select' ? options : undefined},
-            "channel_types": ${expectString(token.attributes, ['type'], pure)},
+            "channel_types": ${pure ? expectString(token.attributes, ['types'], pure).split(',') : expectString(token.attributes, ['types'], pure)},
             "custom_id": ${expectString(token.attributes, ['id', 'custom-id'], pure)},
             "placeholder": ${expectString(token.attributes, ['placeholder'], pure)},
             "min_values": ${expectNumber(token.attributes, ['min', 'min-values'], pure)},
@@ -371,7 +389,7 @@ module.exports = function(text, pure = false) {
     const tokens = tok.getGroups(['start', '*attributes', '?close', '^', 'end']);
 
     let off = 0;
-    for (const usage of parseTokens(tokens, text)) {
+    for (const usage of parseTokens(tokens, text, !pure)) {
         const json = makeJSON(usage, pure);
         text = `${text.slice(0, usage.start + off)}${json}${text.slice(usage.end + off)}`;
         off += json.length - (usage.end - usage.start)
