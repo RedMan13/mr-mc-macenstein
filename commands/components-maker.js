@@ -3,7 +3,7 @@ const embedBuilder = require('../statics/discord-embeds.js');
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'components-maker',
-    alias: ['v2-maker', 'components-v2', 'components-helper', 'v2-helper'],
+    aliases: ['v2-maker', 'components-v2', 'components-helper', 'v2-helper'],
     category: 'languages',
     sDesc: 'Helps with making discord components V2',
     lDesc: 'Uses a bespoke XML format to help produce discord components V2',
@@ -20,7 +20,7 @@ module.exports = {
      * @param {import('discord.js').Message} message
      */
     execute: async (message) => {
-        const code = message.arguments.code.replace(/^```[a-z]*|```$/gi, '');
+        const code = message.arguments.components.replace(/^```[a-z]*|```$/gi, '');
         let output = code;
         try {
             const jSON = JSON.parse(output = embedBuilder(`<components>${code}</components>`, true));
