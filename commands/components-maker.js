@@ -191,7 +191,12 @@ module.exports = {
             output = JSON.stringify(jSON, null, '\t');
             await message.reply({
                 flags: 'IsComponentsV2',
-                components: jSON
+                components: jSON,
+                allowedMentions: {
+                    users: [],
+                    roles: [],
+                    repliedUser: true
+                }
             });
         } catch (err) {
             console.log(err);

@@ -147,13 +147,13 @@ function expectChildElements(children, maximum, pure) {
 }
 function expectString(attributes, names, pure) {
     const attribute = attributes.find(attr => names.includes(attr[0]))?.[1];
-    if (typeof attribute === 'undefined') return;
+    if (typeof attribute === 'undefined') return null;
     if (pure) return unescapeXML(attribute[0] === '"' ? attribute : `"${attribute.slice(1,-1).replace(/(?<!\\)"/g, '\\"')}"`);
     return attribute.startsWith('{') ? attribute.slice(1, -1) : unescapeXML(attribute);
 }
 function expectNumber(attributes, names, pure) {
     const attribute = attributes.find(attr => names.includes(attr[0]))?.[1];
-    if (typeof attribute === 'undefined') return;
+    if (typeof attribute === 'undefined') return null;
     if (pure || /^['"]/.test(attribute)) return Number(unescapeXML(attribute.slice(1,-1)));
     return `Number(${attribute.startsWith('{') ? attribute.slice(1, -1) : unescapeXML(attribute)})`;
 }
@@ -295,8 +295,8 @@ function makeJSON(token, pure) {
             "style": ${style},
             "label": ${expectChildText(token.children, pure)},
             "emoji": ${expectString(token.attributes, ['emoji'], pure)},
-            "custom_id": ${style !== 'premium' ? customId : undefined},
-            "sku_id": ${style === 'premium' ? customId : undefined},
+            "custom_id": ${style !== 'premium' ? customId : null},
+            "sku_id": ${style === 'premium' ? customId : null},
             "url": ${expectString(token.attributes, ['url'], pure)},
             "disabled": ${expectBoolean(token.attributes, ['disabled'], pure)}
         }`;
@@ -322,8 +322,8 @@ function makeJSON(token, pure) {
         const options = expectChildElements(token.children, null, pure);
         return `{
             "type": ${{ 'string-select': 3, 'user-select': 5, 'role-select': 6, 'mentionable-select': 7, 'channel-select': 8 }[token.tagname]},
-            "options": ${token.tagname === 'string-select' ? options : undefined},
-            "default_values": ${token.tagname !== 'string-select' ? options : undefined},
+            "options": ${token.tagname === 'string-select' ? options : null},
+            "default_values": ${token.tagname !== 'string-select' ? options : null},
             "channel_types": ${pure ? expectString(token.attributes, ['types'], pure).split(',') : expectString(token.attributes, ['types'], pure)},
             "custom_id": ${expectString(token.attributes, ['id', 'custom-id'], pure)},
             "placeholder": ${expectString(token.attributes, ['placeholder'], pure)},
