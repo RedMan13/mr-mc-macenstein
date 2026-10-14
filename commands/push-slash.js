@@ -3,6 +3,7 @@ const syncSlash = require('@frostzzone/discord-sync-commands');
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'push-slash',
+    aliases: ['push-commands'],
     category: 'hidden',
     sDesc: 'Pushes the current slash commands.',
     lDesc: 'Pushes the current slash command list from the bot to discord.',
