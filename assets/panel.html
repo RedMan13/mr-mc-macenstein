@@ -31,6 +31,25 @@
             overflow-wrap: anywhere;
         }
 
+        .process-list.error::before { content: 'Error, failed to fetch processes.'; }
+        .process-list.error {
+            color: white;
+            background-color: grey;
+            animation: 500ms ease-out 1 red-hit;
+            box-shadow: 0 0 8px grey;
+            animation: name duration timing-function delay iteration-count direction fill-mode;
+        }
+        @keyframes red-hit {
+            from {
+                background-color: red;
+                box-shadow: 0 0 18px red;
+            }
+            to {
+                background-color: grey;    
+                box-shadow: 0 0 8px grey;
+            }
+        }
+
         .add-process {
             height: 24px;
             width: 100%;
@@ -66,7 +85,7 @@
         <input type="checkbox" id="restarts">
         <img class="button" src="/icons/execute.svg" id="execute">
     </div>
-    <div id="process-list"></div>
+    <div id="process-list" class="process-list"></div>
     <div popover="manual" id="text-suggestions" class="text-suggestions"></div>
     <script>
         const name = document.getElementById('name');
@@ -198,18 +217,22 @@
             memory.innerText = makeMega(proc.memory);
         }
 
-        async function getProcesses() {
+        setInterval(async () => {
             const oldElements = document.getElementsByClassName('process');
 
-            const procs = await fetch('/spawned').then(req => req.json());
+            const procs = await fetch('/spawned').then(req => req.json()).catch(() => {});
+            if (!procs) {
+                for (const el of oldElements) el.remove();
+                processList.classList.add('error');
+                return;
+            }
+            processList.classList.remove('error');
 
             for (const el of oldElements) 
                 if (!procs.some(proc => proc.name === el.id))
                     el.remove();
             procs.forEach(proc => makeProcessWidget(proc));
-            setTimeout(getProcesses, 2000);
-        }
-        getProcesses();
+        }, 1000);
 
 
         let suggestionsChangeListener;

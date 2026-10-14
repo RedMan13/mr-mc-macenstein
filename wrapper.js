@@ -1,3 +1,15 @@
+// for any future usage of this utility, edit this to reference the correct name and file if package.json is missing or invalid
+const package = require('./package.json');
+const main = {
+    name: package.name,
+    spawn: require.resolve('.'),
+    args: [],
+    options: {
+        cwd: __dirname,
+        restarts: true
+    }
+};
+
 const child = require('child_process');
 const bodyParser = require('body-parser');
 const { WebSocketExpress } = require('websocket-express');
@@ -10,6 +22,12 @@ try {
     electron = require('electron');
 } catch (err) { console.warn('No electron!'); }
 
+process.on('uncaughtException', err => {
+    // wrapper can not crash under ANY CIRCUMSTANCE
+    console.error(err);
+    // if an error was thrown, it could have affected the startup of the main process
+});
+
 /** @type {{ [key: name]: child.ChildProcessWithoutNullStreams }} */
 const spawned = {};
 const spawnProc = (name, spawn, args, options) => { args ??= []; options ??= {};
@@ -17,18 +35,19 @@ const spawnProc = (name, spawn, args, options) => { args ??= []; options ??= {};
         spawned[name].allowStop = true;
         spawned[name].kill();
     }
-    const sister = /\.[mc]?js$/i.test(spawn) 
-        ? child.fork(spawn, Object.assign(options, { stdio: 'pipe' }))
-        : child.spawn(spawn, args, Object.assign(options, { stdio: 'pipe' }));
-    sister.allowStop = false;
     const log = getFile(name);
     log.write(`file: ${spawn}, arguments: ${args}, options: ${JSON.stringify(options)}\n`);
+    const sister = /\.[mc]?js$/i.test(spawn) 
+        ? child.fork(spawn, Object.assign(options, { stdio: 'pipe', env: { LOG_FILE: log.path } }))
+        : child.spawn(spawn, args, Object.assign(options, { stdio: 'pipe', env: { LOG_FILE: log.path } }));
+    sister.allowStop = false;
     sister.stdout.pipe(log);
     sister.stderr.pipe(log);
     // sister.stdout.pipe(process.stdout);
     // sister.stderr.pipe(process.stderr);
     sister.spawnOptions = options;
     sister.spawnFile = spawn;
+    sister.logFile = log;
     spawned[name] = sister;
     sister.on('message', msg => {
         if (msg.spawn) spawnProc(msg.name, msg.spawn, msg.args, msg.options);
@@ -63,7 +82,7 @@ const spawnProc = (name, spawn, args, options) => { args ??= []; options ??= {};
 
     return sister;
 }
-spawnProc('mister-mc-macenstein', require.resolve('./index.js'), null, { cwd: __dirname, restarts: true });
+spawnProc(main.name, main.spawn, main.args, main.options);
 
 const app = new WebSocketExpress();
 app.use(bodyParser.json({ type: () => true }));
@@ -81,7 +100,7 @@ app.get('/executables', async (req, res) => {
     res.send({
         allFiles: filtered,
         defaults: [
-            { name: 'media-status-manager', spawn: './media-status.js', options: { restarts: true } },
+            main,
             { name: 'mister-mc-macentstein', spawn: './index.js', options: { restarts: true } },
             { name: 'overlay-manager', spawn: electron, args: ['./electron/index.js'], options: { restarts: true } }
         ]
@@ -125,13 +144,8 @@ app.delete('/spawned/:name', (req, res) => {
     spawned[req.params.name].kill();
 });
 app.get('/logs/:name', async (req, res) => {
-    const dirs = await fs.readdir(path.resolve(__dirname, 'logs', req.params.name)).catch(() => {});
-    if (!dirs) {
-        res.status(404);
-        res.send();
-        return;
-    }
-    res.sendFile(path.resolve(__dirname, 'logs', req.params.name, dirs.at(-1)));
+    const sister = spawned[req.params.name];
+    res.sendFile(sister.logFile.path);
 });
 app.ws('/logs/:name', async (req, res) => {
     if (!(req.params.name in spawned)) {
@@ -142,11 +156,18 @@ app.ws('/logs/:name', async (req, res) => {
     const socket = await res.accept();
     const sister = spawned[req.params.name];
     const pipeSocket = data => socket.send(data.toString());
+    const exit = () => {
+        sister.stdout.off('data', pipeSocket);
+        sister.stderr.off('data', pipeSocket);
+        socket.close();
+    }
     sister.stdout.on('data', pipeSocket);
     sister.stderr.on('data', pipeSocket);
+    sister.on('exit', exit);
     socket.onclose = () => {
         sister.stdout.off('data', pipeSocket);
         sister.stderr.off('data', pipeSocket);
+        sister.off('exit', exit);
     }
 })
 app.useHTTP((req, res) => {
@@ -154,4 +175,20 @@ app.useHTTP((req, res) => {
     if (req.path === '/') name = './panel.html';
     res.sendFile(path.resolve(__dirname, 'assets', name))
 });
-app.listen(2000, () => { console.log('Dashboard open to http://localhost:2000') });
+
+let port = 2000;
+function listen() {
+    app.listen(port, error => {
+        if (port >= 3000) {
+            console.log('Could not get a port open the dashboard.');
+            console.error(error);
+            return;
+        }
+        if (error) {
+            console.log(`Failed to lock in ${port}`);
+            listen(port++);
+            return;
+        }
+        console.log(`Dashboard open to http://localhost:${port}`)
+    });
+}; listen();
