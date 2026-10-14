@@ -1,5 +1,5 @@
 const { AttachmentBuilder } = require('discord.js');
-const { Canvas } = require('skia-canvas');
+const { Canvas } = require('../statics/canvas');
 
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {

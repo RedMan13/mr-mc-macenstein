@@ -1,4 +1,4 @@
-const { Canvas, loadImage, CanvasGradient } = require('skia-canvas');
+const { Canvas, loadImage, CanvasGradient } = require('../statics/canvas');
 const { rgbToHsv, hsvToRgb, rgbToString } = require('../statics/color');
 const sharp = require('sharp');
 const { AttachmentBuilder } = require('discord.js');

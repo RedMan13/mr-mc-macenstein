@@ -1,4 +1,4 @@
-const { Canvas, loadImage, FontLibrary } = require('skia-canvas');
+const { isSkia, isCairo, Canvas, loadImage, FontLibrary } = require('../statics/canvas');
 const { AttachmentBuilder } = require('discord.js');
 const path = require('path');
 
@@ -23,7 +23,7 @@ module.exports = {
      * @param {import('discord.js').Message} message
      */
     execute: async (message) => {
-        const template = await loadImage(path.resolve(__dirname, '../assets/defeat-someone.png'));
+        const template = await loadImage(path.resolve(__dirname, '../assets/defeat-someone.png')).catch(err => Promise.reject(new Error('Failed to load template', { cause: err })));
         const targetUser = matchUser.test(message.arguments.name)
             ? (await imports.client.users.fetch(message.arguments.name.match(matchUser)[1]))
             : message.reference
@@ -31,34 +31,38 @@ module.exports = {
                 : message.author;
         const iconURL = message.attachments.size >= 1
             ? message.attachments.at(0).url
-            : targetUser.avatarURL();
+            : targetUser.avatarURL({ extension: 'jpeg' });
         const defeated = message.arguments.name && !matchUser.test(message.arguments.name ?? '')
             ? message.arguments.name
             : targetUser.displayName ?? targetUser.username;
-        const icon = await loadImage(iconURL);
+        const icon = await loadImage(iconURL).catch(err => {});
         const can = new Canvas(template.width, template.height);
         const ctx = can.getContext('2d');
         ctx.drawImage(template, 0,0);
 
         ctx.save();
-        ctx.translate(940, 265);
+        ctx.translate(940, 330);
         ctx.rotate(-6 / 180 * Math.PI);
 
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.ellipse(300,75, 100,100, 0, 0, Math.PI *2);
-        ctx.fill();
-        ctx.globalCompositeOperation = 'destination-over';
-        ctx.drawImage(icon, 200,-25, 200,200);
-        ctx.globalCompositeOperation = 'source-over';
+        if (icon) {
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.ellipse(300,30, 100,100, 0, 0, Math.PI *2);
+            ctx.fill();
+            ctx.globalCompositeOperation = 'destination-over';
+            ctx.drawImage(icon, 200,-70, 200,200);
+            ctx.globalCompositeOperation = 'source-over';
+        }
 
         ctx.font = '700 600px Wolpe Fanfare';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
         ctx.fillStyle = '#823e54';
-        const { width } = ctx.measureText(defeated);
-        ctx.scale(can.width / Math.max(width, can.width), 1);
+        if (isSkia) {
+            const { width } = ctx.measureText(defeated);
+            ctx.scale(can.width / Math.max(width, can.width), 1);
+        }
         ctx.transform(1,0, -Math.tan(6 * Math.PI / 180), 1,0,0);
-        ctx.fillText(defeated, 0,0);
+        ctx.fillText(defeated.toUpperCase(), 0,0, isCairo && can.width);
         ctx.restore();
 
         message.reply({
