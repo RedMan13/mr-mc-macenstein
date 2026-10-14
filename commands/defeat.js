@@ -39,19 +39,28 @@ module.exports = {
         const can = new Canvas(template.width, template.height);
         const ctx = can.getContext('2d');
         ctx.drawImage(template, 0,0);
+
         ctx.save();
         ctx.translate(940, 265);
         ctx.rotate(-6 / 180 * Math.PI);
+
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.ellipse(300,75, 100,100, 0, 0, Math.PI *2);
+        ctx.fill();
+        ctx.globalCompositeOperation = 'destination-over';
+        ctx.drawImage(icon, 200,-25, 200,200);
+        ctx.globalCompositeOperation = 'source-over';
+
         ctx.font = '700 600px Wolpe Fanfare';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
         ctx.fillStyle = '#823e54';
-        ctx.drawImage(icon, 200,-25, 200,200);
         const { width } = ctx.measureText(defeated);
         ctx.scale(can.width / Math.max(width, can.width), 1);
         ctx.transform(1,0, -Math.tan(6 * Math.PI / 180), 1,0,0);
         ctx.fillText(defeated, 0,0);
         ctx.restore();
+
         message.reply({
             files: [
                 new AttachmentBuilder(await can.toBuffer(), { name: 'defeat.png', description: 'defeat' })
