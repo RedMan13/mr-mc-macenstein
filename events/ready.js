@@ -54,6 +54,7 @@ module.exports = {
                 global.delete('restartMessage');
             }
             global.set('restarted', false);
+            global.save(true);
         }
 
 

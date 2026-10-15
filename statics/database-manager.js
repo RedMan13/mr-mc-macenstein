@@ -45,7 +45,6 @@ class RootDatabase {
         if (!this._needsWrite && !forced) return;
         // never save if the database is empty and was empty
         if (Object.keys(this._data).length <= 0 && this.wasEmpty) return;
-        clearTimeout(this._taboutTimeout);
         if (!forced) console.log(`saving ${this._name}...`);
         await this._saveInternal();
         this._needsWrite = false;

@@ -12,7 +12,11 @@ module.exports = {
      * @param {import('discord.js').Message} message
      */
     execute: async (message) => {
-        const data = await fs.readFile(process.env.LOG_FILE);
-        message.reply(`\`\`\`ansi\n${data.toString().replaceAll('```', '``\x1b[m`').slice(-1989)}\`\`\``);
+        const data = await fs.readFile(process.env.LOG_FILE, 'utf8');
+        const sent = data
+            .replaceAll('```', '``\x1b[m`')
+            .slice(-1989)
+            .replaceAll(imports.client.token, imports.client._censoredToken);
+        message.reply(`\`\`\`ansi\n${sent}\`\`\``);
     },
 };
