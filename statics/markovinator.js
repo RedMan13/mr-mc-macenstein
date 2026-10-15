@@ -83,7 +83,7 @@ class Markov {
             if (!canEnd && char.endsWith(this.finisher)) continue;
             if (pick < level) return char;
         }
-        return '\n';
+        return this.makeStarter();
     }
     generate(starter, minimum = 20, divider = this.divider) {
         let failedToFind = false;
