@@ -31,6 +31,7 @@ const KeyWords = server.model('key-words', KeyWord);
 class RootDatabase {
     _name = '';
     _data = {};
+    _deathTimes = {};
     _needsWrite = false;
     _resolveLoaded = null;
     _saveInterval = null;
@@ -70,7 +71,11 @@ class RootDatabase {
     sub(key) { this._data[key]--; this._needsWrite = true; }
     has(key) { return key in this._data; }
     get(key) { return this._data[key]; }
-    set(key, value) { this._data[key] = value; this._needsWrite = true; }
+    set(key, value, ttl = -1) {
+        this._data[key] = value;
+        if (ttl >= 0) this._deathTimes[key] = Date.now() + ttl;
+        this._needsWrite = true;
+    }
     delete(key) { delete this._data[key]; this._needsWrite = true; }
     flush() { this._needsWrite = true; }
 }
