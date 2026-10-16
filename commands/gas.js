@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { EmbedBuilder } = require('discord.js');
 const Markov = require('../statics/markovinator.js');
+const escape = require('regexp.escape'); // gross
 const markov = new Markov(null, '\n');
 const text = fs.readFileSync(path.resolve(__dirname, '../assets/gsa.txt'), 'utf8');
 // chunks are divided by one of
@@ -10,7 +11,7 @@ const text = fs.readFileSync(path.resolve(__dirname, '../assets/gsa.txt'), 'utf8
 // the following is `|(?<=[^a-z0-9 ])(?=[a-z0-9])|(?<=[^a-z0-9])(?= )` and was removed to make the bot more literate
 // a spoken character (including space) followed by a none-spoken character (without removing either)
 // a none-spoken character followed by a space (without removing either)
-markov.feed(text, /(?<=\n)|(?<=[a-z0-9])(?=[^a-z0-9])/gi);
+markov.feed(text, /(?<=\n)|(?<=[a-z0-9])(?=[^a-z0-9])/gi); 
 
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
@@ -67,6 +68,15 @@ module.exports = {
             })
             return;
         }
+        markov.censorRules = (await message.guild.autoModerationRules.fetch())
+            .map(autorule => [
+                autorule.triggerMetadata.keywordFilter
+                    .map(word => ({ exception: false, match: new RegExp(escape(word), 'i') })),
+                autorule.triggerMetadata.allowList
+                    .map(word => ({ exception: true, match: new RegExp(escape(word), 'i') })),
+                autorule.triggerMetadata.regexPatterns
+                    .map(regex => ({ exception: false, match: new RegExp(regex.replace(/\(\?[a-z]+\)/ig, ''), 'imgs')}))
+            ]).flat(3);
         message.reply({
             content: markov.generate(message.arguments.word, 3, '').slice(0, 2000),
             allowedMentions: {

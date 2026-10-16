@@ -7,8 +7,11 @@ function renderServerSettings(settings, page = 'commands', userOnly, userSetting
 
     const usesBlacklist = !settings.has('blacklist-channels') || settings.get('blacklist-channels');
     const channelsList = settings.get('channels-list');
+    const allCommandsDisabled = settings.has('disable-commands');
 
     const ratReact = !settings.has('rat-reactions') || settings.get('rat-reactions');
+
+    const scamBan = settings.get('ban-scammers');
 
     const pingsOnErrors = !userSettings.has('wordchains-ping') || userSettings.get('wordchains-ping');
     const ratReactsToThem = !userSettings.has('rat-reactions') || userSettings.get('rat-reactions');
@@ -18,16 +21,16 @@ function renderServerSettings(settings, page = 'commands', userOnly, userSetting
             <text>## Word Chains Ping</text>,
             <text>If i should ping you whenever you make a mistake in wordchains.</text>,
             <row>
-                <button id="configure.wordchains-ping.enable" style={pingsOnErrors ? ButtonStyle.Primary : ButtonStyle.Secondary}>Enabled</button>
-                <button id="configure.wordchains-ping.disable" style={!pingsOnErrors ? ButtonStyle.Primary : ButtonStyle.Secondary}>Disabled</button>
+                <button id={`configure.wordchains-ping.enable..${page}`} style={pingsOnErrors ? ButtonStyle.Primary : ButtonStyle.Secondary}>Enabled</button>
+                <button id={`configure.wordchains-ping.disable..${page}`} style={!pingsOnErrors ? ButtonStyle.Primary : ButtonStyle.Secondary}>Disabled</button>
             </row>
         ],
         ['rat-reacts-me']: [
             <text>## Rat Reacts (to you)</text>,
             <text>If the bot should be allowed to react with 🐀 when rat, cheese, 🐀, or 🧀 are used in your messages.</text>,
             <row>,
-                <button id="configure.rat-react-user.enable" style={ratReactsToThem ? ButtonStyle.Primary : ButtonStyle.Secondary}>Enabled</button>
-                <button id="configure.rat-react-user.disable" style={!ratReactsToThem ? ButtonStyle.Primary : ButtonStyle.Secondary}>Disabled</button>
+                <button id={`configure.rat-react-user.enable..${page}`} style={ratReactsToThem ? ButtonStyle.Primary : ButtonStyle.Secondary}>Enabled</button>
+                <button id={`configure.rat-react-user.disable..${page}`} style={!ratReactsToThem ? ButtonStyle.Primary : ButtonStyle.Secondary}>Disabled</button>
             </row>
         ]
     };
@@ -67,7 +70,7 @@ function renderServerSettings(settings, page = 'commands', userOnly, userSetting
                     <button id={`configure.rat-react.enable..${page}`} style={ratReact ? ButtonStyle.Primary : ButtonStyle.Secondary}>Enabled</button>
                     <button id={`configure.rat-react.disable..${page}`} style={!ratReact ? ButtonStyle.Primary : ButtonStyle.Secondary}>Disabled</button>
                 </row>
-            ],
+            ], 
             ['commands']: [
                 <text>## Commands</text>,
                 <row>
@@ -80,7 +83,20 @@ function renderServerSettings(settings, page = 'commands', userOnly, userSetting
                         {channelsList && channelsList.map(channel => (<channel id={channel}/>))}
                     </channel-select>
                 </row>,
+                <text>### All Commands {allCommandsDisabled ? ' Enabled' : ' Disabled'}</text>,
+                <row>
+                    <button id={`configure.commands-enabled.enable..${page}`} style={!allCommandsDisabled ? ButtonStyle.Primary : ButtonStyle.Secondary}>Enable All</button>
+                    <button id={`configure.commands-enabled.disable..${page}`} style={allCommandsDisabled ? ButtonStyle.Primary : ButtonStyle.Secondary}>Disable All</button>
+                </row>,
                 <text>Use `mc;configure [command]` to configure each individual command.</text>
+            ],
+            ['scam-ban']: [
+                <text>## Automatic Scam Ban</text>,
+                <text>Automatically bans any detected scams.</text>,
+                <row>
+                    <button id={`configure.scam-ban.enable..${page}`} style={scamBan ? ButtonStyle.Primary : ButtonStyle.Secondary}>Enabled</button>
+                    <button id={`configure.scam-ban.disable..${page}`} style={!scamBan ? ButtonStyle.Primary : ButtonStyle.Secondary}>Disabled</button>
+                </row>
             ]
         });
 
@@ -88,7 +104,6 @@ function renderServerSettings(settings, page = 'commands', userOnly, userSetting
         <row> 
             <string-select id="configure.change-page" max="1" min="1" placeholder="Category">
                 {Object.entries(pages).map(([name, content]) => (<option id={name} default={page === name}>{content[0].content.slice(3)}</option>))}
-                <option id="all" title="Shows every single option available" default={page === 'all'}>All</option>
             </string-select>
         </row>
         {page === 'all' ? Object.values(pages).flatMap(components => components) : pages[page] ?? <text>Uh Oh! Invalid page</text>}
@@ -171,6 +186,10 @@ module.exports = {
             if (userOnly) message.reply({ content: 'No!', flags: 'Ephemeral' });
             settings.set('channels-list', message.channels.map(channel => channel.id));
             break;
+        case 'commands-enabled':
+            if (userOnly) message.reply({ content: 'No!', flags: 'Ephemeral' });
+            settings.set('disable-commands', boolean !== 'enable');
+            break;
         case 'blacklist-channels':
             if (userOnly) message.reply({ content: 'No!', flags: 'Ephemeral' });
             settings.set('blacklist-channels', boolean === 'enable');
@@ -186,6 +205,10 @@ module.exports = {
         case 'word-chains':
             if (userOnly) message.reply({ content: 'No!', flags: 'Ephemeral' });
             settings.set('wordchains-enabled', boolean === 'enable');
+            break;
+        case 'scam-ban':
+            if (userOnly) message.reply({ content: 'No!', flags: 'Ephemeral' });
+            settings.set('ban-scammers', boolean === 'enable');
             break;
         default:
             if (message.arguments.command) {

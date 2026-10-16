@@ -13,19 +13,23 @@ module.exports = {
             if (!dbs.commands[command].enabled && dbs.commands[command].work !== 'all') return;
 
             const settings = await dbs.database.server(message.channel.guild.id);
-            if (settings.has('channels-list')) {
-                const usesBlacklist = !settings.has('blacklist-channels') || settings.get('blacklist-channels');
-                const list = settings.get('channels-list');
-                // xor my beloved
-                if (usesBlacklist === list.includes(message.channel.id)) return;
-            }
+            if (!message.member.permissions.has('Administrator')) {
+                if (settings.has('channels-list')) {
+                    const usesBlacklist = !settings.has('blacklist-channels') || settings.get('blacklist-channels');
+                    const list = settings.get('channels-list');
+                    // xor my beloved
+                    if (usesBlacklist === list.includes(message.channel.id)) return;
+                }
+                if (settings.get('disable-commands')) return;
 
-            if (settings.has(`${command}-enabled`) && !settings.get(`${command}-enabled`)) return;
-            if (settings.has(`${command}-channels-list`)) {
-                const usesBlacklist = !settings.has(`${command}-blacklist-channels`) || settings.get(`${command}-blacklist-channels`);
-                const list = settings.get(`${command}-channels-list`);
-                // xor my beloved
-                if (usesBlacklist === list.includes(message.channel.id)) return;
+                if (settings.has(`${command}-enabled`) && !settings.get(`${command}-enabled`))
+                    return;
+                if (settings.has(`${command}-channels-list`)) {
+                    const usesBlacklist = !settings.has(`${command}-blacklist-channels`) || settings.get(`${command}-blacklist-channels`);
+                    const list = settings.get(`${command}-channels-list`);
+                    // xor my beloved
+                    if (usesBlacklist === list.includes(message.channel.id)) return;
+                }
             }
 
             const commandData = dbs.commands[command].command;

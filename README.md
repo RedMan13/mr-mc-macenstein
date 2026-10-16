@@ -8,7 +8,9 @@ idk
 
 [Overlay engine](<./electron/>)
 
-[General utilities & APIs (And the config)](<./statics/>)
+[General utilities & APIs](<./statics/>)
+
+[Config](<./statics/config.json>)
 
 > Object type formating is similar to typescript formating, a question marked type/constant can be null or undefined aswell as the type, but the key must exist. question marked keys are optional and can simply not exist.
 

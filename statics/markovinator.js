@@ -59,6 +59,7 @@ class Markov {
             let level = 0;
             for (const char in this.chars) {
                 level += this.chars[char];
+                if (this.isCensored(char)) continue;
                 if (!char || char.endsWith(this.finisher)) continue;
                 if (pick < level) return char;
             }
@@ -68,8 +69,9 @@ class Markov {
     isCensored(chunk) {
         let matched = false;
         for (let i = 0; i < this.censorRules.length; i++) {
-            matched = this.censorRules[i].match.test(chunk);
+            matched = this.censorRules[i].match.exec(chunk);
             if (this.censorRules[i].exception && matched) return false;
+            if (matched) break;
         }
         return matched;
     }
@@ -80,6 +82,7 @@ class Markov {
         let level = 0;
         for (const char in this.chances[chunk].chars) {
             level += this.chances[chunk].chars[char];
+            if (this.isCensored(char)) continue;
             if (!canEnd && char.endsWith(this.finisher)) continue;
             if (pick < level) return char;
         }
@@ -104,6 +107,14 @@ class Markov {
             count++;
         }
         if (failedToFind) acc += '\n-# The provided starting chunk could not be found!';
+        
+        let offset = 0;
+        let match;
+        while (match = this.isCensored(acc)) {
+            const end = match.index + match[0].length;
+            acc = acc.slice(0, match.index) + acc.slice(end);
+            offset -= match[0].length;
+        }
 
         return acc;
     }

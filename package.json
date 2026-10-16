@@ -28,6 +28,8 @@
         "opencl-raub": "^2.0.1",
         "os-utils": "0.0.14",
         "pidusage": "^4.0.1",
+        "puppeteer": "^25.14.0",
+        "regexp.escape": "^2.0.1",
         "sharp": "^0.35.5",
         "skia-canvas": "^3.0.8",
         "speaker": "^0.5.5",

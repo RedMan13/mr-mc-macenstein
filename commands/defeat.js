@@ -57,11 +57,11 @@ module.exports = {
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
         ctx.fillStyle = '#823e54';
+        ctx.transform(1,0, -Math.tan(6 * Math.PI / 180), 1,0,0);
         if (isSkia) {
             const { width } = ctx.measureText(defeated);
             ctx.scale(can.width / Math.max(width, can.width), 1);
         }
-        ctx.transform(1,0, -Math.tan(6 * Math.PI / 180), 1,0,0);
         ctx.fillText(defeated.toUpperCase(), 0,0, isCairo && can.width);
         ctx.restore();
 

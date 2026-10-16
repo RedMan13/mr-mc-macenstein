@@ -3,7 +3,7 @@ const package = require('./package.json');
 const main = {
     name: package.name,
     spawn: require.resolve('.'),
-    args: [],
+    // args: ['--inspect'],
     options: {
         cwd: __dirname,
         restarts: true
@@ -40,6 +40,7 @@ const spawnProc = (name, spawn, args, options) => { args ??= []; options ??= {};
     const sister = /\.[mc]?js$/i.test(spawn) 
         ? child.fork(spawn, Object.assign(options, { stdio: 'pipe', env: { LOG_FILE: log.path } }))
         : child.spawn(spawn, args, Object.assign(options, { stdio: 'pipe', env: { LOG_FILE: log.path } }));
+    console.log('Spawned', name)
     sister.allowStop = false;
     sister.stdout.pipe(log);
     sister.stderr.pipe(log);
@@ -76,8 +77,10 @@ const spawnProc = (name, spawn, args, options) => { args ??= []; options ??= {};
             for (const sister of Object.values(spawned)) sister.kill();
             process.exit();
         }
-        if (sister.allowStop) return;
-        spawnProc(name, spawn, args, options);
+        if (sister.allowStop) return console.log('Killed', name);
+        console.log(name, 'died to', code);
+        if (options.restarts)
+            spawnProc(name, spawn, args, options);
     });
 
     return sister;

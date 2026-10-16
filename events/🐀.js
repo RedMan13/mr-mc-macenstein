@@ -8,6 +8,7 @@ module.exports = {
         const settings = await dbs.database.server(message.channel.guild.id);
         if (settings.has('rat-reactions') && !settings.get('rat-reactions')) return;
         if (userSettings.has('rat-reactions') && !userSettings.get('rat-reactions')) return;
+        if (message.cleanContent.includes('trap')) message.react('🪤');
         if (!/🧀|🐀|cheese|(\s+|^)rat(\s+|$)/ig.test(message.cleanContent)) return;
         message.react('🐀');
     },

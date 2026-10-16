@@ -52,7 +52,7 @@ function parseTokens(tokens, text, js) {
             : batch.slice(1, -3);
         const children = [''];
         if (!isShorthand) { 
-            const elements = parseTokens(batch.at(-2), text);
+            const elements = parseTokens(batch.at(-2), text, js);
             const mid = batch.find(tok => tok.name === 'close');
             let inside = 0;
             let lineStart = true;
