@@ -44,6 +44,7 @@ module.exports = {
         user.delete('content-hash');
         user.delete('file-hashes');
         // the user has posted the exact same content more then three times in distinct channels, which suggests a scam
+        dbs.channels.console.send(`Scammer ${message.author} fount`);
         message.member.ban({ deleteMessageSeconds: 60 * 60, reason: 'Appeared to be a Scammer' });
     },
 };
