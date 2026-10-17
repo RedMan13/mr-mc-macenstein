@@ -30,16 +30,25 @@ process.on('uncaughtException', err => {
 
 /** @type {{ [key: name]: child.ChildProcessWithoutNullStreams }} */
 const spawned = {};
-const spawnProc = (name, spawn, args, options) => { args ??= []; options ??= {};
+const spawnProc = (name, spawn, args, options) => { args ??= [];
     if (spawned[name]) {
         spawned[name].allowStop = true;
         spawned[name].kill();
     }
     const log = getFile(name);
     log.write(`file: ${spawn}, arguments: ${args}, options: ${JSON.stringify(options)}\n`);
+
+    options = Object.assign(options ?? {}, {
+        stdio: 'pipe',
+        env: {
+            LOG_FILE: log.path,
+            ...process.env,
+            ...options.env
+        }
+    });
     const sister = /\.[mc]?js$/i.test(spawn) 
-        ? child.fork(spawn, Object.assign(options, { stdio: 'pipe', env: { LOG_FILE: log.path, ...process.env } }))
-        : child.spawn(spawn, args, Object.assign(options, { stdio: 'pipe', env: { LOG_FILE: log.path, ...process.env } }));
+        ? child.fork(spawn, options)
+        : child.spawn(spawn, args, options);
     console.log('Spawned', name)
     sister.allowStop = false;
     sister.stdout.pipe(log);
