@@ -38,8 +38,8 @@ const spawnProc = (name, spawn, args, options) => { args ??= []; options ??= {};
     const log = getFile(name);
     log.write(`file: ${spawn}, arguments: ${args}, options: ${JSON.stringify(options)}\n`);
     const sister = /\.[mc]?js$/i.test(spawn) 
-        ? child.fork(spawn, Object.assign(options, { stdio: 'pipe', env: { LOG_FILE: log.path } }))
-        : child.spawn(spawn, args, Object.assign(options, { stdio: 'pipe', env: { LOG_FILE: log.path } }));
+        ? child.fork(spawn, Object.assign(options, { stdio: 'pipe', env: { LOG_FILE: log.path, ...process.env } }))
+        : child.spawn(spawn, args, Object.assign(options, { stdio: 'pipe', env: { LOG_FILE: log.path, ...process.env } }));
     console.log('Spawned', name)
     sister.allowStop = false;
     sister.stdout.pipe(log);
