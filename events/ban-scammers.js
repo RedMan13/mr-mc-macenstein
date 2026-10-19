@@ -15,6 +15,8 @@ module.exports = {
 
         if (message.channelId === user.get('last-channel')) return;
         user.set('last-channel', message.channelId);
+        if (message.guildId === user.get('last-guild')) return;
+        user.set('last-guild', message.guildId);
 
         const oldHash = user.get('content-hash');
         const text = hash('sha256', message.content);
