@@ -38,18 +38,16 @@ module.exports = {
         const icon = await loadImage(iconURL).catch(err => {});
         const can = new Canvas(template.width, template.height);
         const ctx = can.getContext('2d');
-        ctx.drawImage(template, 0,0);
 
         ctx.save();
         ctx.translate(940, 330);
         ctx.rotate(-6 / 180 * Math.PI);
 
         if (icon) {
-            ctx.globalCompositeOperation = 'destination-out';
+            ctx.drawImage(icon, 200,-70, 200,200);
+            ctx.globalCompositeOperation = 'destination-in';
             ctx.ellipse(300,30, 100,100, 0, 0, Math.PI *2);
             ctx.fill();
-            ctx.globalCompositeOperation = 'destination-over';
-            ctx.drawImage(icon, 200,-70, 200,200);
             ctx.globalCompositeOperation = 'source-over';
         }
 
@@ -64,6 +62,9 @@ module.exports = {
         }
         ctx.fillText(defeated.toUpperCase(), 0,0, isCairo && can.width);
         ctx.restore();
+        
+        ctx.globalCompositeOperation = 'destination-over';
+        ctx.drawImage(template, 0,0);
 
         message.reply({
             files: [
