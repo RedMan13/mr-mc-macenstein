@@ -71,7 +71,7 @@ module.exports = {
         const fields = [
             { name: 'Computer Uptime', value: makeVerbose(os.uptime()) },
             { name: 'Bot Uptime', value: makeVerbose((Date.now() - dbs.startedAt) / 1000) },
-            { name: 'Watch Dog Presence', value: dbs.lost ? 'Missing' : 'Live' },
+            // { name: 'Watch Dog Presence', value: dbs.lost ? 'Missing' : 'Live' },
             { name: 'Battery', value: (battery.hasBattery ? battery.percentage + '%' : 'None') +
                 (battery.charging ? ' (Plugged)' : ' (Unplugged)') + (battery.diesAt ? (battery.isDying ? ' Dies' : ' Charged') + ' <t:' + battery.diesAt + ':R>' : '') },
             { name: 'Recieve Ping', value: `${rating.ping}ms` },
