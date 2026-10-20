@@ -79,7 +79,6 @@ module.exports = {
         ctx.drawImage(template, 0,0);
 
         message.reply({
-            content: `\`${width}\`, \`${can.width / Math.max(width, can.width)}\``,
             files: [
                 new AttachmentBuilder(await can.toBuffer(), { name: 'defeat.png', description: 'defeat' })
             ]
