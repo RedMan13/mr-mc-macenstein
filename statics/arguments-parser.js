@@ -67,7 +67,7 @@ module.exports = async (message, args, slash) => {
             if (!argContent.endsWith(right) && argIndex === args.length-1) valid = false
             if (argContent.startsWith(left) && !isInString) isInString = argIndex
             if (argContent.endsWith(right)) {
-                result[name] = messageSplit.slice(isInString, argIndex+1).join(' ')
+                result[name] = messageSplit.slice(isInString, argIndex+1).join(' ').slice(1,-1);
                 messageSplit.splice(isInString, argIndex - isInString)
                 argIndex = isInString
                 isInString = 0
