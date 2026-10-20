@@ -25,7 +25,7 @@ module.exports = {
      * @param {import('discord.js').Message} message
      */
     execute: async (message) => {
-        const template = await loadImage(path.resolve(__dirname, '../assets/defeat-someone.png')).catch(err => Promise.reject(new Error('Failed to load template', { cause: err })));
+        const template = await loadImage(path.resolve(__dirname, '../assets/defeat-someone.png'));
         const targetUser = matchUser.test(message.arguments.name)
             ? (await imports.client.users.fetch(message.arguments.name.match(matchUser)[1]))
             : message.reference
@@ -34,9 +34,10 @@ module.exports = {
         const iconURL = message.attachments.size >= 1
             ? message.attachments.at(0).url
             : targetUser.avatarURL({ extension: 'jpeg' });
-        const defeated = message.arguments.name && !matchUser.test(message.arguments.name ?? '')
+        const defeated = (message.arguments.name && !matchUser.test(message.arguments.name ?? '')
             ? message.arguments.name
-            : targetUser.displayName ?? targetUser.username;
+            : targetUser.displayName ?? targetUser.username)
+            .toUpperCase();
         const icon = await loadImage(iconURL).catch(err => {});
         const can = new Canvas(template.width, template.height);
         const ctx = can.getContext('2d');
@@ -69,14 +70,14 @@ module.exports = {
         ctx.transform(1,0, -Math.tan(6 * Math.PI / 180), 1,0,0);
         const { width } = ctx.measureText(defeated);
         ctx.scale(can.width / Math.max(width, can.width), 1);
-        ctx.fillText(defeated.toUpperCase(), 0,0);
+        ctx.fillText(defeated, 0,0);
         ctx.restore();
         
         ctx.globalCompositeOperation = 'destination-over';
         ctx.drawImage(template, 0,0);
 
         message.reply({
-            content: `\`${width}\`, \`${width / can.width}\``,
+            content: `\`${width}\`, \`${can.width / Math.max(width, can.width)}\``,
             files: [
                 new AttachmentBuilder(await can.toBuffer(), { name: 'defeat.png', description: 'defeat' })
             ]
