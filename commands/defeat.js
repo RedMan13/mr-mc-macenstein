@@ -2,6 +2,8 @@ const { isSkia, isCairo, Canvas, loadImage, FontLibrary } = require('../statics/
 const { AttachmentBuilder } = require('discord.js');
 const path = require('path');
 
+const rootWidth = 1920;
+const rootHeight = 1080;
 const matchUser = /\<@([0-9]+)\>/;
 FontLibrary.use('Wolpe Fanfare', path.resolve(__dirname, '../assets/wolpe-fanfare.ttf'));
 /** @type {import('../index.js').CommandDefinition} */
@@ -40,13 +42,22 @@ module.exports = {
         const ctx = can.getContext('2d');
 
         ctx.save();
-        ctx.translate(940, 330);
+        ctx.translate(
+            940 / rootWidth * can.width,
+            330 / rootHeight * can.height
+        );
         ctx.rotate(-6 / 180 * Math.PI);
 
         if (icon) {
-            ctx.drawImage(icon, 200,-70, 200,200);
+            ctx.drawImage(icon,
+                200 / rootWidth * can.width, -70 / rootHeight * can.height, 
+                200 / rootWidth * can.width, 200 / rootHeight * can.height
+            );
             ctx.globalCompositeOperation = 'destination-in';
-            ctx.ellipse(300,30, 100,100, 0, 0, Math.PI *2);
+            ctx.ellipse(
+                300 / rootWidth * can.width, 30 / rootHeight * can.height, 
+                100 / rootWidth * can.width, 100 / rootHeight * can.height,
+            0, 0, Math.PI *2);
             ctx.fill();
             ctx.globalCompositeOperation = 'source-over';
         }
