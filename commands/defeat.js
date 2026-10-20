@@ -62,15 +62,13 @@ module.exports = {
             ctx.globalCompositeOperation = 'source-over';
         }
 
-        ctx.font = '700 600px Wolpe Fanfare';
+        ctx.font = `700 ${600 / rootWidth * can.width}px Wolpe Fanfare`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
         ctx.fillStyle = '#823e54';
         ctx.transform(1,0, -Math.tan(6 * Math.PI / 180), 1,0,0);
-        if (isSkia || true) {
-            const { width } = ctx.measureText(defeated);
-            ctx.scale(can.width / Math.max(width, can.width), 1);
-        }
+        const { width } = ctx.measureText(defeated);
+        ctx.scale(can.width / Math.max(width, can.width), 1);
         ctx.fillText(defeated.toUpperCase(), 0,0);
         ctx.restore();
         
@@ -78,6 +76,7 @@ module.exports = {
         ctx.drawImage(template, 0,0);
 
         message.reply({
+            content: `\`${width}\`, \`${width / can.width}\``,
             files: [
                 new AttachmentBuilder(await can.toBuffer(), { name: 'defeat.png', description: 'defeat' })
             ]
