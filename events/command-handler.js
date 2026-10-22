@@ -2,8 +2,10 @@ module.exports = {
     name: 'messageCreate',
     once: false,
     global: true,
+    /** @param {import('discord.js').Message} message */
     execute: async (message) => {
         if (!dbs.commandConfig.prefix) return;
+        if (message.author.bot) return;
         if (message.content.startsWith(dbs.commandConfig.prefix)) {
             const args = message.content.split(' ');
             let command = args.shift().slice(dbs.config.commands.prefix.length);
