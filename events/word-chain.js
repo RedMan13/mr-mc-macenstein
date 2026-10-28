@@ -52,7 +52,7 @@ async function checkMessage(message) {
         wordChains.send(words.slice(start, end));
         wordErrors.send('Oops! that cant be right!');
     }
-    if (messageChannel.get(filtered.at(-1)) < 0) return `\`${filtered.at(-1)}\` has been all used up!`;
+    if (messageChannel.get(filtered.at(-1)) >= topCounts[letter]) return `\`${filtered.at(-1)}\` has been all used up!`;
 
     if (messageChannel.get('lastUser') === message.author.id) return `You are not allowed to submit back to back!`;
 
@@ -67,8 +67,6 @@ async function checkMessage(message) {
     if (!messageChannel.has(letter))
         messageChannel.set(letter, 0);
     messageChannel.add(letter);
-    if (messageChannel.get(letter) >= topCounts[letter])
-        messageChannel.set(letter, -1);
 
     return false;
 }
