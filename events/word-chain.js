@@ -44,8 +44,8 @@ async function checkMessage(message) {
             .filter(([letter, count]) => messageChannel.get(letter) < count)
             .map(([letter]) => letter);
         const letter = availableLetters[Math.floor(Math.random() * availableLetters.length)];
-        const end = words.indexOf(letter + ',');
-        const start = words.lastIndexOf(',', end);
+        const end = words.indexOf(letter + ',') +1;
+        const start = words.lastIndexOf(',', end) +1;
         const wordChains = await imports.client.channels.fetch(settings.get('wordchains-channel'));
         const wordErrors = await imports.client.channels.fetch(settings.get('word-errors-channel'));
         
