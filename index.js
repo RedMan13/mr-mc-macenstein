@@ -141,7 +141,7 @@ function loadCommand(file, enabled = false) {
             command.aliases.forEach(name => dbs.commands[name] = { aliasFor: command.name })
         return command.name;
     } catch (err) {
-        dbs.commandFailures[path.relative(__dirname, file)] = err.message;
+        dbs.commandFailures[path.relative(__dirname, file)] = err.message.split('\n')[0];
         return null
     }
 }
