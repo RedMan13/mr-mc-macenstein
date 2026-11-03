@@ -5,7 +5,6 @@ module.exports = {
     /** @param {import('discord.js').Message} message */
     execute: async (message) => {
         if (!dbs.commandConfig.prefix) return;
-        if (message.author.bot) return;
         if (message.content.startsWith(dbs.commandConfig.prefix)) {
             const args = message.content.split(' ');
             let command = args.shift().slice(dbs.config.commands.prefix.length);
@@ -13,6 +12,7 @@ module.exports = {
             if ('aliasFor' in dbs.commands[command])
                 command = dbs.commands[command].aliasFor;
             if (!dbs.commands[command].enabled && dbs.commands[command].work !== 'all') return;
+            if (message.author.bot && command !== 'rate') return;
 
             const settings = await dbs.database.server(message.channel.guild.id);
             if (!message.member.permissions.has('Administrator')) {
