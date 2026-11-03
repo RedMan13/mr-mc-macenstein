@@ -21,7 +21,11 @@ module.exports = {
         dbs.channels = Object.fromEntries(await Promise.all(Object.entries(dbs.config.channels)
             .map(async ([name, id]) => [name, await client.channels.fetch(id).catch(console.warn)])));
         dbs.channelsLoaded = true;
-        dbs.channels.console.send(`Ready! Logged in as ${client.user.tag}`);
+        let readyMessage = `Ready! Logged in as ${client.user.tag}`
+        for (const file in dbs.commandFailures)
+            readyMessage += `\n- \`${file}\`: ${dbs.commandFailures[file]}`;
+        delete dbs.commandFailures;
+        dbs.channels.console.send(readyMessage);
         for (const name of ['log', 'warn', 'error', 'debug', 'info']) {
             const item = console[name];
             console[name] = function(...args) {
@@ -31,7 +35,6 @@ module.exports = {
             };
         }
 
-        // not used for now, cant fgure out why its blocking mouse inputs
         try {
             const electron = require('electron');
             process.send({
@@ -66,7 +69,6 @@ module.exports = {
                 shard.on('resumed', onRun);
         }
         dbs.needsAppended = [];
-
 
         fs.stat(textSamples)
             .catch(async () => {

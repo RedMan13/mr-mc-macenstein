@@ -24,7 +24,8 @@ require.extensions['.js'] = (module, filename) => {
         const lines = text.split('\n');
         const focus = lines.slice(line -1, line +2);
         focus.splice(2, 0, '> ' + err.message);
-        console.error(focus.join('\n'))
+        console.error(focus.join('\n'));
+        throw err;
     }
 }
 
@@ -94,7 +95,8 @@ globalThis.dbs = { // databases
     lost: true,
     needsAppended: [],
     trainingData: fs.readFileSync(path.resolve(__dirname, './assets/samples.txt'), 'utf8'),
-    onNewData: {}
+    onNewData: {},
+    commandFailures: {}
 }
 
 /**
@@ -139,7 +141,7 @@ function loadCommand(file, enabled = false) {
             command.aliases.forEach(name => dbs.commands[name] = { aliasFor: command.name })
         return command.name;
     } catch (err) {
-        console.warn('\t' + err.message.split('\n')[0]);
+        dbs.commandFailures[path.relative(__dirname, file)] = err.message;
         return null
     }
 }
