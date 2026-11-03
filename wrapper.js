@@ -38,7 +38,7 @@ const spawnProc = (name, spawn, args, options) => { args ??= [];
     const log = getFile(name);
     log.write(`file: ${spawn}, arguments: ${args}, options: ${JSON.stringify(options)}\n`);
 
-    options = Object.assign(options ?? {}, {
+    const opts = Object.assign(options ?? {}, {
         stdio: 'pipe',
         env: {
             LOG_FILE: log.path,
@@ -47,8 +47,8 @@ const spawnProc = (name, spawn, args, options) => { args ??= [];
         }
     });
     const sister = /\.[mc]?js$/i.test(spawn) 
-        ? child.fork(spawn, options)
-        : child.spawn(spawn, args, options);
+        ? child.fork(spawn, opts)
+        : child.spawn(spawn, args, opts);
     console.log('Spawned', name)
     sister.allowStop = false;
     sister.stdout.pipe(log);
@@ -153,6 +153,7 @@ app.delete('/spawned/:name', (req, res) => {
         res.send();
         return;
     }
+    spawned[req.params.name].allowStop = true;
     spawned[req.params.name].kill();
 });
 app.get('/logs/:name', async (req, res) => {
