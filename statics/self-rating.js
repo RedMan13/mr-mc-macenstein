@@ -4,6 +4,9 @@ let lastCpus = os.cpus().map(cpu => Object.entries(cpu.times));
 module.exports = function rate(initiator, describe = false) {
     const ratings = [];
 
+    // check ping early, since its meant to be network ping
+    const ping = Date.now() - initiator;
+
     // if this particular 
     const parrel = os.availableParallelism();
     ratings.push(['Cores', Math.min((parrel / 16) * 3, 3)]);
@@ -31,7 +34,6 @@ module.exports = function rate(initiator, describe = false) {
     if (freeMem <= 0.15) ratings.splice(0, ratings.length, ['Memory', 0]); // adding zero isnt enough, if we dont have enough memory we need to simply never use this host
 
     // piss poor ping will disqualify this particular host
-    const ping = Date.now() - initiator;
     if (ping > 4000) ratings.splice(0, ratings.length, ['Ping', 1]);
     if (ping > 20000) ratings.splice(0, ratings.length, ['Ping', 0]);
 
