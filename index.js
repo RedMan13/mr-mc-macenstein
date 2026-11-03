@@ -20,11 +20,7 @@ require.extensions['.js'] = (module, filename) => {
     try {
         module._compile(text, filename);
     } catch (err) {
-        const line = parseInt(err.stack.split('\n')[0].split(':').at(-1));
-        const lines = text.split('\n');
-        const focus = lines.slice(line -1, line +2);
-        focus.splice(2, 0, '> ' + err.message);
-        console.error(focus.join('\n'));
+        console.error(err);
         throw err;
     }
 }
