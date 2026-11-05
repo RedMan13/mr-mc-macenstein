@@ -94,14 +94,14 @@ module.exports = async (message, args, slash) => {
         case 'channel':
             let channel = argContent
             channel = channel.match(/(?:<#)?([0-9]+)>?/i);
-            channel = await imports.client.channels.fetch(channel).catch(err => console.warn(err));
+            channel = await imports.client.channels.fetch(channel?.[1]).catch(err => console.warn(err));
             if (!channel) return `The argument "${name}" has to be a real channel`;
             result[name] = channel;
             break;
         case 'role':
             let role = argContent
             role = role.match(/(?:<@&)?([0-9]+)>?/i);
-            role = await message.guild.roles.fetch(role).catch(err => console.warn(err));
+            role = await message.guild.roles.fetch(role?.[1]).catch(err => console.warn(err));
             if (!role) return `The argument "${name}" has to be a real role`
             result[name] = role;
             break;
