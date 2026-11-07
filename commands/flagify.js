@@ -14,10 +14,6 @@ const innerFlagWidth = canvasWidth - (flagOutlineWidth + poleWidth);
 const innerFlagHeight = flagHeight - flagOutlineWidth;
 const rippleHeight = canvasWidth * 0.0390625;
 
-const gradient = new CanvasGradient('linear', 0,0, 0,innerFlagHeight);
-gradient.addColorStop(0, '#00000000');
-gradient.addColorStop(1, '#00000040');
-
 /** @param {CanvasRenderingContext2D} ctx */
 const pole = ctx => {
     ctx.beginPath();
@@ -49,6 +45,9 @@ module.exports = {
     execute: async (message) => {
         const canvas = new Canvas(canvasWidth, canvasHeight);
         const ctx = canvas.getContext('2d');
+        const gradient = ctx.createLinearGradient(0,0, 0,innerFlagHeight);
+        gradient.addColorStop(0, '#00000000');
+        gradient.addColorStop(1, '#00000040');
 
         // load attached image, if any, and extract meta from it like the primary color
         let imageDraw = () => {}
