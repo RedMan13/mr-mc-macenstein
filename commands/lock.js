@@ -7,7 +7,7 @@ module.exports = {
     category: 'operator',
     sDesc: 'locks (sleeps) the target host',
     lDesc: 'Makes the target host lock itself then go to sleep.',
-    work: 'all',
+    work: 'pc',
     args: [
         {
             type: 'any',
