@@ -21,7 +21,7 @@ module.exports = {
         dbs.channels = Object.fromEntries(await Promise.all(Object.entries(dbs.config.channels)
             .map(async ([name, id]) => [name, await client.channels.fetch(id).catch(console.warn)])));
         dbs.channelsLoaded = true;
-        let readyMessage = `Ready! Logged in as ${client.user.tag}`
+        let readyMessage = `Ready! Setup as ${dbs.id} (${dbs.alias})`
         for (const file in dbs.commandFailures)
             readyMessage += `\n- \`${file}\`: ${dbs.commandFailures[file]}`;
         delete dbs.commandFailures;
