@@ -208,9 +208,9 @@ async function checkBattery() {
     if (!info.hasBattery) return;
 
     if (info.charging && info.isDying)
-        dbs.channels.console.send(`<@${dbs.config.users.owner}> Battery isnt charging on ${dbs.alias}!! dying in <t:${info.diesAt}:R>`);
+        dbs.channels.console.send(`<@${dbs.config.users.owner}> Battery isnt charging on ${dbs.alias}!! dying <t:${info.diesAt}:R>`);
     else if (info.charging && !wasPluggedIn)
-        dbs.channels.console.send(`<@${dbs.config.users.owner}> Plugged in ${dbs.alias}, charged in <t:${info.diesAt}:R>`);
+        dbs.channels.console.send(`<@${dbs.config.users.owner}> Plugged in ${dbs.alias}, charged <t:${info.diesAt}:R>`);
     wasPluggedIn = info.charging;
 
     if (info.charging && batteryWarnings >= 0) batteryWarnings = -1;
@@ -221,15 +221,15 @@ async function checkBattery() {
         batteryWarnings--;
     }
     if (info.percentage < 30 && batteryWarnings === 0) {
-        dbs.channels.console.send(`<@${dbs.config.users.owner}> Plug in ${dbs.alias} please, dying in <t:${info.diesAt}:R>`);
+        dbs.channels.console.send(`<@${dbs.config.users.owner}> Plug in ${dbs.alias} please, dying <t:${info.diesAt}:R>`);
         batteryWarnings++;
     }
     if (info.percentage < 20 && batteryWarnings === 1) {
-        dbs.channels.console.send(`<@${dbs.config.users.owner}> Plug in ${dbs.alias} right now, dying in <t:${info.diesAt}:R>`);
+        dbs.channels.console.send(`<@${dbs.config.users.owner}> Plug in ${dbs.alias} right now, dying <t:${info.diesAt}:R>`);
         batteryWarnings++;
     }
     if (info.percentage < 10 && batteryWarnings === 2) {
-        dbs.channels.console.send(`<@${dbs.config.users.owner}> Plug me the FUCK in you utter BAFOON. ${dbs.alias} dying in <t:${info.diesAt}:R>`);
+        dbs.channels.console.send(`<@${dbs.config.users.owner}> Plug me the FUCK in you utter BAFOON. ${dbs.alias} dying <t:${info.diesAt}:R>`);
         batteryWarnings++;
     }
 
