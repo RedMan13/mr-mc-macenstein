@@ -214,7 +214,7 @@ async function checkBattery() {
     wasPluggedIn = info.charging;
 
     if (info.charging && batteryWarnings >= 0) batteryWarnings = -1;
-    if (!info.charging) batteryWarnings = 0;
+    if (!info.charging && batteryWarnings <= 0) batteryWarnings = 0;
 
     if (info.percentage >= 100 && batteryWarnings === -1) {
         dbs.channels.console.send(`<@${dbs.config.users.owner}> ${dbs.alias} has finished charging!`);
