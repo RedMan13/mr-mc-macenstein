@@ -208,7 +208,7 @@ async function checkBattery() {
     if (!info.hasBattery) return;
 
     if (info.charging && info.isDying)
-        dbs.channels.console.send(`<@${dbs.config.users.owner}> Battery isnt charging on ${dbs.alias}!!`);
+        dbs.channels.console.send(`<@${dbs.config.users.owner}> Battery isnt charging on ${dbs.alias}!! dying in <t:${info.diesAt}:R>`);
     else if (info.charging && !wasPluggedIn)
         dbs.channels.console.send(`<@${dbs.config.users.owner}> Plugged in ${dbs.alias}, charged in <t:${info.diesAt}:R>`);
     wasPluggedIn = info.charging;
