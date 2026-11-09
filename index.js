@@ -233,7 +233,7 @@ async function checkBattery() {
         batteryWarnings++;
     }
 
-    setImmediate(checkBattery);
+    setTimeout(checkBattery, 500);
 }; checkBattery();
 
 globalThis.stop = async () => {
