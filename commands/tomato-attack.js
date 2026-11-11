@@ -37,9 +37,7 @@ module.exports = {
         const req = await fetch(message.attachments.at(0).proxyURL);
         if (!['image/webp', 'image/gif', 'image/avif', 'image/png', 'image/jpeg', 'image/svg+xml'].includes(req.headers.get('content-type')))
             return rootMsg.edit('The image is in an unsupported format (supports png,jpeg,svg,webp,gif,avif ONLY)');
-        let image = Buffer.from(await req.bytes());
-        if (['image/webp', 'image/gif', 'image/avif'].includes(req.headers.get('content-type')))
-            image = sharp(image);
+        const image = sharp(Buffer.from(await req.bytes()));
         const background = await loadImage(image).catch(() => {});
 
         const scale = Math.min(500 / background.width, 1);
