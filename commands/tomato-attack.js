@@ -39,6 +39,10 @@ module.exports = {
             return rootMsg.edit('The image is in an unsupported format (supports png,jpeg,svg,webp,gif,avif ONLY)');
         const image = sharp(Buffer.from(await req.bytes()));
         const background = await loadImage(image).catch(() => {});
+        if (!background) {
+            rootMsg.delete();
+            return message.reply('Couldnt load the image :(');
+        }
 
         const scale = Math.min(500 / background.width, 1);
         const canvas = new Canvas(background.width * scale, background.height * scale);
