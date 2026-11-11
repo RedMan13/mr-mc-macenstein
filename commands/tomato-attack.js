@@ -24,8 +24,6 @@ module.exports = {
         leadingCount: [['leading-count', 'l'], { match: /^[0-9]+$/i, default: 6 }, 'How many tomatoes to start throwing, one at a time'],
         trailingCount: [['trailing-count', 't', 'c', 'default'], { match: /^(?:[0-9]+|\s*)$/i, default: 200 }, 'How many tomatoes to finish with'],
         frameRate: [['frame-rate', 'fps', 'f', 'r'], { match: /^[0-9]+$/i, default: 30 }, 'The framerate to throw tomatoes at']
-        // trailingTime: [['trailing-time', 'T', 'd'], { match: /^(?:[0-9]+(?:\.[0-9]+)?\s*[hms])+$/i, default: `${frames.length / frameRate}s` }, 'For just how long the final moments should last'],
-        // spread: [['s'], { match: /^[0-9]+$/i, default: 100 }, 'What percentage area of the image should be covered']
     },
     execute: async message => {
         const frameRate = Number(message.arguments.frameRate) || 60;
