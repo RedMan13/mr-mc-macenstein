@@ -30,11 +30,14 @@ module.exports = function parseArgs(argv, keys) {
         let needsAdvance = false;
         for (const key of keys) {
             if (key === 'default') continue;
-            if (!props[key]) return `Argument ${arg} does not exist`;
-            const hasValue = !props[key].noValue && ((arg[0] === '-' && (argv[i +1]?.[0] ?? '-') !== '-') || key === 'default' || key === lookup['default']);
+            if (!props[key])
+                return `Argument ${arg} does not exist`;
+            const isDefault = key === 'default';
+            const hasValue = !props[key].noValue && ((arg[0] === '-' && (argv[i +1]?.[0] ?? '-') !== '-') || key === lookup['default'] || isDefault);
             needsAdvance ||= arg[0] === '-' && hasValue;
-            if (hasValue && props[key].match && !props[key].match.test(argv[i +1])) return `Inputs for ${key} must conform to \`${props[key].match}\``;
             const value = !hasValue ? true : arg[0] !== '-' ? argv[i] : argv[i +1];
+            if (hasValue && props[key].match && !props[key].match.test(value))
+                return `Inputs for ${key} must conform to \`${props[key].match}\``;
             if (props[key].repeatable) args[key].push(value);
             else args[key] = value;
         }

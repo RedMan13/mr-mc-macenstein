@@ -3,7 +3,7 @@ const child = require('child_process');
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'lock',
-    alias: ['sleep'],
+    aliases: ['sleep'],
     category: 'operator',
     sDesc: 'locks (sleeps) the target host',
     lDesc: 'Makes the target host lock itself then go to sleep.',

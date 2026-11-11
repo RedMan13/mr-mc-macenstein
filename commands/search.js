@@ -36,7 +36,7 @@ const delimiter = /(?<=\n)|(?<=[a-z0-9])(?=[^a-z0-9])/gi;
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'search',
-    alias: ['lookup', 'what-is'],
+    aliases: ['lookup', 'what-is'],
     category: 'markov',
     sDesc: 'Searches the internet for some term.',
     lDesc: 'Looks up something with bing, then rewords it using markov.',
