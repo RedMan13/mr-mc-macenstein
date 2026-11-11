@@ -82,7 +82,8 @@ module.exports = {
             interaction.respond(completes);
             return;
         }
-        const command = dbs.commands[interaction.options.get('command').value];
+        let command = dbs.commands[interaction.options.get('command').value];
+        if ('aliasFor' in command) command = dbs.commands[command.aliasFor];
         if (!command?.enabled) return interaction.reply({ content: 'Command doesnt exist!!', ephumeral: true });
         await interaction.deferReply();
         const msg = new FakeMessage(interaction);
