@@ -38,7 +38,7 @@ const spawnProc = (name, spawn, args, options) => { args ??= [];
     const log = getFile(name);
     log.write(`file: ${spawn}, arguments: ${args}, options: ${JSON.stringify(options)}\n`);
 
-    const opts = Object.assign(options ?? {}, {
+    const opts = Object.assign({}, options ?? {}, {
         stdio: 'pipe',
         env: {
             LOG_FILE: log.path,

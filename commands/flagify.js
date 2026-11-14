@@ -51,13 +51,8 @@ module.exports = {
 
         // load attached image, if any, and extract meta from it like the primary color
         let imageDraw = () => {}
-        if (message.attachments.size >= 1) {
-            const rootMsg = await message.reply('Loading target image...');
-            const req = await fetch(message.attachments.at(0).proxyURL);
-            let image = Buffer.from(await req.bytes());
-            if (['image/webp', 'image/gif', 'image/avif'].includes(req.headers.get('content-type')))
-                image = sharp(image);
-            const toTransform = await loadImage(image).catch(() => {});
+        if (message.attachments.size >= 1 || message.reference) {
+            const toTransform = await imports.loadTargetImages(message);;
             if (!toTransform) return rootMsg.edit('The image is in an unsupported format (supports png,jpeg,svg,webp,gif,avif,pdf ONLY)');
 
             const scale = Math.min(innerFlagWidth / toTransform.width, innerFlagHeight / toTransform.height);

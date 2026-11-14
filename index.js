@@ -1,6 +1,8 @@
 console.log('starting...')  
 
 // require('./statics/uptimer');
+const { loadImage } = require('./statics/canvas');
+const sharp = require('sharp');
 const { Client, GatewayIntentBits } = require('discord.js');
 const { GoogleGenAI } = require("@google/genai");
 const { exec } = require("child_process");
@@ -69,6 +71,51 @@ globalThis.imports = {
         }
         
         return res;
+    },
+    /**
+     * @param {import('discord.js').Message} message 
+     * @returns {Promise<Buffer[]>}
+     */
+    async fetchTargetImages(message, limit) {
+        if (message.reference?.messageId)
+            message = await message.channel.messages.fetch(message.reference.messageId);
+
+        const links = [];
+        if (message.attachments?.size > 0) 
+            links.push(...message.attachments.map(attachment => attachment.proxyURL));
+        if (links.length <= 0)
+            links.push(
+                message.member?.avatarURL?.() ??
+                message.author.avatarURL() ??
+                `https://cdn.discordapp.com/embed/avatars/${+message.author.id % 6}.png`
+            );
+
+        if (typeof limit === 'number') // remove everything at and after length
+            links.splice(limit, links.length);
+
+        return Promise.all(links.map(url => fetch(url)
+            .then(async req => ({
+                contentType: req.headers.get('content-type'),
+                data: Buffer.from(await req.bytes())
+            }))));
+    },
+    /**
+     * @param {import('discord.js').Message} message 
+     * @param {number} [limit=1] 
+     * @returns {Promise<import('./statics/canvas').Image[]|import('./statics/canvas').Image>}
+     */
+    async loadTargetImages(message, limit = 1) {
+        const images = (await this.fetchTargetImages(message, limit))
+            .map(async asset => {
+                let image = asset.data;
+                if (['image/webp', 'image/gif', 'image/avif'].includes(asset.contentType))
+                    image = sharp(asset.data);
+                
+                return loadImage(image);
+            });
+
+        if (limit <= 1) return images[0];
+        return Promise.all(images);
     },
     client: new Client({ 
         intents: [

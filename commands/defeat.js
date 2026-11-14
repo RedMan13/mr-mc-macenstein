@@ -31,14 +31,11 @@ module.exports = {
             : message.reference
                 ? (await message.channel.messages.fetch(message.reference.messageId)).author
                 : message.author;
-        const iconURL = message.attachments.size >= 1
-            ? message.attachments.at(0).url
-            : targetUser.avatarURL({ extension: 'jpeg' });
         const defeated = (message.arguments.name && !matchUser.test(message.arguments.name ?? '')
             ? message.arguments.name
             : targetUser.displayName ?? targetUser.username)
             .toUpperCase();
-        const icon = await loadImage(iconURL).catch(err => {});
+        const icon = await imports.loadTargetImages(message);
         const can = new Canvas(template.width, template.height);
         const ctx = can.getContext('2d');
 

@@ -32,17 +32,10 @@ module.exports = {
         const frameCount = (tomatoRate * leadingCount) + frames.length;
         if (frameCount > 4000) return message.reply('Total gif length can not be longer then 3:20!');
 
-        if (!message.attachments.at(0)) return message.reply('You have to add an image silly!');
         const rootMsg = await message.reply('Loading target image...');
-        const req = await fetch(message.attachments.at(0).proxyURL);
-        if (!['image/webp', 'image/gif', 'image/avif', 'image/png', 'image/jpeg', 'image/svg+xml'].includes(req.headers.get('content-type')))
+        const background = await imports.loadTargetImages(message);
+        if (!background)
             return rootMsg.edit('The image is in an unsupported format (supports png,jpeg,svg,webp,gif,avif ONLY)');
-        const image = sharp(Buffer.from(await req.bytes()));
-        const background = await loadImage(image).catch(() => {});
-        if (!background) {
-            rootMsg.delete();
-            return message.reply('Couldnt load the image :(');
-        }
 
         const scale = Math.min(500 / background.width, 1);
         const canvas = new Canvas(background.width * scale, background.height * scale);
