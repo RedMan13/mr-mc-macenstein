@@ -32,7 +32,8 @@ module.exports = {
      */
     execute: async (message) => {
         if (message.arguments.word === 'has-said') {
-            let word = markov.findWord(message.args.split(' ').at(-1));
+            let word = message.args.indexOf('has-said ') + 9;
+            word = markov.findWord(message.args.slice(word));
             if (!word) {
                 const chances = Object.entries(markov.chars)
                     .sort((a,b) => b[1] - a[1])
