@@ -77,7 +77,7 @@ module.exports = {
                 </row>
             ]
         }
-        if (!isSelection || !message.update) message.reply(content);
+        if (!isSelection || !message.update) return message.reply(content);
         message.update(content);
     },
 };
