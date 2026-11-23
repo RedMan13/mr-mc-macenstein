@@ -5,7 +5,8 @@ const path = require('path');
 /** @type {import('../index.js').CommandDefinition} */
 module.exports = {
     name: 'help',
-    category: 'hidden',
+    aliases: [''],
+    category: 'info',
     sDesc: 'Gets help',
     lDesc: 'Sends the entire help list yippee',
     work: 'any',
@@ -20,7 +21,10 @@ module.exports = {
     /**
      * @param {import('discord.js').Message} message
      */
-    execute: async (message) => {
+    execute: async (message, isSelection) => {
+        let category = 'info';
+        if (isSelection) category = message.values[0];
+
         const commands = Object.keys(dbs.commands);
         const embed = {
             color: 0x33cc00,
@@ -29,7 +33,7 @@ module.exports = {
             timestamp: new Date().toISOString(),
         }
 
-        if (commands.includes(message.arguments.command)) {
+        if (message.arguments?.command && commands.includes(message.arguments.command)) {
             if ('aliasFor' in dbs.commands[message.arguments.command])
                 message.arguments.command = dbs.commands[message.arguments.command].aliasFor;
             const commandData = dbs.commands[message.arguments.command].command;
@@ -59,16 +63,21 @@ module.exports = {
         }
 
         embed.title = 'command list';
-        embed.fields = dbs.commandConfig.categorys
-            .map(category => ({
-                name: category,
-                value: commands
-                    .filter(command => dbs.commands[command].category === category && dbs.commands[command].enabled)
-                    .map(command => `\`${command}\` ${dbs.commands[command].description}`)
-                    .join('\n'),
-                inline: false
-            }))
-            .filter(v => v.value.length);
-        message.reply({ embeds: [embed] });
+        embed.description = commands
+            .filter(command => dbs.commands[command].category === category && dbs.commands[command].enabled)
+            .map(command => `\`${command}\` ${dbs.commands[command].description}`)
+            .join('\n');
+        const content = {
+            embeds: [embed], 
+            components: [
+                <row>
+                    <string-select id={`help.categorySelector`}>
+                        {dbs.commandConfig.categorys.map(name => (<option id={name} default={name === category}>{name}</option>))}
+                    </string-select>
+                </row>
+            ]
+        }
+        if (!isSelection) message.reply(content);
+        message.update(content);
     },
 };
