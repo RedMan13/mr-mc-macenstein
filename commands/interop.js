@@ -77,6 +77,7 @@ module.exports = {
             const value = interaction.options.get('command').value;
             const completes = Object.keys(dbs.commands)
                 .filter(command => command.startsWith(value))
+                .filter(command => dbs.commands[command].category !== 'hidden')
                 .slice(0,25)
                 .map(command => ({ name: command, value: command }));
             interaction.respond(completes);
@@ -93,6 +94,10 @@ module.exports = {
         msg.arguments = command.useCLI
             ? imports.parseArgs(msg.args.split(' '), command.command.args)
             : await imports.getAllArgs(msg, command.command.args);
-        command.command.execute(msg);
+        try {
+            command.command.execute(msg);
+        } catch (err) {
+            msg.reply('Owwieeee my head huurts :,((');
+        }
     }
 } 
