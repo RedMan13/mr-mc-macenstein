@@ -324,7 +324,7 @@ function makeJSON(token, pure) {
             "type": ${{ 'string-select': 3, 'user-select': 5, 'role-select': 6, 'mentionable-select': 7, 'channel-select': 8 }[token.tagname]},
             "options": ${token.tagname === 'string-select' ? options : null},
             "default_values": ${token.tagname !== 'string-select' ? options : null},
-            "channel_types": ${pure ? expectString(token.attributes, ['types'], pure).split(',') : expectString(token.attributes, ['types'], pure)},
+            "channel_types": ${pure ? expectString(token.attributes, ['types'], pure)?.split?.(',') ?? null : expectString(token.attributes, ['types'], pure)},
             "custom_id": ${expectString(token.attributes, ['id', 'custom-id'], pure)},
             "placeholder": ${expectString(token.attributes, ['placeholder'], pure)},
             "min_values": ${expectNumber(token.attributes, ['min', 'min-values'], pure)},

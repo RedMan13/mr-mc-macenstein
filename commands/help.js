@@ -62,21 +62,25 @@ module.exports = {
             return message.reply({ embeds: [embed] });
         }
 
-        embed.title = 'command list';
-        embed.description = commands
-            .filter(command => dbs.commands[command].category === category && dbs.commands[command].enabled)
-            .map(command => `\`${command}\` ${dbs.commands[command].description}`)
-            .join('\n');
         const content = {
-            embeds: [embed], 
+            flags: 'IsComponentsV2',
             components: [
-                <row>
-                    <string-select id={`help.categorySelector`}>
-                        {dbs.commandConfig.categorys.map(name => (<option id={name} default={name === category}>{name}</option>))}
-                    </string-select>
-                </row>
+                <container>
+                    <text>### mc;help &lt;command&gt; for more info</text>
+                    <row>
+                        <string-select id="help.categorySelector">
+                            {dbs.commandConfig.categorys.map(name => (<option id={name} default={name === category}>{name}</option>))}
+                        </string-select>
+                    </row>
+                    <text>
+                        {commands
+                            .filter(command => dbs.commands[command].category === category && dbs.commands[command].enabled)
+                            .map(command => `\`${command}\` ${dbs.commands[command].description}`)
+                            .join('\n')}
+                    </text>
+                </container>
             ]
-        }
+        };
         if (!isSelection || !message.update) return message.reply(content);
         message.update(content);
     },
